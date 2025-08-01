@@ -1,5 +1,5 @@
 .symbolsAndequationsContainer {
-  max-width: 320px;
+  max-width: 350px;
   width: 100%;
   height: 100%;
   display: none;
@@ -92,7 +92,8 @@
   padding: 10px 0;
   height: calc(100% - 120px);
   position: relative;
-  overflow-y: scroll;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .tab-content.active {
@@ -103,7 +104,7 @@
 .symbol-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
 }
 
@@ -119,7 +120,7 @@
   border: 1px solid #ddd;
   padding: 4px 10px;
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
 }
