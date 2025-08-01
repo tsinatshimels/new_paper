@@ -51,12 +51,19 @@
 #open_matching_modal {
   padding: 4px 10px;
   border-radius: 20px;
-  border: 1px solid #eaecf0;
 
   display: flex;
   align-items: center;
   gap: 7px;
-  background: white;
+
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  background-color: var(--dropdown-bg);
+}
+#SheetToDocsDropdown {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  background-color: var(--dropdown-bg);
 }
 
 .tools_navbar--header > form input {
@@ -80,7 +87,7 @@
 }
 
 .tools_navbar--header button:hover {
-  /* background: #dceaf7; */
+  background: #dceaf7;
   /* background: #0a2238; */
 }
 

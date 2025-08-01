@@ -276,3 +276,66 @@ $(document).on("keydown", "input.cell[data-col][data-row]", (event) => {
     event.preventDefault();
   }
 });
+
+// Handle cell focus
+$(document).on("focus", "input.cell[data-col][data-row]", function () {
+  const $input = $(this);
+  const col = $input.attr("data-col");
+  const row = $input.attr("data-row");
+
+  // Remove previous highlights
+  $(".ruler_cols > span").removeClass("active-col");
+  $(".ruler_rows > span").removeClass("active-row");
+
+  // Highlight current column header (letter)
+  $(`.ruler_cols > span[data-col="${col}"]`).addClass("active-col");
+
+  // Highlight current row header (number)
+  $(`.ruler_rows > span[data-row="${row}"]`).addClass("active-row");
+});
+
+// Optional: Clear highlights when losing focus
+// $(document).on('blur', 'input.cell', function() {
+//   $('.ruler_cols > span, .ruler_rows > span').removeClass('active-col active-row');
+// });
+// Get references to the input elements
+const cellAddressInput = document.querySelector('nav input[placeholder="A2"]');
+const cellContentInput = document.querySelector("nav label input");
+
+// Update the address input when a cell is focused
+$(document).on("focus", "input.cell[data-col][data-row]", function () {
+  const $input = $(this);
+  const col = Number($input.attr("data-col"));
+  const row = Number($input.attr("data-row"));
+
+  // Convert column number to letter (1 -> A, 2 -> B, etc.)
+  const colLetter = String.fromCharCode(64 + col);
+
+  // Update the address input
+  cellAddressInput.value = `${colLetter}${row}`;
+
+  // Update the content input with the cell's current value
+  cellContentInput.value = $input.val();
+});
+
+// Update cell content when typing in the formula bar
+cellContentInput.addEventListener("input", function () {
+  const activeCell = document.querySelector("input.cell:focus");
+  if (activeCell) {
+    activeCell.value = this.value;
+  }
+});
+
+// Update formula bar when typing directly in a cell
+$(document).on("input", "input.cell", function () {
+  const activeCell = document.querySelector("input.cell:focus");
+  if (activeCell === this) {
+    cellContentInput.value = this.value;
+  }
+});
+
+// Handle the Fx button if needed
+document.querySelector("nav button").addEventListener("click", function () {
+  // Add any formula-specific functionality here
+  console.log("Formula button clicked");
+});

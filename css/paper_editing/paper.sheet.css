@@ -150,3 +150,26 @@
     display: none;
   }
 }
+
+/* Style for focused cell */
+input.cell:focus {
+  outline: none;
+  border: 3px solid #8b5cf6 !important;
+  z-index: 1;
+  position: relative;
+}
+
+/* Style for active column header (top ruler - letters) */
+.ruler_cols > span.active-col {
+  background-color: rgba(136, 55, 233, 0.15) !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+
+/* Style for active row header (left ruler - numbers) */
+.ruler_rows > span.active-row {
+  background-color: rgba(136, 55, 233, 0.15) !important;
+
+  color: #000 !important;
+  font-weight: bold;
+}
