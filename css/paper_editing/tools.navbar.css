@@ -22,7 +22,6 @@
 .tools_navbar--header > div {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
 
 .tools_navbar--header > form,
