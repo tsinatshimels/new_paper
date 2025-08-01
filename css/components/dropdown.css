@@ -1,0 +1,119 @@
+:root {
+  --primary-bg-color: #262429;
+  --primary-color: #8837e9;
+  --dropdown-bg: #ffffff;
+
+  --body-color: #ffffff;
+  --overlay-z-index: 10000000;
+}
+
+.dropdown {
+  position: relative;
+  width: max-content;
+}
+
+.dropdown-select {
+  background-color: var(--dropdown-bg);
+  padding: 6px;
+  border-radius: 0.45rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  color: var(--text-color);
+}
+
+.dropdown-select:hover {
+  border-color: var(--primary-color);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--dropdown-bg);
+  border-radius: 5px;
+  margin-top: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: var(--overlay-z-index);
+  overflow: hidden;
+  padding: .35rem;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 1rem .75rem;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  text-align: left;
+  color: var(--text-color);
+  display: block;
+  width: 100% !important;
+  border-radius: .15rem;
+
+}
+
+.dropdown-item:hover {
+  background-color: var(--dropdown-hover);
+}
+
+.dropdown-item.active {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.dropdown-item.active svg path{
+  fill: #ffffff;
+}
+
+.dropdown-arrow {
+  border: solid var(--text);
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+.dropdown-select.open .dropdown-arrow {
+  transform: rotate(-135deg);
+}
+
+.theme-options {
+  padding: 0.5rem;
+  right: 0;
+  left: auto;
+}
+
+.content {
+  margin-top: 2rem;
+  max-width: 600px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  line-height: 1.6;
+}
+
+.theme-options .dropdown-item {
+  border-radius: 1.54rem;
+}
+
+.theme-label {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  font-size: 1.25rem;
+}

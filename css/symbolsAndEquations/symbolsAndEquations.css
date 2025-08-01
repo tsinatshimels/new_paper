@@ -1,0 +1,140 @@
+.symbolsAndequationsContainer {
+  max-width: 320px;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+/* Header */
+.symbolsAndequationsContainer header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.symbolsAndequationsContainer header h1 {
+  font-size: 16px !important;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  color: #888;
+}
+
+.symbolsAndequationsContainer .close-button:hover {
+  color: #333;
+}
+
+/* Subcategory Tabs */
+.subcategory-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.subcat-button {
+  padding: 4px 6px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  border-radius: 0.3rem;
+  border: none;
+}
+
+.subcat-button.active {
+  background: #fff1ff; /* Purple accent color */
+  color: #673ab7;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.tab-button.active {
+  color: #673ab7; /* Purple accent color */
+}
+
+.tab-button.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #673ab7;
+}
+
+/* Content */
+.tab-content {
+  display: none;
+  padding: 10px 0;
+  height: calc(100% - 120px);
+  position: relative;
+  overflow-y: scroll;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Symbols Grid */
+.symbol-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+/* Symbols Grid */
+.expression-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.symbol {
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  padding: 4px 10px;
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.expression {
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  padding: 4px 10px;
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.symbol:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.05);
+}
