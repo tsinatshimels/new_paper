@@ -42,12 +42,13 @@
 }
 
 .tools_navbar--header button {
-  font-size: 0.85rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
   border-radius: 20px;
   padding: 3px 10px;
 
   position: relative;
+  white-space: nowrap;
 }
 
 .tools_navbar--header button span {
