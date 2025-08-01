@@ -34,6 +34,7 @@
   align-items: center;
   gap: 7px;
   background: white;
+  width: 150px;
 }
 
 .tools_navbar--header > form input {
