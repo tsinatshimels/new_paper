@@ -1,0 +1,159 @@
+/* Share Modal */
+.share_modal,
+.share_modal > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.share_modal {
+  gap: 15px;
+  width: 520px;
+}
+
+.share_modal > div {
+  padding: 15px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.share_modal > div:last-child {
+  gap: 8px;
+}
+
+.share_modal > div:last-child input {
+  border-radius: 8px;
+  background: #f4f4f4;
+  padding: 0.6rem;
+  outline: none;
+}
+
+.share_modal > div:last-child input::placeholder,
+.share_modal > div:last-child input {
+  color: #9e9e9e;
+  font-size: 13px;
+}
+
+.share_modal #invite_button {
+  background: linear-gradient(to right, #37b6f2, #31c6fe);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0.6rem;
+  transition: all 0.4s ease-in-out;
+}
+
+#invite_button {
+  background: #1c64f2;
+}
+
+.share_modal button:disabled {
+  background: #909397cf !important;
+  cursor: not-allowed;
+}
+
+.share_modal > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share_modal .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.share_modal .top h2 {
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.share_modal .top button {
+  width: 40px;
+  height: 40px;
+  background: #f4f4f4;
+  border-radius: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.share_modal .bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share_modal .bottom h3 {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.share_modal .bottom .copy_link {
+  background: #f4f4f4;
+  border-radius: 7px;
+  padding: 0.8rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.share_modal .bottom .copy_link p {
+  color: #3638537f;
+}
+
+.share_modal .middle {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 20px;
+  padding: 1rem 0;
+}
+
+.share_modal .middle button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #363853;
+  font-size: 14px;
+  font-weight: 500;
+}
+.paper--hidden {
+  display: none !important;
+}
+
+.modal_mobile_cancel,
+.filter_board,
+.filter_board_overlay {
+  display: none;
+}
+
+.invite_sent--message {
+  background: #def7ec !important;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  color: #046c4e;
+}
+
+.invite_sent--message > div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.invite_sent--message h3 {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+#invite_component--form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

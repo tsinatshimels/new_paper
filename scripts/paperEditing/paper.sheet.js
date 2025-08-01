@@ -75,10 +75,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Function to update dropdown-select text
+  // function updateDropdownText(mode) {
+  //   if (mode === "true") {
+  //     dropdownSelectButton.innerHTML = `
+  //     <div style="display: flex; align-items: center; gap: 4px;">
+  //       <img src="./icons/word-icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
+  //       <span>Word</span>
+  //     </div>
+  //   `;
+
+  //   } else if (mode === "false") {
+  //     dropdownSelectButton.innerHTML = `
+  //       <div style="display: flex; align-items: center; gap: 4px;">
+  //         <img src="./icons/sheet_icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
+  //         <span>Sheet</span>
+  //       </div>
+  //   `;
+  //   }
+  // }
+
   function updateDropdownText(mode) {
-    dropdownSelectButton.textContent = mode === "true" ? "Word" : "Sheet";
+    const wordDropdown = document.getElementById("exportWord--dropdown");
+    const sheetDropdown = document.getElementById("exportSheet--dropdown");
+    const exportButton = document.getElementById("exportButton");
+    const dropdownSelect = document.querySelector(".dropdown-select");
+
+    if (mode === "true") {
+      // Show Word dropdown content
+      dropdownSelectButton.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <img src="./icons/word-icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
+                <span>Word</span>
+            </div>
+        `;
+
+      // Hide sheet dropdown and show word dropdown
+      sheetDropdown.classList.add("paper--hidden");
+      wordDropdown.classList.remove("paper--hidden");
+
+      // Update dropdown instance
+      const dropdown = document.getElementById("exportWordSheet");
+      if (dropdown.dropdownInstance) {
+        dropdown.dropdownInstance.menu = wordDropdown;
+      }
+    } else if (mode === "false") {
+      // Show Sheet dropdown content
+      dropdownSelectButton.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <img src="./icons/sheet_icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
+                <span>Sheet</span>
+            </div>
+        `;
+
+      // Hide word dropdown and show sheet dropdown
+      wordDropdown.classList.add("paper--hidden");
+      sheetDropdown.classList.remove("paper--hidden");
+
+      // Update dropdown instance
+      const dropdown = document.getElementById("exportWordSheet");
+      if (dropdown.dropdownInstance) {
+        dropdown.dropdownInstance.menu = sheetDropdown;
+      }
+    }
   }
+
+  // Initialize with default state (Sheet)
+  // updateDropdownText("false");
 
   // Initialize with Sheet mode
   setMode(currentMode);
@@ -99,11 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Optional: Add click event to dropdown-select to toggle dropdown menu (if not already handled by CSS)
   const dropdown = document.getElementById("SheetToDocsDropdown");
   const dropdownMenu = dropdown.querySelector(".dropdown-menu");
-  dropdownSelectButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    dropdownMenu.style.display =
-      dropdownMenu.style.display === "block" ? "none" : "block";
-  });
+  // dropdownSelectButton.addEventListener("click", (e) => {
+  //   e.preventDefault();
+  //   dropdownMenu.style.display =
+  //     dropdownMenu.style.display === "block" ? "none" : "block";
+  // });
 });
 
 function generateCellInput() {

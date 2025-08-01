@@ -2,10 +2,12 @@ class Dropdown {
   constructor(element) {
     this.dropdown = element;
     this.select = element.querySelector(".dropdown-select");
-    this.menu = element.querySelector(".dropdown-menu");
+    this.menu =
+      element.querySelector(".dropdown-menu:not(.paper--hidden)") ||
+      element.querySelector(".dropdown-menu");
     this.selected = element.querySelector(".selected");
     this.items = element.querySelectorAll(".dropdown-item");
-
+    element.dropdownInstance = this;
     this.select.addEventListener("click", () => this.toggle());
     this.items.forEach((item) => {
       item.addEventListener("click", () => this.selectOption(item));
@@ -35,8 +37,12 @@ class Dropdown {
     this.items.forEach((item) => item.classList.remove("active"));
     itemElement.classList.add("active");
 
+    // close the dropdown menu when one of the items is clicked
+    this.menu.classList.remove("show");
+    this.select.classList.remove("open");
+
     // Determine if the item contains only text
-    const isTextOnly = false
+    const isTextOnly = false;
     // [...itemElement.childNodes].every(
     //   (node) => node.nodeType === Node.TEXT_NODE
     // );
@@ -59,8 +65,8 @@ class Dropdown {
       this.selected.appendChild(selectedContent);
     }
 
-    this.menu.classList.remove("show");
-    this.select.classList.remove("open");
+    // this.menu.classList.remove("show");
+    // this.select.classList.remove("open");
   }
 }
 
