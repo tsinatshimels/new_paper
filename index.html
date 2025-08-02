@@ -2071,12 +2071,228 @@
                 <div class="tools">
                   <div class="sheet_label">Spreadsheet</div>
                   <div class="column">
-                    <button id="sizemug_bold--btn" data-tippy-content="Bold">
-                      <!-- prettier-ignore -->
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.6667 10.6663H1.33333L5.99999 5.99967L1.33333 1.33301H10.6667" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <div class="dropdown">
+                      <div class="dropdown-select">
+                        <button
+                          id="matematicalEquation"
+                          data-tippy-content="Bold"
+                        >
+                          <!-- prettier-ignore -->
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.6667 10.6663H1.33333L5.99999 5.99967L1.33333 1.33301H10.6667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
-                    </button>
+                        </button>
+                      </div>
+                      <div
+                        class="dropdown-menu dropdown-menu-math"
+                        style="width: 300px"
+                      >
+                        <h3 class="dropdown-title">Functions</h3>
+                        <div class="dropdown-list">
+                          <div class="dropdown-category">
+                            <button class="category-btn">
+                              Mathematical Functions
+                              <span
+                                ><svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <rect width="24" height="24" fill="none" />
+                                  <g fill="none" fill-rule="evenodd">
+                                    <path
+                                      d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                                    />
+                                    <path
+                                      fill="#000"
+                                      d="M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z"
+                                    />
+                                  </g>
+                                </svg>
+                              </span>
+                            </button>
+                            <div class="submenu">
+                              <button>SUM (range)</button>
+                              <button>AVERAGE (range)</button>
+                              <button>ROUND (number, num_digits)</button>
+                              <button>ABS (number)</button>
+                              <button>INT (number)</button>
+                              <button>MOD (number, divisor)</button>
+                              <button>POWER (number, power)</button>
+                            </div>
+                          </div>
+
+                          <div class="dropdown-category">
+                            <button class="category-btn">
+                              Statistical Functions
+                              <span>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <rect width="24" height="24" fill="none" />
+                                  <g fill="none" fill-rule="evenodd">
+                                    <path
+                                      d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                                    />
+                                    <path
+                                      fill="#000"
+                                      d="M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z"
+                                    />
+                                  </g>
+                                </svg>
+                              </span>
+                            </button>
+                            <div class="submenu">
+                              <button>MIN (range)</button>
+                              <button>MAX (range)</button>
+                              <button>MEDIAN (range)</button>
+                              <button>COUNT (range)</button>
+                              <button>COUNTA (range)</button>
+                              <button>STDEV.P (range)</button>
+                              <button>STDEV.S (range)</button>
+                            </div>
+                          </div>
+
+                          <div class="dropdown-category">
+                            <button class="category-btn">
+                              Logical Functions
+                              <span
+                                ><svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <rect width="24" height="24" fill="none" />
+                                  <g fill="none" fill-rule="evenodd">
+                                    <path
+                                      d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                                    />
+                                    <path
+                                      fill="#000"
+                                      d="M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z"
+                                    />
+                                  </g>
+                                </svg>
+                              </span>
+                            </button>
+                            <div class="submenu">
+                              <button>
+                                IF (logical_test, value_if_true, value_if_false)
+                              </button>
+                              <button>AND (condition1, condition2, ...)</button>
+                              <button>OR (condition1, condition2, ...)</button>
+                              <button>NOT (logical)</button>
+                            </div>
+                          </div>
+
+                          <div class="dropdown-category">
+                            <button class="category-btn">
+                              Date/Time Functions
+                              <span>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <rect width="24" height="24" fill="none" />
+                                  <g fill="none" fill-rule="evenodd">
+                                    <path
+                                      d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                                    />
+                                    <path
+                                      fill="#000"
+                                      d="M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z"
+                                    />
+                                  </g>
+                                </svg>
+                              </span>
+                            </button>
+                            <div class="submenu">
+                              <button>TODAY()</button>
+                              <button>NOW()</button>
+                              <button>DATE(year, month, day)</button>
+                              <button>
+                                DATEDIF (start_date, end_date, unit)
+                              </button>
+                              <button>TEXT (date, format)</button>
+                            </div>
+                          </div>
+
+                          <div class="dropdown-category">
+                            <button class="category-btn">
+                              Text Functions
+                              <span
+                                ><svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <rect width="24" height="24" fill="none" />
+                                  <g fill="none" fill-rule="evenodd">
+                                    <path
+                                      d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                                    />
+                                    <path
+                                      fill="#000"
+                                      d="M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z"
+                                    />
+                                  </g>
+                                </svg>
+                              </span>
+                            </button>
+                            <div class="submenu">
+                              <button>CONCAT (text1, text2, ...)</button>
+                              <button>LEFT (text, num_chars)</button>
+                              <button>RIGHT (text, num_chars)</button>
+                              <button>LEN (text)</button>
+                              <button>UPPER (text)</button>
+                              <button>LOWER (text)</button>
+                              <button>TRIM (text)</button>
+                            </div>
+                          </div>
+
+                          <div class="dropdown-category">
+                            <button class="category-btn">
+                              Lookup & Reference Functions
+                              <!-- prettier ignore -->
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                              >
+                                <rect width="24" height="24" fill="none" />
+                                <g fill="none" fill-rule="evenodd">
+                                  <path
+                                    d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                                  />
+                                  <path
+                                    fill="#000"
+                                    d="M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z"
+                                  />
+                                </g>
+                              </svg>
+                            </button>
+                            <div class="submenu">
+                              <button>CONCAT (text1, text2, ...)</button>
+                              <button>LEFT (text, num_chars)</button>
+                              <button>RIGHT (text, num_chars)</button>
+                              <button>LEN (text)</button>
+                              <button>UPPER (text)</button>
+                              <button>LOWER (text)</button>
+                              <button>TRIM (text)</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <button
                       id="sizemug_letter_spacing--btn"
                       data-tippy-content="Letter Spacing"

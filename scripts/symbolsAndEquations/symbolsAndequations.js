@@ -19,7 +19,7 @@ class ToggleComponent {
 const toggle = new ToggleComponent("equationButton", "equations_and_symbols");
 
 // Arrays of symbols for each subcategory
-const basicMathsSymbols = [
+const basicMathsSymbols = [       
   "±",
   "∞",
   "≠",

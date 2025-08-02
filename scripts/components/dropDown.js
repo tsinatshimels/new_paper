@@ -21,6 +21,12 @@ class Dropdown {
     document.querySelectorAll(".dropdown-menu.show").forEach((menu) => {
       menu.classList.remove("show");
     });
+
+    // Remove purple background from all trigger buttons
+    document.querySelectorAll(".dropdown-select button").forEach((btn) => {
+      btn.classList.remove("active-category");
+    });
+
     document.querySelectorAll(".dropdown-select.open").forEach((select) => {
       select.classList.remove("open");
     });
@@ -29,6 +35,12 @@ class Dropdown {
     if (!isOpen) {
       this.menu.classList.add("show");
       this.select.classList.add("open");
+
+      // ✅ Highlight the matematikalEquation button
+      const mathBtn = this.select.querySelector("#matematicalEquation");
+      if (mathBtn) {
+        mathBtn.classList.add("active-category");
+      }
     }
   }
 

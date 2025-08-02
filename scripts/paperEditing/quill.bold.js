@@ -14,3 +14,18 @@ function handleOnBold(editor) {
     console.log("No text selected for bold.");
   }
 }
+
+// making a modal for mathematical Equations
+
+document.querySelectorAll(".category-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    // remove active-category class from all buttons
+    document.querySelectorAll(".category-btn").forEach((button) => {
+      button.classList.remove("active-category");
+    });
+    // add active-category class to the clicked button
+    btn.classList.add("active-category");
+    // const parent = btn.closest(".dropdown-category");
+    // btn.classList.toggle(".active-category");
+  });
+});
