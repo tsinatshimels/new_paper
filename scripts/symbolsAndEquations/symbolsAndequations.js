@@ -19,7 +19,7 @@ class ToggleComponent {
 const toggle = new ToggleComponent("equationButton", "equations_and_symbols");
 
 // Arrays of symbols for each subcategory
-const basicMathsSymbols = [       
+const basicMathsSymbols = [
   "±",
   "∞",
   "≠",
@@ -161,9 +161,44 @@ const geometrySymbols = [
 // Arrays for Expressions subcategories
 const expressions = {
   "sub-super-scripts": [
-    "x<sup>2</sup>",
-    "y<sub>3</sub>",
-    "z<sup>a</sup><sub>b</sub>",
+    // Sub-left + Sup-right
+    `<div class="math-layout diagonal">
+     <div class="box bottom-left"></div>
+     <div class="box top-right"></div>
+   </div>`,
+
+    // Sup-left + Sub-right
+    `<div class="math-layout diagonal">
+     <div class="box top-left"></div>
+     <div class="box bottom-right"></div>
+   </div>`,
+
+    // Sub + Sup stacked vertically
+    `<div class="math-layout dual">
+     <div class="box top-middle-left"></div>
+<div class="vertical-right">
+     <div class="box sup"></div>
+     <div class="box sub"></div>
+     </div>
+   </div>`,
+
+    // Sub + Sup stacked vertically
+    `<div class="math-layout dual">
+     <div class="box top-middle-right"></div>
+<div class="vertical-left">
+     <div class="box sup"></div>
+     <div class="box sub"></div>
+     </div>
+   </div>`,
+
+    // Actual example: e^(-x)
+    `<div class="math-layout"><span>e<sup>−x</sup></span></div>`,
+
+    // Actual example: x²
+    `<div class="math-layout"><span>x<sup>2</sup></span></div>`,
+
+    // Actual example: indexed notation
+    `<div class="math-layout"><span>n<sub>1</sub>Y</span></div>`,
   ],
   fraction: [
     "<sup>x</sup>/<sub>y</sub>",
