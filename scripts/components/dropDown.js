@@ -59,7 +59,7 @@ class Dropdown {
     //   (node) => node.nodeType === Node.TEXT_NODE
     // );
 
-    this.selected.innerHTML = ""; // Clear previous content
+    // this.selected.innerHTML = ""; // Clear previous content
 
     if (isTextOnly) {
       // Use textContent for performance if it's just text
@@ -74,7 +74,7 @@ class Dropdown {
           clonedItem.removeEventListener("click", () => {});
           clonedItem.onclick = null;
         });
-      this.selected.appendChild(selectedContent);
+      // this.selected.appendChild(selectedContent);
     }
 
     // this.menu.classList.remove("show");

@@ -1,4 +1,35 @@
 // Initialize Quill with multiple editors
+
+// const BlockEmbed = Quill.import("blots/block/embed");
+
+// class MathQuillBlot extends BlockEmbed {
+//   static create(value) {
+//     const node = super.create();
+//     node.classList.add("mathquill-container");
+
+//     const span = document.createElement("span");
+//     span.classList.add("mathquill-field");
+
+//     const MQ = MathQuill.getInterface(2);
+//     const mathField = MQ.StaticMath(span);
+//     mathField.latex(value || "");
+
+//     node.appendChild(span);
+//     return node;
+//   }
+
+//   static value(node) {
+//     const latex = node.querySelector(".mathquill-field").textContent;
+//     return latex || "";
+//   }
+// }
+
+// MathQuillBlot.blotName = "mathquill";
+// MathQuillBlot.tagName = "div";
+// MathQuillBlot.className = "mathquill-wrapper";
+
+// Quill.register(MathQuillBlot);
+
 const paperEditors = [];
 let currentEditorIndex = 0;
 const paperEditor = document.getElementById("editor_paper--wrapper");
@@ -26,9 +57,39 @@ function createNewEditor() {
         container: "#toolbar",
       },
     },
-    formats: ["font", "size", "bold", "italic", "underline", "strike", "letterSpacing", "header", "outline", "lineHeight", "color", "highlight", "script", "align", "list", "paragraphSpacing", "indent", "chart", "divider", "link", "shape", "blockquote", "table", "arrow", "custom-image", "citation", "image"],
+    formats: [
+      "font",
+      "size",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "letterSpacing",
+      "header",
+      "outline",
+      "lineHeight",
+      "color",
+      "highlight",
+      "script",
+      "align",
+      "list",
+      "paragraphSpacing",
+      "indent",
+      "chart",
+      "divider",
+      "link",
+      "shape",
+      "blockquote",
+      "table",
+      "arrow",
+      "custom-image",
+      "citation",
+      "image",
+    ],
     placeholder: "Compose something amazing...",
   });
+  // Save globally if needed
+  window.focusedEditor = editor;
 
   // Set a fixed height and width for the editor container
   container.style.maxHeight = "900px";
@@ -63,39 +124,70 @@ function setupEditorListener(editor) {
   });
 }
 
+// function handleOverflow(editor) {
+//   const editorElement = editor?.container?.querySelector(".ql-editor");
+//   const currentIndex = paperEditors.indexOf(editor);
+//   let nextEditor;
+
+//   nextEditor = createNewEditor();
+
+//   // Get the content that overflows
+//   const length = editor?.getLength();
+//   const text = editor?.getText();
+
+//   // Find the last paragraph break that fits
+//   let lastFittingIndex = findLastFittingParagraph(editor);
+
+//   if (lastFittingIndex < length - 1) {
+//     // Get the overflow content
+//     const overflowText = editor.getText(lastFittingIndex);
+//     const overflowContent = editor.getContents(lastFittingIndex);
+
+//     // Remove overflow content from current editor
+//     editor.deleteText(lastFittingIndex, length);
+
+//     // Insert overflow content at the beginning of next editor
+//     nextEditor.setContents(overflowContent);
+
+//     // Immediately scroll and focus the next editor
+//     const nextEditorElement = nextEditor.container.parentElement;
+//     nextEditorElement.scrollIntoView({
+//       behavior: "smooth",
+//       block: "start",
+//     });
+
+//     // Focus and place cursor at beginning of the next editor immediately
+//     nextEditor.focus();
+//     nextEditor.setSelection(0, 0);
+//   }
+// }
+// ... existing code ...
+
 function handleOverflow(editor) {
   const editorElement = editor?.container?.querySelector(".ql-editor");
   const currentIndex = paperEditors.indexOf(editor);
   let nextEditor;
 
-  nextEditor = createNewEditor();
-
   // Get the content that overflows
   const length = editor?.getLength();
-  const text = editor?.getText();
 
   // Find the last paragraph break that fits
   let lastFittingIndex = findLastFittingParagraph(editor);
 
+  // Only proceed if there's actually overflow content
   if (lastFittingIndex < length - 1) {
-    // Get the overflow content
-    const overflowText = editor.getText(lastFittingIndex);
-    const overflowContent = editor.getContents(lastFittingIndex);
+    const overflowLength = length - lastFittingIndex;
+    const overflowContent = editor.getContents(
+      lastFittingIndex,
+      overflowLength
+    );
 
-    // Remove overflow content from current editor
-    editor.deleteText(lastFittingIndex, length);
-
-    // Insert overflow content at the beginning of next editor
+    editor.deleteText(lastFittingIndex, overflowLength);
     nextEditor.setContents(overflowContent);
 
-    // Immediately scroll and focus the next editor
     const nextEditorElement = nextEditor.container.parentElement;
-    nextEditorElement.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    nextEditorElement.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    // Focus and place cursor at beginning of the next editor immediately
     nextEditor.focus();
     nextEditor.setSelection(0, 0);
   }
@@ -188,25 +280,7 @@ document.head.appendChild(style);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Create the Pickr instance
@@ -215,7 +289,22 @@ function createPickrInstance(element, containerEl, appClass, theme = "nano") {
     el: element,
     theme: theme, // or 'classic', 'monolith', etc.
     container: containerEl,
-    swatches: ["rgba(244, 67, 54, 1)", "rgba(233, 30, 99, 0.95)", "rgba(156, 39, 176, 0.9)", "rgba(103, 58, 183, 0.85)", "rgba(63, 81, 181, 0.8)", "rgba(33, 150, 243, 0.75)", "rgba(3, 169, 244, 0.7)", "rgba(0, 188, 212, 0.7)", "rgba(0, 150, 136, 0.75)", "rgba(76, 175, 80, 0.8)", "rgba(139, 195, 74, 0.85)", "rgba(205, 220, 57, 0.9)", "rgba(255, 235, 59, 0.95)", "rgba(255, 193, 7, 1)"],
+    swatches: [
+      "rgba(244, 67, 54, 1)",
+      "rgba(233, 30, 99, 0.95)",
+      "rgba(156, 39, 176, 0.9)",
+      "rgba(103, 58, 183, 0.85)",
+      "rgba(63, 81, 181, 0.8)",
+      "rgba(33, 150, 243, 0.75)",
+      "rgba(3, 169, 244, 0.7)",
+      "rgba(0, 188, 212, 0.7)",
+      "rgba(0, 150, 136, 0.75)",
+      "rgba(76, 175, 80, 0.8)",
+      "rgba(139, 195, 74, 0.85)",
+      "rgba(205, 220, 57, 0.9)",
+      "rgba(255, 235, 59, 0.95)",
+      "rgba(255, 193, 7, 1)",
+    ],
     components: {
       // Main components
       preview: true,
@@ -273,7 +362,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (editor?.container) {
         // // Use focusin instead of focus (bubbles up)
         editor.container.addEventListener("focusin", (e) => {
-          if (e.relatedTarget && e.relatedTarget.closest("#mobile_header_nav")) return;
+          if (e.relatedTarget && e.relatedTarget.closest("#mobile_header_nav"))
+            return;
 
           if (window.innerWidth < 667) {
             animateHeight(mobileHeaderNav, 0, mobileHeaderNav.scrollHeight);
@@ -283,7 +373,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Handle blur with a delay to allow for clicks
         editor.container.addEventListener("focusout", (e) => {
           if (window.innerWidth < 667) {
-            if (e.relatedTarget && e.relatedTarget.closest("#mobile_header_nav")) return;
+            if (
+              e.relatedTarget &&
+              e.relatedTarget.closest("#mobile_header_nav")
+            )
+              return;
 
             // Safely check relatedTarget
             setTimeout(() => {
