@@ -399,14 +399,36 @@ $(() => {
     };
   }
 
+  // --- In your selection logic section ---
+
   function highlightSelection() {
+    // Clear previous cell selections
     $(".cell").removeClass("selected");
+
+    // NEW: Clear all previous ruler highlights (both for selection and single focus)
+    $(".ruler_cols > span, .ruler_rows > span").removeClass(
+      "ruler-selected active-col active-row"
+    );
+
     const range = getSelectedRange();
+
+    // If a valid selection range exists...
     if (range) {
+      // 1. Highlight all the cells in the range (Existing Logic)
       for (let c = range.minCol; c <= range.maxCol; c++) {
         for (let r = range.minRow; r <= range.maxRow; r++) {
           $(`input.cell[data-col=${c}][data-row=${r}]`).addClass("selected");
         }
+      }
+
+      // 2. NEW: Highlight all the corresponding column rulers
+      for (let c = range.minCol; c <= range.maxCol; c++) {
+        $(`.ruler_cols > span[data-col=${c}]`).addClass("ruler-selected");
+      }
+
+      // 3. NEW: Highlight all the corresponding row rulers
+      for (let r = range.minRow; r <= range.maxRow; r++) {
+        $(`.ruler_rows > span[data-row=${r}]`).addClass("ruler-selected");
       }
     }
   }
