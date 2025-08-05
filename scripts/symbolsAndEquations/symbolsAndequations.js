@@ -15,26 +15,6 @@ class ToggleComponent {
   }
 }
 
-// const MQ = MathQuill.getInterface(2); // MathQuill API version 2
-
-// function createMathFieldElement(initialLatex = "") {
-//   const span = document.createElement("span");
-//   span.classList.add("mathquill-field");
-
-//   const mathField = MQ.MathField(span, {
-//     spaceBehavesLikeTab: true,
-//     handlers: {
-//       edit: function () {
-//         console.log("Math changed:", mathField.latex());
-//       },
-//     },
-//   });
-
-//   mathField.latex(initialLatex);
-//   return span;
-// }
-
-// Usage
 const toggle = new ToggleComponent("equationButton", "equations_and_symbols");
 
 // Arrays of symbols for each subcategory
@@ -295,8 +275,8 @@ const expressions = {
 };
 
 function insertIntoEditor(content, range) {
-  const editor = window.focusedEditor;
-  if (!editor) {
+  const quill = window.focusedEditor;
+  if (!quill) {
     console.warn("No editor is currently focused.");
     return;
   }
@@ -310,7 +290,7 @@ function insertIntoEditor(content, range) {
   if (range) {
     // If content has HTML tags, use dangerouslyPasteHTML
     if (/<[a-z][\s\S]*>/i.test(content)) {
-      editor.clipboard.dangerouslyPasteHTML(range.index, content + " ");
+      quill.clipboard.dangerouslyPasteHTML(range.index, content + " ");
 
       //   // Move cursor after inserted content
       //   setTimeout(() => {
@@ -318,20 +298,20 @@ function insertIntoEditor(content, range) {
       //   }, 0);
     } else {
       // Otherwise, treat it as plain text
-      editor.insertText(range.index, content);
+      quill.insertText(range.index, content);
       //   quill.setSelection(range.index + content.length);
     }
   } else {
     // Fallback: append at the end
     const length = quill.getLength();
     if (/<[a-z][\s\S]*>/i.test(content)) {
-      editor.clipboard.dangerouslyPasteHTML(length - 1, content);
+      quill.clipboard.dangerouslyPasteHTML(length - 1, content);
       setTimeout(() => {
-        editor.setSelection(length - 1 + content.length);
+        quill.setSelection(length - 1 + content.length);
       }, 0);
     } else {
-      editor.insertText(length - 1, content);
-      editor.setSelection(length);
+      quill.insertText(length - 1, content);
+      quill.setSelection(length);
     }
   }
 }
