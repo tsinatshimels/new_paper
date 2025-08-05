@@ -58,6 +58,8 @@ function createNewEditor() {
       },
     },
     formats: [
+      "sub-super-script", // <--- ADD THIS LINE
+      "math-expression",
       "font",
       "size",
       "bold",

@@ -10,7 +10,8 @@ class LetterSpacingBlot extends Inline {
   static create(value) {
     const node = super.create();
     if (value) {
-      node.style.letterSpacing = typeof value === "string" ? value : `${value}px`;
+      node.style.letterSpacing =
+        typeof value === "string" ? value : `${value}px`;
     }
     return node;
   }
@@ -22,7 +23,8 @@ class LetterSpacingBlot extends Inline {
   format(name, value) {
     if (name === "letterSpacing") {
       if (value) {
-        this.domNode.style.letterSpacing = typeof value === "string" ? value : `${value}px`;
+        this.domNode.style.letterSpacing =
+          typeof value === "string" ? value : `${value}px`;
       } else {
         this.domNode.style.removeProperty("letter-spacing");
       }
@@ -129,10 +131,14 @@ Quill.register(LineHeightBlot);
 // Paragraph Parchment
 const Parchment = Quill.import("parchment");
 
-let ParagraphSpacingAttributor = new Parchment.Attributor.Style("paragraphSpacing", "margin-bottom", {
-  scope: Parchment.Scope.BLOCK,
-  whitelist: ["0em", "0.5em", "1em", "1.5em", "2em", "6em"],
-});
+let ParagraphSpacingAttributor = new Parchment.Attributor.Style(
+  "paragraphSpacing",
+  "margin-bottom",
+  {
+    scope: Parchment.Scope.BLOCK,
+    whitelist: ["0em", "0.5em", "1em", "1.5em", "2em", "6em"],
+  }
+);
 
 Quill.register(ParagraphSpacingAttributor, true);
 
@@ -148,7 +154,11 @@ class ChartBlot extends BlockEmbed {
     node.appendChild(canvas);
 
     // Store chart config and data
-    const chartData = value || { type: "pie", data: { datasets: [] }, options: {} };
+    const chartData = value || {
+      type: "pie",
+      data: { datasets: [] },
+      options: {},
+    };
     const chart = new Chart(canvas, chartData); // Initialize the chart
 
     // Resize handling
@@ -220,7 +230,8 @@ Quill.register(DividerBlot);
 class ShapeBlot extends BlockEmbed {
   static #rotation = 0;
   static shapeContainerWrapper;
-  static editingContainer = focusedEditor?.container?.querySelector(".ql-editor");
+  static editingContainer =
+    focusedEditor?.container?.querySelector(".ql-editor");
   static bgColorButtonId;
 
   static create(value) {
@@ -257,7 +268,10 @@ class ShapeBlot extends BlockEmbed {
     ];
 
     resizeHandles.forEach((handle) => {
-      const resizeBtn = createElement("div", `resize_btn table_resize ${handle.class}`);
+      const resizeBtn = createElement(
+        "div",
+        `resize_btn table_resize ${handle.class}`
+      );
       shapeWrapper.appendChild(resizeBtn);
     });
 
@@ -273,7 +287,10 @@ class ShapeBlot extends BlockEmbed {
     actionBtnWrappper.style.bottom = "-30px";
     actionBtnWrappper.style.top = "initial";
 
-    const shapeBgTextColorPickrRandom = Math.random().toString().split(".").at(-1);
+    const shapeBgTextColorPickrRandom = Math.random()
+      .toString()
+      .split(".")
+      .at(-1);
 
     actionsHandler.forEach((handle) => {
       const actionBtn = createElement("button", `action_btn ${handle.class}`);
@@ -302,7 +319,11 @@ class ShapeBlot extends BlockEmbed {
     svg.style.overflow = "visible";
 
     // Create shape based on type
-    const shape = this.createSVGShape(value.type, parseInt(value.width || "100"), parseInt(value.height || "100"));
+    const shape = this.createSVGShape(
+      value.type,
+      parseInt(value.width || "100"),
+      parseInt(value.height || "100")
+    );
     svg.appendChild(shape);
 
     // Mouseenter & Mouseleave Editor
@@ -360,7 +381,10 @@ class ShapeBlot extends BlockEmbed {
 
     setTimeout(() => {
       // Create Picker Instance
-      this.setupShapeBackgroundColorWithPickr(shapeBgTextColorPickrRandom, editableElement);
+      this.setupShapeBackgroundColorWithPickr(
+        shapeBgTextColorPickrRandom,
+        editableElement
+      );
     }, 900);
 
     return node;
@@ -371,7 +395,11 @@ class ShapeBlot extends BlockEmbed {
     const clickButton = `shape_bg_color--btn-${this.bgColorButtonId}`;
     const customShapePickr = `shape_custom_pickr--${pickrContainerId}`;
 
-    const shapeBgColorPickrInstance = createPickrInstance(`#${clickButton}`, `#shape_bg_text_color_pickr--${pickrContainerId}`, customShapePickr); // this function is in init file
+    const shapeBgColorPickrInstance = createPickrInstance(
+      `#${clickButton}`,
+      `#shape_bg_text_color_pickr--${pickrContainerId}`,
+      customShapePickr
+    ); // this function is in init file
     const shapeBgColorBtn = document.getElementById(clickButton);
     const pcrApp = document.querySelector(`.${customShapePickr}`);
     pcrApp.id = "sizemug_shape_pikcr_bg_color";
@@ -436,7 +464,10 @@ class ShapeBlot extends BlockEmbed {
   }
 
   static createSVGShape(type, width, height) {
-    const shape = document.createElementNS("http://www.w3.org/2000/svg", type === "circle" ? "circle" : "path");
+    const shape = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      type === "circle" ? "circle" : "path"
+    );
 
     shape.setAttribute("fill", "white");
     // shape.setAttribute("stroke", "black");
@@ -462,7 +493,10 @@ class ShapeBlot extends BlockEmbed {
 
       case "rectangle": {
         // Remove newlines and ensure no units are included
-        shape.setAttribute("d", `M 0,0 L ${width},0 L ${width},${height} L 0,${height} Z`);
+        shape.setAttribute(
+          "d",
+          `M 0,0 L ${width},0 L ${width},${height} L 0,${height} Z`
+        );
         shape.setAttribute("data-shape-type", "rectangle");
 
         break;
@@ -527,15 +561,22 @@ class ShapeBlot extends BlockEmbed {
         onmove(event) {
           // Calculate new dimensions based on the resize handle's position
           const tableRect = tableOuterContainer.getBoundingClientRect();
-          let newWidth = tableRect.width + (edges.right ? event.dx : edges.left ? -event.dx : 0);
-          let newHeight = tableRect.height + (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
+          let newWidth =
+            tableRect.width +
+            (edges.right ? event.dx : edges.left ? -event.dx : 0);
+          let newHeight =
+            tableRect.height +
+            (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
 
           // Apply the new dimensions to the table container
           tableOuterContainer.style.width = `${newWidth}px`;
           tableOuterContainer.style.height = `${newHeight}px`;
 
           // Call SVG update function if necessary
-          updateSVGDimensions(tableOuterContainer, { width: newWidth, height: newHeight });
+          updateSVGDimensions(tableOuterContainer, {
+            width: newWidth,
+            height: newHeight,
+          });
         },
       });
     });
@@ -576,7 +617,10 @@ class ShapeBlot extends BlockEmbed {
               break;
             }
             case "rectangle":
-              shape.setAttribute("d", `M 0,0 L ${width},0 L ${width},${height} L 0,${height} Z`);
+              shape.setAttribute(
+                "d",
+                `M 0,0 L ${width},0 L ${width},${height} L 0,${height} Z`
+              );
               break;
           }
         }
@@ -612,8 +656,12 @@ class ShapeBlot extends BlockEmbed {
         // Called whenever moveBtn is dragged
         move(event) {
           // Get current position of shapeContainer
-          let x = (parseFloat(shapeContainerWrapper.getAttribute("data-x")) || 0) + event.dx;
-          let y = (parseFloat(shapeContainerWrapper.getAttribute("data-y")) || 0) + event.dy;
+          let x =
+            (parseFloat(shapeContainerWrapper.getAttribute("data-x")) || 0) +
+            event.dx;
+          let y =
+            (parseFloat(shapeContainerWrapper.getAttribute("data-y")) || 0) +
+            event.dy;
 
           // Update shapeContainerWrapper's position
           shapeContainerWrapper.style.transform = `translate(${x}px, ${y}px)`;
@@ -669,12 +717,16 @@ Quill.register(ShapeBlot);
 //////////////////////////////////////////
 // TABLE BLOT
 class TableBlot extends BlockEmbed {
-  static editingContainer = focusedEditor?.container?.querySelector(".ql-editor");
+  static editingContainer =
+    focusedEditor?.container?.querySelector(".ql-editor");
 
   static create(value) {
     // Create main wrapper
     const tableOuterContainer = super.create();
-    tableOuterContainer.classList.add("insert_outer_wrapper", "table_whole_container");
+    tableOuterContainer.classList.add(
+      "insert_outer_wrapper",
+      "table_whole_container"
+    );
     tableOuterContainer.setAttribute("data-table-status", "deactivate");
 
     const tableInnerContainer = createElement("div", "insert_inner_wrapper");
@@ -722,7 +774,9 @@ class TableBlot extends BlockEmbed {
 
     // Shape outside clicked
     document.addEventListener("click", (e) => {
-      const allTableContainerWrapper = document.querySelectorAll(".table_whole_container");
+      const allTableContainerWrapper = document.querySelectorAll(
+        ".table_whole_container"
+      );
 
       if (!e.target.closest(".table_whole_container")) {
         allTableContainerWrapper.forEach((container) => {
@@ -749,14 +803,18 @@ class TableBlot extends BlockEmbed {
     TableBlot.setupToggleEditState(tableOuterContainer);
     TableBlot.setupResizingButtons(tableOuterContainer);
     TableBlot.setupActivateTable(tableOuterContainer);
-    TableBlot.setupQuickEvent(tableOuterContainer.querySelector(".quick_btn--wrapper"));
+    TableBlot.setupQuickEvent(
+      tableOuterContainer.querySelector(".quick_btn--wrapper")
+    );
     return tableOuterContainer;
   }
 
   static value(domNode) {
     // Extract value to store in Delta
     const rows = domNode.querySelectorAll("tr").length;
-    const cols = domNode.querySelector("tr") ? domNode.querySelector("tr").cells.length : 0;
+    const cols = domNode.querySelector("tr")
+      ? domNode.querySelector("tr").cells.length
+      : 0;
     return { rows, cols };
   }
 
@@ -771,7 +829,12 @@ class TableBlot extends BlockEmbed {
     ];
 
     actionsHandler.forEach((handle) => {
-      const actionBtn = createElement("button", `action_btn ${handle.class} ${handle.class !== "options_action" && HIDDEN}`);
+      const actionBtn = createElement(
+        "button",
+        `action_btn ${handle.class} ${
+          handle.class !== "options_action" && HIDDEN
+        }`
+      );
       actionBtn.innerHTML = handle.icon;
       actionBtnsWrappper.appendChild(actionBtn);
     });
@@ -793,7 +856,10 @@ class TableBlot extends BlockEmbed {
     ];
 
     resizeHandles.forEach((handle) => {
-      const resizeBtn = createElement("div", `resize_btn table_resize ${handle.class} ${HIDDEN}`);
+      const resizeBtn = createElement(
+        "div",
+        `resize_btn table_resize ${handle.class} ${HIDDEN}`
+      );
       tableInnerContainer.appendChild(resizeBtn);
     });
 
@@ -802,20 +868,66 @@ class TableBlot extends BlockEmbed {
 
   // Bottom Table Tools (Quick Action Buttons)
   static createQuickActions() {
-    const quickBtnWrappper = createElement("div", `quick_btn--wrapper ${HIDDEN}`);
+    const quickBtnWrappper = createElement(
+      "div",
+      `quick_btn--wrapper ${HIDDEN}`
+    );
     const tableOptionsHandler = [
-      { class: "no_grid_action", icon: noGridIcon, dataset: "no-grid", tooltip: "No Grid" },
-      { class: "col_grid_center_action", icon: colGridCenterIcon, dataset: "col-grid-center", tooltip: "Column Grid Center" },
-      { class: "col_grid_left_action", icon: colGridLeftIcon, dataset: "col-grid-left", tooltip: "Column Grid Left" },
-      { class: "col_grid_right_action", icon: colGridRightIcon, dataset: "col-grid-right", tooltip: "Column Grid Right" },
-      { class: "row_grid_center_action", icon: rowGridCenterIcon, dataset: "row-grid-center", tooltip: "Row Grid Center" },
-      { class: "row_grid_top_action", icon: rowGridTopIcon, dataset: "row-grid-top", tooltip: "Row Grid Top" },
-      { class: "row_grid_bottom_action", icon: rowGridBottomIcon, dataset: "row-grid-bottom", tooltip: "Row Grid Bottom" },
-      { class: "row_grid_right_action", icon: rowGridCenterIcon, dataset: "outline-grid", tooltip: "Outline Grid" },
+      {
+        class: "no_grid_action",
+        icon: noGridIcon,
+        dataset: "no-grid",
+        tooltip: "No Grid",
+      },
+      {
+        class: "col_grid_center_action",
+        icon: colGridCenterIcon,
+        dataset: "col-grid-center",
+        tooltip: "Column Grid Center",
+      },
+      {
+        class: "col_grid_left_action",
+        icon: colGridLeftIcon,
+        dataset: "col-grid-left",
+        tooltip: "Column Grid Left",
+      },
+      {
+        class: "col_grid_right_action",
+        icon: colGridRightIcon,
+        dataset: "col-grid-right",
+        tooltip: "Column Grid Right",
+      },
+      {
+        class: "row_grid_center_action",
+        icon: rowGridCenterIcon,
+        dataset: "row-grid-center",
+        tooltip: "Row Grid Center",
+      },
+      {
+        class: "row_grid_top_action",
+        icon: rowGridTopIcon,
+        dataset: "row-grid-top",
+        tooltip: "Row Grid Top",
+      },
+      {
+        class: "row_grid_bottom_action",
+        icon: rowGridBottomIcon,
+        dataset: "row-grid-bottom",
+        tooltip: "Row Grid Bottom",
+      },
+      {
+        class: "row_grid_right_action",
+        icon: rowGridCenterIcon,
+        dataset: "outline-grid",
+        tooltip: "Outline Grid",
+      },
     ];
 
     tableOptionsHandler.forEach((handle) => {
-      const quickBtn = createElement("button", `quick_table_btn ${handle.class}`);
+      const quickBtn = createElement(
+        "button",
+        `quick_table_btn ${handle.class}`
+      );
       quickBtn.innerHTML = handle.icon;
       quickBtn.setAttribute("data-quick-type", handle.dataset);
 
@@ -864,13 +976,17 @@ class TableBlot extends BlockEmbed {
       tableOuterContainer.setAttribute("data-y", y);
 
       const resizeButtons = tableOuterContainer.querySelectorAll(".resize_btn");
-      const actionWrapper = tableOuterContainer.querySelector(".action_btn--wrapper");
+      const actionWrapper = tableOuterContainer.querySelector(
+        ".action_btn--wrapper"
+      );
 
       if (rotation % 180 === 0) {
         resizeButtons.forEach((btn) => (btn.style.transform = "rotate(0deg)"));
         actionWrapper.style.transform = "rotate(0deg)";
       } else {
-        resizeButtons.forEach((btn) => (btn.style.transform = "rotate(-90deg)"));
+        resizeButtons.forEach(
+          (btn) => (btn.style.transform = "rotate(-90deg)")
+        );
         actionWrapper.style.transform = "rotate(-90deg)";
       }
     });
@@ -934,15 +1050,23 @@ class TableBlot extends BlockEmbed {
   static toggleTableButtonsHandler(tableOuterContainer, state = "active") {
     // show/hide all resizing buttons
     const resizeHandles = tableOuterContainer.querySelectorAll(".table_resize");
-    resizeHandles.forEach((handle) => handle.classList[state === "active" ? "remove" : "add"](HIDDEN));
+    resizeHandles.forEach((handle) =>
+      handle.classList[state === "active" ? "remove" : "add"](HIDDEN)
+    );
 
     // show/hide top actions buttons
-    const actionsBtnsHandles = tableOuterContainer.querySelectorAll(".action_btn--wrapper .action_btn");
+    const actionsBtnsHandles = tableOuterContainer.querySelectorAll(
+      ".action_btn--wrapper .action_btn"
+    );
     const actionsButtons = Array.from(actionsBtnsHandles).slice(0, -1);
-    actionsButtons.forEach((btn) => btn.classList[state === "active" ? "remove" : "add"](HIDDEN));
+    actionsButtons.forEach((btn) =>
+      btn.classList[state === "active" ? "remove" : "add"](HIDDEN)
+    );
 
     // show/hide bottom quick buttons
-    const quickBtnsContainer = tableOuterContainer.querySelector(".quick_btn--wrapper");
+    const quickBtnsContainer = tableOuterContainer.querySelector(
+      ".quick_btn--wrapper"
+    );
     quickBtnsContainer.classList[state === "active" ? "remove" : "add"](HIDDEN);
   }
 
@@ -982,8 +1106,12 @@ class TableBlot extends BlockEmbed {
         onmove(event) {
           // Calculate new dimensions based on the resize handle's position
           const tableRect = tableOuterContainer.getBoundingClientRect();
-          let newWidth = tableRect.width + (edges.right ? event.dx : edges.left ? -event.dx : 0);
-          let newHeight = tableRect.height + (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
+          let newWidth =
+            tableRect.width +
+            (edges.right ? event.dx : edges.left ? -event.dx : 0);
+          let newHeight =
+            tableRect.height +
+            (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
 
           // Enforce minimum width and height
           newWidth = Math.max(newWidth, minWidth);
@@ -1016,7 +1144,10 @@ class TableBlot extends BlockEmbed {
     quickButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const { quickType } = btn.dataset;
-        updateTableStyle(quickType, quickButtonsContainer.closest(".insert_outer_wrapper"));
+        updateTableStyle(
+          quickType,
+          quickButtonsContainer.closest(".insert_outer_wrapper")
+        );
       });
     });
   }
@@ -1064,7 +1195,10 @@ class ArrowBlot extends BlockEmbed {
     svg.style.padding = "10px";
 
     // Create the polygon for the arrow
-    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const polygon = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polygon"
+    );
     polygon.setAttribute("points", "0,0 100,50 0,100 20,50");
     polygon.setAttribute("fill", "black");
     polygon.setAttribute("stroke", "black");
@@ -1095,7 +1229,9 @@ class ArrowBlot extends BlockEmbed {
   static showArrowButtons(arrowContainer, state = false) {
     // show/hide buttons
     const resizeBtns = arrowContainer.querySelectorAll(".resize_btn");
-    resizeBtns.forEach((btn) => btn.classList[!state ? "add" : "remove"](HIDDEN));
+    resizeBtns.forEach((btn) =>
+      btn.classList[!state ? "add" : "remove"](HIDDEN)
+    );
 
     if (state) {
       arrowContainer.classList.add("active");
@@ -1118,7 +1254,10 @@ class ArrowBlot extends BlockEmbed {
     ];
 
     resizeHandles.forEach((handle) => {
-      const resizeBtn = createElement("div", `resize_btn table_resize ${handle.class} ${HIDDEN}`);
+      const resizeBtn = createElement(
+        "div",
+        `resize_btn table_resize ${handle.class} ${HIDDEN}`
+      );
       arrowContainer.appendChild(resizeBtn);
     });
 
@@ -1130,7 +1269,8 @@ class ArrowBlot extends BlockEmbed {
     const updateArrowDimensions = this.updateArrowDimensions;
 
     // Select each resizing button
-    const resizeButtons = arrowMainContainerWrapper.querySelectorAll(".resize_btn");
+    const resizeButtons =
+      arrowMainContainerWrapper.querySelectorAll(".resize_btn");
 
     resizeButtons.forEach((button) => {
       let edges = {};
@@ -1159,15 +1299,22 @@ class ArrowBlot extends BlockEmbed {
         onmove(event) {
           // Calculate new dimensions based on the resize handle's position
           const arrowRect = arrowMainContainerWrapper.getBoundingClientRect();
-          let newWidth = arrowRect.width + (edges.right ? event.dx : edges.left ? -event.dx : 0);
-          let newHeight = arrowRect.height + (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
+          let newWidth =
+            arrowRect.width +
+            (edges.right ? event.dx : edges.left ? -event.dx : 0);
+          let newHeight =
+            arrowRect.height +
+            (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
 
           // Apply the new dimensions to the table container
           arrowMainContainerWrapper.style.width = `${newWidth}px`;
           arrowMainContainerWrapper.style.height = `${newHeight}px`;
 
           // Call SVG update function if necessary
-          updateArrowDimensions(arrowMainContainerWrapper, { width: newWidth, height: newHeight });
+          updateArrowDimensions(arrowMainContainerWrapper, {
+            width: newWidth,
+            height: newHeight,
+          });
         },
       });
     });
@@ -1176,7 +1323,9 @@ class ArrowBlot extends BlockEmbed {
   // Update Arrow Dimensions
   static updateArrowDimensions(arrowMainContainerWrapper, { width, height }) {
     // Find the SVG inside the arrow container
-    const svg = arrowMainContainerWrapper.querySelector(".arrow_main_container>svg");
+    const svg = arrowMainContainerWrapper.querySelector(
+      ".arrow_main_container>svg"
+    );
 
     if (svg) {
       // Update only the SVG dimensions
@@ -1275,8 +1424,12 @@ class ImageBlot extends BlockEmbed {
       interact(button).draggable({
         onmove(event) {
           const tableRect = container.getBoundingClientRect();
-          let newWidth = tableRect.width + (edges.right ? event.dx : edges.left ? -event.dx : 0);
-          let newHeight = tableRect.height + (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
+          let newWidth =
+            tableRect.width +
+            (edges.right ? event.dx : edges.left ? -event.dx : 0);
+          let newHeight =
+            tableRect.height +
+            (edges.bottom ? event.dy : edges.top ? -event.dy : 0);
 
           newWidth = Math.max(newWidth, minWidth);
           newHeight = Math.max(newHeight, minHeight);
@@ -1289,10 +1442,14 @@ class ImageBlot extends BlockEmbed {
   }
 
   static getEdges(button) {
-    if (button.classList.contains("resize_top_left")) return { top: true, left: true };
-    if (button.classList.contains("resize_top_right")) return { top: true, right: true };
-    if (button.classList.contains("resize_bottom_left")) return { bottom: true, left: true };
-    if (button.classList.contains("resize_bottom_right")) return { bottom: true, right: true };
+    if (button.classList.contains("resize_top_left"))
+      return { top: true, left: true };
+    if (button.classList.contains("resize_top_right"))
+      return { top: true, right: true };
+    if (button.classList.contains("resize_bottom_left"))
+      return { bottom: true, left: true };
+    if (button.classList.contains("resize_bottom_right"))
+      return { bottom: true, right: true };
     return {};
   }
 
@@ -1351,3 +1508,100 @@ class CitationBlot extends Inline {
 CitationBlot.blotName = "citation";
 CitationBlot.tagName = "span";
 Quill.register(CitationBlot);
+
+///////////////////////////
+//////////////////////////
+////////////////////////////
+
+// Find and replace your entire SubSuperScriptBlot class with this one.
+// In your quill.blots.js file
+// REPLACE the entire SubSuperScriptBlot class and its registration with this code.
+
+class SubSuperScriptBlot extends BlockEmbed {
+  static create(value) {
+    // value is now an object, e.g., { layout: 'diagonal-lr' }
+    const node = super.create(value); // Let super create the wrapper
+    node.setAttribute("contenteditable", "false");
+
+    // Create the inner structure based on the layout value
+    const layout = document.createElement("div");
+    node.appendChild(layout);
+
+    // Build the DOM programmatically
+    switch (value.layout) {
+      case "diagonal-lr":
+        layout.className = "math-layout diagonal";
+        layout.innerHTML =
+          '<span class="editable-box bottom-left" contenteditable="true"></span><span class="editable-box top-right" contenteditable="true"></span>';
+        break;
+      case "diagonal-rl":
+        layout.className = "math-layout diagonal";
+        layout.innerHTML =
+          '<span class="editable-box top-left" contenteditable="true"></span><span class="editable-box bottom-right" contenteditable="true"></span>';
+        break;
+      case "vertical-right":
+        layout.className = "math-layout dual";
+        layout.innerHTML =
+          '<span class="editable-box top-middle-left" contenteditable="true"></span><div class="vertical-right"><span class="editable-box sup" contenteditable="true"></span><span class="editable-box sub" contenteditable="true"></span></div>';
+        break;
+      case "vertical-left":
+        layout.className = "math-layout dual";
+        layout.innerHTML =
+          '<span class="editable-box top-middle-right" contenteditable="true"></span><div class="vertical-left"><span class="editable-box sup" contenteditable="true"></span><span class="editable-box sub" contenteditable="true"></span></div>';
+        break;
+      case "e-power-neg-x":
+        layout.className = "math-layout";
+        layout.innerHTML =
+          '<span>e<sup><span class="editable-inline" contenteditable="true">-x</span></sup></span>';
+        break;
+      case "x-squared":
+        layout.className = "math-layout";
+        layout.innerHTML =
+          '<span>x<sup><span class="editable-inline" contenteditable="true">2</span></sup></span>';
+        break;
+      case "n-sub-1-y":
+        layout.className = "math-layout";
+        layout.innerHTML =
+          '<span>n<sub><span class="editable-inline" contenteditable="true">1</span></sub>Y</span>';
+        break;
+      default:
+        // Handle unknown layout or provide a default
+        break;
+    }
+    return node;
+  }
+
+  static value(node) {
+    // Return the data object that can be used to recreate the blot
+    const layoutDiv = node.querySelector(".math-layout");
+    if (
+      layoutDiv.classList.contains("diagonal") &&
+      layoutDiv.querySelector(".bottom-left")
+    )
+      return { layout: "diagonal-lr" };
+    if (
+      layoutDiv.classList.contains("diagonal") &&
+      layoutDiv.querySelector(".top-left")
+    )
+      return { layout: "diagonal-rl" };
+    if (
+      layoutDiv.classList.contains("dual") &&
+      layoutDiv.querySelector(".vertical-right")
+    )
+      return { layout: "vertical-right" };
+    if (
+      layoutDiv.classList.contains("dual") &&
+      layoutDiv.querySelector(".vertical-left")
+    )
+      return { layout: "vertical-left" };
+    if (node.querySelector("e sup")) return { layout: "e-power-neg-x" };
+    if (node.querySelector("x sup")) return { layout: "x-squared" };
+    if (node.querySelector("n sub")) return { layout: "n-sub-1-y" };
+    return {}; // Fallback
+  }
+}
+
+SubSuperScriptBlot.blotName = "sub-super-script";
+SubSuperScriptBlot.tagName = "div";
+SubSuperScriptBlot.className = "math-expression";
+Quill.register(SubSuperScriptBlot);

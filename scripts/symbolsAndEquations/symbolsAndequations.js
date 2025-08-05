@@ -158,179 +158,280 @@ const geometrySymbols = [
 ];
 
 // Arrays for Expressions subcategories
+// const expressions = {
+//   "sub-super-scripts": [
+//     // Sub-left + Sup-right (NOTE: contenteditable="true" is removed)
+//     `<div class="math-layout diagonal">
+//       <span class="editable-box bottom-left"></span>
+//       <span class="editable-box top-right"></span>
+//     </div>`,
+
+//     // Sup-left + Sub-right
+//     `<div class="math-layout diagonal">
+//       <span class="editable-box top-left"></span>
+//       <span class="editable-box bottom-right"></span>
+//     </div>`,
+
+//     // Sub + Sup stacked vertically (right side)
+//     `<div class="math-layout dual">
+//       <span class="editable-box top-middle-left"></span>
+//       <div class="vertical-right">
+//         <span class="editable-box sup"></span>
+//         <span class="editable-box sub"></span>
+//       </div>
+//     </div>`,
+
+//     // Sub + Sup stacked vertically (left side)
+//     `<div class="math-layout dual">
+//       <span class="editable-box top-middle-right"></span>
+//       <div class="vertical-left">
+//         <span class="editable-box sup"></span>
+//         <span class="editable-box sub"></span>
+//       </div>
+//     </div>`,
+
+//     // e^(-x)
+//     `<div class="math-layout">
+//       <span>e<sup><span class="editable-inline">-x</span></sup></span>
+//     </div>`,
+
+//     // x²
+//     `<div class="math-layout">
+//       <span>x<sup><span class="editable-inline">2</span></sup></span>
+//     </div>`,
+
+//     // n₁Y
+//     `<div class="math-layout">
+//       <span>n<sub><span class="editable-inline">1</span></sub>Y</span>
+//     </div>`,
+//   ],
+//   // "sub-super-scripts": [
+//   //   // Sub-left + Sup-right
+//   //   "a_{\\Box}^{\\Box}",
+
+//   //   // Sup-left + Sub-right — flipped version
+//   //   "^{\\Box}_{\\Box}a",
+
+//   //   // Sub + Sup stacked vertically (right side)
+//   //   "x^{\\Box}_{\\Box}",
+
+//   //   // Sub + Sup stacked vertically (left side)
+//   //   "^{\\Box}_{\\Box}x",
+
+//   //   // e^(-x)
+//   //   "e^{-x}",
+
+//   //   // x²
+//   //   "x^2",
+
+//   //   // n₁Y
+//   //   "n_1Y",
+//   // ],
+//   fraction: [
+//     "<sup>x</sup>/<sub>y</sub>",
+//     "<sup>a+b</sup>/<sub>c-d</sub>",
+//     "<sup>m^n</sup>/<sub>p^q</sub>",
+//   ],
+//   radicals: ["√x", "∛y", "∜z", "∜[n]{a}"],
+//   brackets: ["(x)", "[y]", "{z}", "< x>", "|v|"],
+//   summations: [
+//     "∑<sub>i=1</sub><sup>n</sup> i",
+//     "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
+//     "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
+//   ],
+//   trigonometry: [
+//     "sin θ",
+//     "cos φ",
+//     "tan ψ",
+//     "csc α",
+//     "sec β",
+//     "cot γ",
+//     "sin<sup>-1</sup> x",
+//     "cos<sup>-1</sup> y",
+//     "tan<sup>-1</sup> z",
+//     "sinh x",
+//     "cosh y",
+//     "tanh z",
+//     "coth w",
+//     "sinh<sup>-1</sup> u",
+//     "cosh<sup>-1</sup> v",
+//     "tanh<sup>-1</sup> w",
+//     "coth<sup>-1</sup> t",
+//   ],
+//   integrals: [
+//     "∫ f(x) dx",
+//     "∫<sub>a</sub><sup>b</sup> g(x) dx",
+//     "∬ f(x, y) dxdy",
+//     "∮ C f(z) dz",
+//   ],
+//   logs: [
+//     "log<sub>2</sub> x",
+//     "ln x",
+//     "log<sub>10</sub> y",
+//     "min<sub>a</sub> b",
+//     "max<sub>a</sub> b",
+//     "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
+//   ],
+// };
 const expressions = {
+  // This is our special category that uses the custom Blot
   "sub-super-scripts": [
-    // Sub-left + Sup-right
-    `<div class="math-layout diagonal">
-    <span class="editable-box bottom-left" contenteditable="true"></span>
-    <span class="editable-box top-right" contenteditable="true"></span>
-  </div>`,
-
-    // Sup-left + Sub-right
-    `<div class="math-layout diagonal">
-    <span class="editable-box top-left" contenteditable="true"></span>
-    <span class="editable-box bottom-right" contenteditable="true"></span>
-  </div>`,
-
-    // Sub + Sup stacked vertically (right side)
-    `<div class="math-layout dual">
-    <span class="editable-box top-middle-left" contenteditable="true"></span>
-    <div class="vertical-right">
-      <span class="editable-box sup" contenteditable="true"></span>
-      <span class="editable-box sub" contenteditable="true"></span>
-    </div>
-  </div>`,
-
-    // Sub + Sup stacked vertically (left side)
-    `<div class="math-layout dual">
-    <span class="editable-box top-middle-right" contenteditable="true"></span>
-    <div class="vertical-left">
-      <span class="editable-box sup" contenteditable="true"></span>
-      <span class="editable-box sub" contenteditable="true"></span>
-    </div>
-  </div>`,
-
-    // e^(-x)
-    `<div class="math-layout">
-    <span>e<sup><span class="editable-inline" contenteditable="true">-x</span></sup></span>
-  </div>`,
-
-    // x²
-    `<div class="math-layout">
-    <span>x<sup><span class="editable-inline" contenteditable="true">2</span></sup></span>
-  </div>`,
-
-    // n₁Y
-    `<div class="math-layout">
-    <span>n<sub><span class="editable-inline" contenteditable="true">1</span></sub>Y</span>
-  </div>`,
+    // We now pass a descriptive object instead of an HTML string
+    {
+      type: "blot",
+      content: { layout: "diagonal-lr" },
+      display:
+        '<div class="math-layout diagonal"><span class="editable-box bottom-left"></span><span class="editable-box top-right"></span></div>',
+    },
+    {
+      type: "blot",
+      content: { layout: "diagonal-rl" },
+      display:
+        '<div class="math-layout diagonal"><span class="editable-box top-left"></span><span class="editable-box bottom-right"></span></div>',
+    },
+    {
+      type: "blot",
+      content: { layout: "vertical-right" },
+      display:
+        '<div class="math-layout dual"><span class="editable-box top-middle-left"></span><div class="vertical-right"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
+    },
+    {
+      type: "blot",
+      content: { layout: "vertical-left" },
+      display:
+        '<div class="math-layout dual"><span class="editable-box top-middle-right"></span><div class="vertical-left"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
+    },
+    {
+      type: "blot",
+      content: { layout: "e-power-neg-x" },
+      display: '<div class="math-layout"><span>e<sup>-x</sup></span></div>',
+    },
+    {
+      type: "blot",
+      content: { layout: "x-squared" },
+      display: '<div class="math-layout"><span>x<sup>2</sup></span></div>',
+    },
+    {
+      type: "blot",
+      content: { layout: "n-sub-1-y" },
+      display: '<div class="math-layout"><span>n<sub>1</sub>Y</span></div>',
+    },
   ],
-  // "sub-super-scripts": [
-  //   // Sub-left + Sup-right
-  //   "a_{\\Box}^{\\Box}",
-
-  //   // Sup-left + Sub-right — flipped version
-  //   "^{\\Box}_{\\Box}a",
-
-  //   // Sub + Sup stacked vertically (right side)
-  //   "x^{\\Box}_{\\Box}",
-
-  //   // Sub + Sup stacked vertically (left side)
-  //   "^{\\Box}_{\\Box}x",
-
-  //   // e^(-x)
-  //   "e^{-x}",
-
-  //   // x²
-  //   "x^2",
-
-  //   // n₁Y
-  //   "n_1Y",
-  // ],
+  // These categories use simple HTML pasting
   fraction: [
-    "<sup>x</sup>/<sub>y</sub>",
-    "<sup>a+b</sup>/<sub>c-d</sub>",
-    "<sup>m^n</sup>/<sub>p^q</sub>",
+    { type: "html", content: "<sup>x</sup>/<sub>y</sub>" },
+    { type: "html", content: "<sup>a+b</sup>/<sub>c-d</sub>" },
+    { type: "html", content: "<sup>m^n</sup>/<sub>p^q</sub>" },
   ],
-  radicals: ["√x", "∛y", "∜z", "∜[n]{a}"],
-  brackets: ["(x)", "[y]", "{z}", "< x>", "|v|"],
+  radicals: [
+    { type: "html", content: "√x" },
+    { type: "html", content: "∛y" },
+    { type: "html", content: "∜z" },
+    { type: "html", content: "∜[n]{a}" },
+  ],
+  brackets: [
+    { type: "html", content: "(x)" },
+    { type: "html", content: "[y]" },
+    { type: "html", content: "{z}" },
+    { type: "html", content: "<x>" }, // Use HTML entity for <
+    { type: "html", content: "|v|" },
+  ],
   summations: [
-    "∑<sub>i=1</sub><sup>n</sup> i",
-    "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
-    "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
+    { type: "html", content: "∑<sub>i=1</sub><sup>n</sup> i" },
+    { type: "html", content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>" },
+    { type: "html", content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>" },
   ],
   trigonometry: [
-    "sin θ",
-    "cos φ",
-    "tan ψ",
-    "csc α",
-    "sec β",
-    "cot γ",
-    "sin<sup>-1</sup> x",
-    "cos<sup>-1</sup> y",
-    "tan<sup>-1</sup> z",
-    "sinh x",
-    "cosh y",
-    "tanh z",
-    "coth w",
-    "sinh<sup>-1</sup> u",
-    "cosh<sup>-1</sup> v",
-    "tanh<sup>-1</sup> w",
-    "coth<sup>-1</sup> t",
+    { type: "html", content: "sin θ" },
+    { type: "html", content: "cos φ" },
+    { type: "html", content: "tan ψ" },
+    { type: "html", content: "sin<sup>-1</sup> x" },
+    { type: "html", content: "cos<sup>-1</sup> y" },
+    { type: "html", content: "tan<sup>-1</sup> z" },
   ],
   integrals: [
-    "∫ f(x) dx",
-    "∫<sub>a</sub><sup>b</sup> g(x) dx",
-    "∬ f(x, y) dxdy",
-    "∮ C f(z) dz",
+    { type: "html", content: "∫ f(x) dx" },
+    { type: "html", content: "∫<sub>a</sub><sup>b</sup> g(x) dx" },
+    { type: "html", content: "∬ f(x, y) dxdy" },
+    { type: "html", content: "∮ C f(z) dz" },
   ],
   logs: [
-    "log<sub>2</sub> x",
-    "ln x",
-    "log<sub>10</sub> y",
-    "min<sub>a</sub> b",
-    "max<sub>a</sub> b",
-    "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
+    { type: "html", content: "log<sub>2</sub> x" },
+    { type: "html", content: "ln x" },
+    { type: "html", content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>" },
   ],
 };
-
-function insertIntoEditor(content, range) {
+// Replace your insertIntoEditor function with this smart version
+function insertIntoEditor(data, range) {
   const quill = window.focusedEditor;
   if (!quill) {
     console.warn("No editor is currently focused.");
     return;
   }
 
-  // Force focus to ensure selection works
-  //   quill.focus();
-  //   const range = quill.getSelection();
+  if (!range) {
+    range = quill.getSelection(true);
+  }
 
-  // Get current cursor position
+  // Check if the data is a plain string (from the symbols tab)
+  if (typeof data === "string") {
+    quill.insertText(range.index, data, Quill.sources.USER);
+    quill.setSelection(range.index + data.length, Quill.sources.SILENT);
+    return;
+  }
 
-  if (range) {
-    // If content has HTML tags, use dangerouslyPasteHTML
-    if (/<[a-z][\s\S]*>/i.test(content)) {
-      quill.clipboard.dangerouslyPasteHTML(range.index, content + " ");
+  // Otherwise, it's an object from the expressions tab
+  // Use a switch statement to handle each type
+  switch (data.type) {
+    case "blot":
+      // Pass the CONTENT OBJECT to the blot
+      quill.insertEmbed(
+        range.index,
+        "sub-super-script",
+        data.content,
+        Quill.sources.USER
+      );
+      quill.setSelection(range.index + 1, Quill.sources.SILENT);
+      break;
 
-      //   // Move cursor after inserted content
-      //   setTimeout(() => {
-      //     quill.setSelection(range.index + content.length);
-      //   }, 0);
-    } else {
-      // Otherwise, treat it as plain text
-      quill.insertText(range.index, content);
-      //   quill.setSelection(range.index + content.length);
-    }
-  } else {
-    // Fallback: append at the end
-    const length = quill.getLength();
-    if (/<[a-z][\s\S]*>/i.test(content)) {
-      quill.clipboard.dangerouslyPasteHTML(length - 1, content);
-      setTimeout(() => {
-        quill.setSelection(length - 1 + content.length);
-      }, 0);
-    } else {
-      quill.insertText(length - 1, content);
-      quill.setSelection(length);
-    }
+    case "html":
+      // Use dangerouslyPasteHTML for all other simple HTML content
+      quill.clipboard.dangerouslyPasteHTML(
+        range.index,
+        data.content + " ",
+        Quill.sources.USER
+      );
+      break;
+
+    case "text":
+      // Fallback for any expressions defined as plain text
+      quill.insertText(range.index, data.content, Quill.sources.USER);
+      quill.setSelection(
+        range.index + data.content.length,
+        Quill.sources.SILENT
+      );
+      break;
   }
 }
 // Function to render expressions
+// Replace your renderExpressions function with this
+
 function renderExpressions(containerId, expressionsArray) {
   const expressionGrid = document.getElementById(containerId);
   expressionGrid.innerHTML = ""; // Clear existing content
 
-  expressionsArray.forEach((expression) => {
+  expressionsArray.forEach((expressionObj) => {
     const div = document.createElement("div");
     div.className = "expression";
-    div.innerHTML = expression; // Use innerHTML for math symbols
-    // Add click handler
-    // Add click handler
+    // Use the NEW 'display' property for the preview HTML
+    div.innerHTML = expressionObj.display;
+
     div.addEventListener("mousedown", (e) => {
-      e.preventDefault(); // Stops focus shift
+      e.preventDefault();
       if (window.focusedEditor) {
         savedRange = window.focusedEditor.getSelection();
-        insertIntoEditor(expression, savedRange);
+        // Pass the ENTIRE OBJECT to the insert function
+        insertIntoEditor(expressionObj, savedRange);
       }
     });
     expressionGrid.appendChild(div);

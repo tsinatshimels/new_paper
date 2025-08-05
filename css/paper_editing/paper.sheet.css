@@ -516,3 +516,28 @@ input.cell:focus {
   top: 8px;
   right: 0;
 }
+.math-expression {
+  display: inline-block;
+  /* Add any other wrapper styles here */
+}
+
+.math-layout {
+  border: 1px solid transparent;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Editable input boxes */
+.editable-box {
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  font-size: 14px;
+  border: 2px dotted #555;
+  background-color: transparent;
+  outline: none;
+  padding: 0;
+}
