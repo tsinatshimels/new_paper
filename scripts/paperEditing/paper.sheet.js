@@ -351,6 +351,51 @@ document.querySelector("nav button").addEventListener("click", function () {
 
 // For selection and math equation functionality
 $(() => {
+  // --- INFINITE SCROLL LOGIC ---
+  const $cellsWrapper = $("#cells_wrapper");
+  let currentRowCount = rows; // Initially 50 from your global variable
+  const rowsPerBatch = 50; // How many new rows to add at a time
+
+  // Function to add a new batch of rows
+  function addMoreRows() {
+    const newRowsLimit = currentRowCount + rowsPerBatch;
+
+    // Add new row rulers
+    const $rulerRows = $sheet.find(".ruler_rows");
+    for (let r = currentRowCount + 1; r <= newRowsLimit; r++) {
+      const $cell = $(`<span/>`).attr("data-row", r).text(r);
+      $rulerRows.append($cell);
+    }
+
+    // Add new cells
+    for (let r = currentRowCount + 1; r <= newRowsLimit; r++) {
+      for (let c = 1; c <= cols; c++) {
+        const $cellWrapper = $('<div class="cell-wrapper"></div>')
+          .css("--cell-col", c)
+          .css("--cell-row", r)
+          .attr("data-col", c)
+          .attr("data-row", r);
+
+        const $cellInput = $('<input type="text" class="cell" />')
+          .attr("data-col", c)
+          .attr("data-row", r);
+
+        $cellWrapper.append($cellInput);
+        $cellsWrapper.append($cellWrapper);
+      }
+    }
+    currentRowCount = newRowsLimit;
+    $sheet.css("--row-count", currentRowCount); // Update the grid layout
+  }
+
+  // Attach the scroll event listener to the spreadsheet container
+  $sheet.on("scroll", function () {
+    // Check if the user has scrolled to the bottom
+    if (this.scrollTop + this.clientHeight >= this.scrollHeight - 10) {
+      // -10px buffer
+      addMoreRows();
+    }
+  });
   // --- SETUP & STATE MANAGEMENT ---
   let isSelecting = false;
   let startCell = null;
@@ -411,7 +456,9 @@ $(() => {
     );
 
     const range = getSelectedRange();
-
+    if (range) {
+      cellAddressInput.value = range.rangeA1;
+    }
     // If a valid selection range exists...
     if (range) {
       // 1. Highlight all the cells in the range (Existing Logic)
@@ -596,7 +643,63 @@ $(() => {
       .closest(".dropdown-select")
       .removeClass("open active-category");
   });
+  // --- SORTING LOGIC FOR FILTER PANE ---
 
+  $("#sort-asc-btn, #sort-desc-btn").on("click", function () {
+    const sortOrder = $(this).attr("id") === "sort-asc-btn" ? "asc" : "desc";
+
+    const $activeTab = $("#filter-column-tabs .filter-tab.active");
+    if ($activeTab.length === 0) {
+      alert("Please select a column tab to sort.");
+      return;
+    }
+
+    const col = $activeTab.data("col");
+    const headerRow = 1;
+
+    // 1. Gather all rows into an array of objects (This part is fine)
+    const rowsToSort = [];
+    for (let r = headerRow + 1; r <= currentRowCount; r++) {
+      const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).val();
+      rowsToSort.push({ row: r, value: cellValue || "" });
+    }
+
+    // 2. Sort the array with new rules for handling blanks
+    rowsToSort.sort((a, b) => {
+      const valA = a.value;
+      const valB = b.value;
+      const options = { numeric: true, sensitivity: "base" };
+
+      // *** NEW LOGIC TO HANDLE BLANKS ***
+      const aIsEmpty = valA === "";
+      const bIsEmpty = valB === "";
+
+      if (aIsEmpty && bIsEmpty) return 0; // If both are empty, their order doesn't matter
+      if (aIsEmpty) return 1; // Always push empty 'a' to the bottom
+      if (bIsEmpty) return -1; // Always push empty 'b' to the bottom
+      // **********************************
+
+      // If we reach this point, neither cell is empty, so we perform the normal sort
+      if (sortOrder === "asc") {
+        return valA.localeCompare(valB, undefined, options);
+      } else {
+        // 'desc'
+        return valB.localeCompare(valA, undefined, options);
+      }
+    });
+
+    // 3. Re-append the rows to the DOM in the new sorted order (This part is fine)
+    const $cellsWrapper = $("#cells_wrapper");
+    rowsToSort.forEach((sortedItem) => {
+      const $rowElements = $cellsWrapper.find(
+        `.cell-wrapper[data-row=${sortedItem.row}]`
+      );
+      $cellsWrapper.append($rowElements);
+    });
+
+    // 4. Close the filter pane
+    // $("#filter-pane").removeClass("open");
+  });
   // 1. Main Filter Button: Toggle filtering on the selected header row
   $("#sizemug_lfilter--btn").on("click", function () {
     const $filterBtn = $(this);

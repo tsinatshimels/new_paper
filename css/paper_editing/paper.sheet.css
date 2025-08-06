@@ -394,6 +394,10 @@ input.cell:focus {
   display: block;
 }
 
+.cell-wrapper.filter-enabled {
+  background-color: #e9d5ff; /* A light purple color */
+}
+
 /* .layout {
   display: inline-block;
   border: 1px dashed transparent;
