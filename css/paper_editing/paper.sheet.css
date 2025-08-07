@@ -545,3 +545,76 @@ input.cell:focus {
   outline: none;
   padding: 0;
 }
+/* new */
+.math-layout {
+  border: 1px solid transparent;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Editable input boxes */
+.editable-box {
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  font-size: 14px;
+  border: 2px dotted #555;
+  background-color: transparent;
+  outline: none;
+  padding: 0;
+}
+
+.math-layout.active {
+  border: 2px solid #8837e9; /* Highlight when active */
+  padding: 3px !important; /* Add some space around the element */
+}
+
+.controls {
+  position: absolute;
+  top: -2px; /* Adjust as needed */
+  right: -33px; /* Adjust as needed */
+  background-color: #8837e9; /* Semi-transparent purple */
+
+  padding: 2px;
+  border-radius: 3px;
+  display: flex; /* For easy alignment of resizer and dropdown */
+  align-items: center;
+  z-index: 10; /* Ensure it's above other elements */
+  display: flex;
+  flex-direction: column;
+}
+
+.resizer {
+  cursor: grab; /* Visual cue for resizing */
+  margin-right: 3px;
+}
+
+.dropdown-trigger {
+  cursor: pointer;
+  font-size: 0.8em; /* Adjust size as needed */
+}
+
+.dropdown-menu-paper {
+  position: absolute;
+  top: 48px;
+  left: 50px;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: none; /* Hidden by default */
+  z-index: 11; /* Above controls */
+  width: 200px;
+  height: auto;
+}
+
+.dropdown-menu-paper.show {
+  display: block;
+}
+.dropdown-section {
+  /* height: 50px; */
+}

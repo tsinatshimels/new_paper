@@ -157,126 +157,8 @@ const geometrySymbols = [
   "▮",
 ];
 
-// Arrays for Expressions subcategories
-// const expressions = {
-//   "sub-super-scripts": [
-//     // Sub-left + Sup-right (NOTE: contenteditable="true" is removed)
-//     `<div class="math-layout diagonal">
-//       <span class="editable-box bottom-left"></span>
-//       <span class="editable-box top-right"></span>
-//     </div>`,
-
-//     // Sup-left + Sub-right
-//     `<div class="math-layout diagonal">
-//       <span class="editable-box top-left"></span>
-//       <span class="editable-box bottom-right"></span>
-//     </div>`,
-
-//     // Sub + Sup stacked vertically (right side)
-//     `<div class="math-layout dual">
-//       <span class="editable-box top-middle-left"></span>
-//       <div class="vertical-right">
-//         <span class="editable-box sup"></span>
-//         <span class="editable-box sub"></span>
-//       </div>
-//     </div>`,
-
-//     // Sub + Sup stacked vertically (left side)
-//     `<div class="math-layout dual">
-//       <span class="editable-box top-middle-right"></span>
-//       <div class="vertical-left">
-//         <span class="editable-box sup"></span>
-//         <span class="editable-box sub"></span>
-//       </div>
-//     </div>`,
-
-//     // e^(-x)
-//     `<div class="math-layout">
-//       <span>e<sup><span class="editable-inline">-x</span></sup></span>
-//     </div>`,
-
-//     // x²
-//     `<div class="math-layout">
-//       <span>x<sup><span class="editable-inline">2</span></sup></span>
-//     </div>`,
-
-//     // n₁Y
-//     `<div class="math-layout">
-//       <span>n<sub><span class="editable-inline">1</span></sub>Y</span>
-//     </div>`,
-//   ],
-//   // "sub-super-scripts": [
-//   //   // Sub-left + Sup-right
-//   //   "a_{\\Box}^{\\Box}",
-
-//   //   // Sup-left + Sub-right — flipped version
-//   //   "^{\\Box}_{\\Box}a",
-
-//   //   // Sub + Sup stacked vertically (right side)
-//   //   "x^{\\Box}_{\\Box}",
-
-//   //   // Sub + Sup stacked vertically (left side)
-//   //   "^{\\Box}_{\\Box}x",
-
-//   //   // e^(-x)
-//   //   "e^{-x}",
-
-//   //   // x²
-//   //   "x^2",
-
-//   //   // n₁Y
-//   //   "n_1Y",
-//   // ],
-//   fraction: [
-//     "<sup>x</sup>/<sub>y</sub>",
-//     "<sup>a+b</sup>/<sub>c-d</sub>",
-//     "<sup>m^n</sup>/<sub>p^q</sub>",
-//   ],
-//   radicals: ["√x", "∛y", "∜z", "∜[n]{a}"],
-//   brackets: ["(x)", "[y]", "{z}", "< x>", "|v|"],
-//   summations: [
-//     "∑<sub>i=1</sub><sup>n</sup> i",
-//     "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
-//     "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
-//   ],
-//   trigonometry: [
-//     "sin θ",
-//     "cos φ",
-//     "tan ψ",
-//     "csc α",
-//     "sec β",
-//     "cot γ",
-//     "sin<sup>-1</sup> x",
-//     "cos<sup>-1</sup> y",
-//     "tan<sup>-1</sup> z",
-//     "sinh x",
-//     "cosh y",
-//     "tanh z",
-//     "coth w",
-//     "sinh<sup>-1</sup> u",
-//     "cosh<sup>-1</sup> v",
-//     "tanh<sup>-1</sup> w",
-//     "coth<sup>-1</sup> t",
-//   ],
-//   integrals: [
-//     "∫ f(x) dx",
-//     "∫<sub>a</sub><sup>b</sup> g(x) dx",
-//     "∬ f(x, y) dxdy",
-//     "∮ C f(z) dz",
-//   ],
-//   logs: [
-//     "log<sub>2</sub> x",
-//     "ln x",
-//     "log<sub>10</sub> y",
-//     "min<sub>a</sub> b",
-//     "max<sub>a</sub> b",
-//     "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
-//   ],
-// };
 const expressions = {
-  // This is our special category that uses the custom Blot
   "sub-super-scripts": [
-    // We now pass a descriptive object instead of an HTML string
     {
       type: "blot",
       content: { layout: "diagonal-lr" },
@@ -317,7 +199,6 @@ const expressions = {
       display: '<div class="math-layout"><span>n<sub>1</sub>Y</span></div>',
     },
   ],
-  // These categories use simple HTML pasting
   fraction: [
     { type: "html", content: "<sup>x</sup>/<sub>y</sub>" },
     { type: "html", content: "<sup>a+b</sup>/<sub>c-d</sub>" },
@@ -361,7 +242,9 @@ const expressions = {
     { type: "html", content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>" },
   ],
 };
-// Replace your insertIntoEditor function with this smart version
+
+let activeMathLayout = null; // Keep track of the currently active math-layout element
+
 function insertIntoEditor(data, range) {
   const quill = window.focusedEditor;
   if (!quill) {
@@ -381,10 +264,8 @@ function insertIntoEditor(data, range) {
   }
 
   // Otherwise, it's an object from the expressions tab
-  // Use a switch statement to handle each type
   switch (data.type) {
     case "blot":
-      // Pass the CONTENT OBJECT to the blot
       quill.insertEmbed(
         range.index,
         "sub-super-script",
@@ -392,10 +273,26 @@ function insertIntoEditor(data, range) {
         Quill.sources.USER
       );
       quill.setSelection(range.index + 1, Quill.sources.SILENT);
+
+      // Use setTimeout to ensure DOM is updated and Quill has finished its rendering
+      setTimeout(() => {
+        const insertedBlot = quill.container.querySelector(
+          ".ql-editor .math-layout:not(.ql-blank)"
+        ); // Select the math-layout that was just inserted
+        if (insertedBlot) {
+          activateMathLayout(insertedBlot);
+
+          // Add double-click handler
+          insertedBlot.addEventListener("dblclick", (event) => {
+            event.preventDefault();
+            event.stopPropagation(); // Prevent the document click listener from firing immediately
+            activateMathLayout(insertedBlot);
+          });
+        }
+      }, 0);
       break;
 
     case "html":
-      // Use dangerouslyPasteHTML for all other simple HTML content
       quill.clipboard.dangerouslyPasteHTML(
         range.index,
         data.content + " ",
@@ -404,7 +301,6 @@ function insertIntoEditor(data, range) {
       break;
 
     case "text":
-      // Fallback for any expressions defined as plain text
       quill.insertText(range.index, data.content, Quill.sources.USER);
       quill.setSelection(
         range.index + data.content.length,
@@ -413,8 +309,6 @@ function insertIntoEditor(data, range) {
       break;
   }
 }
-// Function to render expressions
-// Replace your renderExpressions function with this
 
 function renderExpressions(containerId, expressionsArray) {
   const expressionGrid = document.getElementById(containerId);
@@ -423,14 +317,12 @@ function renderExpressions(containerId, expressionsArray) {
   expressionsArray.forEach((expressionObj) => {
     const div = document.createElement("div");
     div.className = "expression";
-    // Use the NEW 'display' property for the preview HTML
     div.innerHTML = expressionObj.display;
 
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       if (window.focusedEditor) {
         savedRange = window.focusedEditor.getSelection();
-        // Pass the ENTIRE OBJECT to the insert function
         insertIntoEditor(expressionObj, savedRange);
       }
     });
@@ -438,41 +330,6 @@ function renderExpressions(containerId, expressionsArray) {
   });
 }
 
-// function renderExpressions(containerId, expressionsArray) {
-//   const expressionGrid = document.getElementById(containerId);
-//   expressionGrid.innerHTML = ""; // Clear existing content
-
-//   expressionsArray.forEach((latex) => {
-//     const div = document.createElement("div");
-//     div.className = "expression";
-
-//     const preview = MQ.StaticMath(document.createElement("span"));
-//     preview.latex(latex);
-//     div.appendChild(preview.el());
-
-//     // Insert handler
-//     div.addEventListener("mousedown", (e) => {
-//       e.preventDefault();
-//       const editor = window.focusedEditor;
-//       if (!editor) return;
-
-//       savedRange = editor.getSelection();
-
-//       if (savedRange) {
-//         const mathEl = createMathFieldElement(latex);
-//         editor.insertEmbed(savedRange.index, "mathquill", latex);
-
-//         editor.setSelection(savedRange.index + 1);
-//       }
-//     });
-
-//     expressionGrid.appendChild(div);
-//   });
-// }
-
-let savedRange = null;
-
-// Function to render symbols
 function renderSymbols(containerId, symbolsArray) {
   const symbolGrid = document.getElementById(containerId);
   symbolGrid.innerHTML = ""; // Clear existing content
@@ -482,7 +339,6 @@ function renderSymbols(containerId, symbolsArray) {
     div.className = "symbol";
     div.textContent = symbol;
 
-    // Add click handler
     div.addEventListener("mousedown", (e) => {
       e.preventDefault(); // Stops focus shift
       if (focusedEditor) {
@@ -494,7 +350,6 @@ function renderSymbols(containerId, symbolsArray) {
   });
 }
 
-// Function to toggle main tabs
 function toggleTab(event) {
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
@@ -514,7 +369,6 @@ function toggleTab(event) {
   }
 }
 
-// Function to toggle subcategory tabs
 function toggleSubcategory(event) {
   const subcatButtons = document.querySelectorAll(".subcat-button");
 
@@ -544,7 +398,6 @@ function toggleSubcategory(event) {
   }
 }
 
-// Helper function to render the default subcategory for Symbols
 function renderSubcategory(subcat) {
   const subcatButtons = document.querySelectorAll(".subcat-button");
   const symbolGrid = document.getElementById("symbolGrid");
@@ -567,7 +420,6 @@ function renderSubcategory(subcat) {
   }
 }
 
-// Helper function to render the default subcategory for Expressions
 function renderExpressionSubcategory(subcat) {
   const subcatButtons = document.querySelectorAll(".subcat-button");
   const expressionGrid = document.getElementById("expressionGrid");
@@ -578,7 +430,6 @@ function renderExpressionSubcategory(subcat) {
   renderExpressions("expressionGrid", expressions[subcat]);
 }
 
-// Add event listeners
 document.addEventListener("DOMContentLoaded", () => {
   const tabButtons = document.querySelectorAll(".tab-button");
   const subcatButtons = document.querySelectorAll(".subcat-button");
@@ -588,7 +439,159 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", toggleSubcategory)
   );
 
-  // Initial render for the active tab (Symbols)
   renderSubcategory("basic-maths"); // For Symbols
   renderExpressionSubcategory("sub-super-scripts"); // For Expressions
+
+  // Add a global click listener to deactivate the math layout
+  document.addEventListener("mousedown", (event) => {
+    if (activeMathLayout && !activeMathLayout.contains(event.target)) {
+      deactivateMathLayout(activeMathLayout);
+      activeMathLayout = null;
+    }
+  });
 });
+
+let savedRange = null; // Keep track of the saved range
+
+function activateMathLayout(element) {
+  if (!element) return;
+
+  // Deactivate any previously active element
+  if (activeMathLayout && activeMathLayout !== element) {
+    deactivateMathLayout(activeMathLayout);
+  }
+
+  activeMathLayout = element; // Set the currently active element
+
+  element.classList.add("active"); // Add the 'active' class to show the border/icons
+  addControls(element); // Add controls here
+
+  makeEditable(element); // Make the editable boxes editable
+
+  // Save the current selection range before activating
+  savedRange = window.focusedEditor.getSelection();
+}
+
+function deactivateMathLayout(element) {
+  if (!element) return;
+
+  element.classList.remove("active"); // Remove the 'active' class to hide the border/icons
+  removeControls(element);
+
+  // Remove contenteditable from the editable boxes
+  const editableBoxes = element.querySelectorAll(".editable-box");
+  editableBoxes.forEach((box) => {
+    box.removeAttribute("contenteditable");
+  });
+}
+function removeControls(element) {
+  const controls = element.querySelector(".controls");
+  if (controls) {
+    controls.remove();
+  }
+}
+function makeEditable(element) {
+  const editableBoxes = element.querySelectorAll(".editable-box");
+  editableBoxes.forEach((box) => {
+    box.contentEditable = "true";
+  });
+
+  // Focus the first editable box, or the element itself if no boxes exist
+  if (editableBoxes.length > 0) {
+    editableBoxes.forEach((box) => box.focus());
+  } else {
+    element.focus();
+  }
+}
+
+function enableRuler(element) {
+  const resizer = element.querySelector(".resizer");
+  if (!resizer) return;
+
+  resizer.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    console.log("Ruler Interaction");
+
+    function drag(event) {
+      element.style.transform = `translate(${event.clientX - e.clientX}px, ${
+        event.clientY - e.clientY
+      }px)`;
+    }
+
+    window.addEventListener("mousemove", drag);
+    window.addEventListener(
+      "mouseup",
+      () => {
+        window.removeEventListener("mousemove", drag);
+      },
+      { once: true }
+    );
+  });
+}
+
+function addDropdown(element) {
+  const dropdownTrigger = element.querySelector(".dropdown-trigger");
+  if (!dropdownTrigger) return;
+
+  const dropdownMenu = document.createElement("div");
+  dropdownMenu.className = "dropdown-menu-paper";
+  dropdownMenu.innerHTML = `
+        <div class="dropdown-section">
+            <div class="dropdown-title">Formats</div>
+            <button data-format="inline">Inline Text</button>
+            <button data-format="math">Math Display</button>
+            <button data-format="inline-all">Inline Text (All)</button>
+            <button data-format="math-all">Math Display (All)</button>
+        </div>
+
+        `; // Replace with your actual menu items
+  // <div class="dropdown-section">
+  //     <div class="dropdown-title">Justification</div>
+  //     <button data-justify="left">Left</button>
+  //     <button data-justify="right">Right</button>
+  //     <button data-justify="center">Centered</button>
+  //     <button data-justify="center-group">Centered as a Group</button>
+  // </div>
+  element.appendChild(dropdownMenu);
+
+  dropdownTrigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle("show");
+  });
+
+  // Close the dropdown if clicked outside
+  document.addEventListener("click", () => {
+    dropdownMenu.classList.remove("show");
+  });
+
+  // Add event listeners for the dropdown options
+  dropdownMenu.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent the document click listener from firing immediately
+      const format = button.dataset.format;
+      const justify = button.dataset.justify;
+
+      if (format) {
+        // Handle format options (e.g., apply Quill formatting)
+        console.log(`Applying format: ${format}`);
+      }
+
+      if (justify) {
+        // Handle justification options (e.g., apply CSS styles)
+        console.log(`Applying justification: ${justify}`);
+      }
+
+      dropdownMenu.classList.remove("show"); // Close the dropdown
+    });
+  });
+}
+
+function addControls(element) {
+  const controls = document.createElement("div");
+  controls.className = "controls";
+  controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
+  element.appendChild(controls);
+
+  enableRuler(element);
+  addDropdown(element);
+}
