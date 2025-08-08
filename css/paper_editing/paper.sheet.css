@@ -569,7 +569,7 @@ input.cell:focus {
 
 .math-layout.active {
   border: 2px solid #8837e9; /* Highlight when active */
-  padding: 3px !important; /* Add some space around the element */
+  padding: 30px !important; /* Add some space around the element */
 }
 
 .controls {

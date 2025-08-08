@@ -204,42 +204,95 @@ const expressions = {
     { type: "html", content: "<sup>a+b</sup>/<sub>c-d</sub>" },
     { type: "html", content: "<sup>m^n</sup>/<sub>p^q</sub>" },
   ],
+  fraction: [
+    {
+      type: "html",
+      content: "<sup>x</sup>/<sub>y</sub>",
+      display: "<sup>x</sup>/<sub>y</sub>",
+    },
+    {
+      type: "html",
+      content: "<sup>a+b</sup>/<sub>c-d</sub>",
+      display: "<sup>a+b</sup>/<sub>c-d</sub>",
+    },
+    {
+      type: "html",
+      content: "<sup>m^n</sup>/<sub>p^q</sub>",
+      display: "<sup>m^n</sup>/<sub>p^q</sub>",
+    },
+  ],
   radicals: [
-    { type: "html", content: "√x" },
-    { type: "html", content: "∛y" },
-    { type: "html", content: "∜z" },
-    { type: "html", content: "∜[n]{a}" },
+    { type: "html", content: "√x", display: "√x" },
+    { type: "html", content: "∛y", display: "∛y" },
+    { type: "html", content: "∜z", display: "∜z" },
+    { type: "html", content: "∜[n]{a}", display: "∜[n]{a}" },
   ],
   brackets: [
-    { type: "html", content: "(x)" },
-    { type: "html", content: "[y]" },
-    { type: "html", content: "{z}" },
-    { type: "html", content: "<x>" }, // Use HTML entity for <
-    { type: "html", content: "|v|" },
+    { type: "html", content: "(x)", display: "(x)" },
+    { type: "html", content: "[y]", display: "[y]" },
+    { type: "html", content: "{z}", display: "{z}" },
+    { type: "html", content: "<x>", display: "<x>" }, // Use HTML entity for <
+    { type: "html", content: "|v|", display: "|v|" },
   ],
   summations: [
-    { type: "html", content: "∑<sub>i=1</sub><sup>n</sup> i" },
-    { type: "html", content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>" },
-    { type: "html", content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>" },
+    {
+      type: "html",
+      content: "∑<sub>i=1</sub><sup>n</sup> i",
+      display: "∑<sub>i=1</sub><sup>n</sup> i",
+    },
+    {
+      type: "html",
+      content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
+      display: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
+    },
+    {
+      type: "html",
+      content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
+      display: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
+    },
   ],
   trigonometry: [
-    { type: "html", content: "sin θ" },
-    { type: "html", content: "cos φ" },
-    { type: "html", content: "tan ψ" },
-    { type: "html", content: "sin<sup>-1</sup> x" },
-    { type: "html", content: "cos<sup>-1</sup> y" },
-    { type: "html", content: "tan<sup>-1</sup> z" },
+    { type: "html", content: "sin θ", display: "sin θ" },
+    { type: "html", content: "cos φ", display: "cos φ" },
+    { type: "html", content: "tan ψ", display: "tan ψ" },
+    {
+      type: "html",
+      content: "sin<sup>-1</sup> x",
+      display: "sin<sup>-1</sup> x",
+    },
+    {
+      type: "html",
+      content: "cos<sup>-1</sup> y",
+      display: "cos<sup>-1</sup> y",
+    },
+    {
+      type: "html",
+      content: "tan<sup>-1</sup> z",
+      display: "tan<sup>-1</sup> z",
+    },
   ],
   integrals: [
-    { type: "html", content: "∫ f(x) dx" },
-    { type: "html", content: "∫<sub>a</sub><sup>b</sup> g(x) dx" },
-    { type: "html", content: "∬ f(x, y) dxdy" },
-    { type: "html", content: "∮ C f(z) dz" },
+    { type: "html", content: "∫ f(x) dx", display: "∫ f(x) dx" },
+    {
+      type: "html",
+      content: "∫<sub>a</sub><sup>b</sup> g(x) dx",
+      display: "∫<sub>a</sub><sup>b</sup> g(x) dx",
+    },
+    { type: "html", content: "∬ f(x, y) dxdy", display: "∬ f(x, y) dxdy" },
+    { type: "html", content: "∮ C f(z) dz", display: "∮ C f(z) dz" },
   ],
   logs: [
-    { type: "html", content: "log<sub>2</sub> x" },
-    { type: "html", content: "ln x" },
-    { type: "html", content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>" },
+    {
+      type: "html",
+      content: "log<sub>2</sub> x",
+      display: "log<sub>2</sub> x",
+    },
+    { type: "html", content: "ln x", display: "ln x" },
+    {
+      type: "html",
+      content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
+      display: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
+    },
   ],
 };
 
@@ -293,11 +346,37 @@ function insertIntoEditor(data, range) {
       break;
 
     case "html":
-      quill.clipboard.dangerouslyPasteHTML(
-        range.index,
-        data.content + " ",
-        Quill.sources.USER
-      );
+      // Check for active math layout
+      if (activeMathLayout) {
+        // Insert HTML into the active math layout
+        activeMathLayout.insertAdjacentHTML("beforeend", data.content + " "); // Or 'afterbegin', depending on desired insertion point
+      } else {
+        // Create a new math layout and insert HTML
+        const insertIndex = range.index;
+        quill.insertText(insertIndex, " ", Quill.sources.USER); // Insert a space first
+        quill.clipboard.dangerouslyPasteHTML(
+          insertIndex,
+          `<div class="math-layout">${data.content}</div> `, //Wrap with math-layout
+          Quill.sources.USER
+        );
+
+        //Activate the new math layout
+        setTimeout(() => {
+          const insertedBlot = quill.container.querySelector(
+            ".ql-editor .math-layout:not(.ql-blank)"
+          ); // Select the math-layout that was just inserted
+          if (insertedBlot) {
+            activateMathLayout(insertedBlot);
+
+            // Add double-click handler
+            insertedBlot.addEventListener("dblclick", (event) => {
+              event.preventDefault();
+              event.stopPropagation(); // Prevent the document click listener from firing immediately
+              activateMathLayout(insertedBlot);
+            });
+          }
+        }, 0);
+      }
       break;
 
     case "text":
@@ -494,6 +573,21 @@ function makeEditable(element) {
   const editableBoxes = element.querySelectorAll(".editable-box");
   editableBoxes.forEach((box) => {
     box.contentEditable = "true";
+
+    box.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevent default line break in contenteditable
+
+        const quill = window.focusedEditor;
+        if (quill) {
+          const range = quill.getSelection(true);
+          quill.insertText(range.index + 1, "\n", Quill.sources.USER); // Insert a newline character
+          quill.setSelection(range.index + 2, Quill.sources.SILENT); // Move the cursor after the newline
+        }
+        deactivateMathLayout(element); // Deactivate after pressing enter.
+      }
+    });
+    box.focus();
   });
 
   // Focus the first editable box, or the element itself if no boxes exist
