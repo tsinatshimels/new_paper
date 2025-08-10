@@ -623,59 +623,92 @@ function enableRuler(element) {
   });
 }
 
+// function addDropdown(element) {
+//   const dropdownTrigger = element.querySelector(".dropdown-trigger");
+//   if (!dropdownTrigger) return;
+
+//   const dropdownMenu = document.createElement("div");
+//   dropdownMenu.className = "dropdown-menu-paper";
+//   dropdownMenu.innerHTML = `
+//         <div class="dropdown-section">
+//             <div class="dropdown-title">Formats</div>
+//             <button data-format="inline">Inline Text</button>
+//             <button data-format="math">Math Display</button>
+//             <button data-format="inline-all">Inline Text (All)</button>
+//             <button data-format="math-all">Math Display (All)</button>
+//         </div>
+
+//         `; // Replace with your actual menu items
+//   // <div class="dropdown-section">
+//   //     <div class="dropdown-title">Justification</div>
+//   //     <button data-justify="left">Left</button>
+//   //     <button data-justify="right">Right</button>
+//   //     <button data-justify="center">Centered</button>
+//   //     <button data-justify="center-group">Centered as a Group</button>
+//   // </div>
+//   element.appendChild(dropdownMenu);
+
+//   dropdownTrigger.addEventListener("click", (e) => {
+//     e.stopPropagation();
+//     dropdownMenu.classList.toggle("show");
+//   });
+
+//   // Close the dropdown if clicked outside
+//   document.addEventListener("click", () => {
+//     dropdownMenu.classList.remove("show");
+//   });
+
+//   // Add event listeners for the dropdown options
+//   dropdownMenu.querySelectorAll("button").forEach((button) => {
+//     button.addEventListener("click", (e) => {
+//       e.stopPropagation(); // Prevent the document click listener from firing immediately
+//       const format = button.dataset.format;
+//       const justify = button.dataset.justify;
+
+//       if (format) {
+//         // Handle format options (e.g., apply Quill formatting)
+//         console.log(`Applying format: ${format}`);
+//       }
+
+//       if (justify) {
+//         // Handle justification options (e.g., apply CSS styles)
+//         console.log(`Applying justification: ${justify}`);
+//       }
+
+//       dropdownMenu.classList.remove("show"); // Close the dropdown
+//     });
+//   });
+// }
+
 function addDropdown(element) {
   const dropdownTrigger = element.querySelector(".dropdown-trigger");
   if (!dropdownTrigger) return;
 
-  const dropdownMenu = document.createElement("div");
-  dropdownMenu.className = "dropdown-menu-paper";
-  dropdownMenu.innerHTML = `
-        <div class="dropdown-section">
-            <div class="dropdown-title">Formats</div>
-            <button data-format="inline">Inline Text</button>
-            <button data-format="math">Math Display</button>
-            <button data-format="inline-all">Inline Text (All)</button>
-            <button data-format="math-all">Math Display (All)</button>
-        </div>
+  // Clone template instead of creating HTML
+  const template = document.getElementById("dropdown-template");
+  if (!template) return;
 
-        `; // Replace with your actual menu items
-  // <div class="dropdown-section">
-  //     <div class="dropdown-title">Justification</div>
-  //     <button data-justify="left">Left</button>
-  //     <button data-justify="right">Right</button>
-  //     <button data-justify="center">Centered</button>
-  //     <button data-justify="center-group">Centered as a Group</button>
-  // </div>
+  const dropdownMenu = template.content.cloneNode(true).firstElementChild;
   element.appendChild(dropdownMenu);
 
+  // Toggle dropdown visibility
   dropdownTrigger.addEventListener("click", (e) => {
     e.stopPropagation();
     dropdownMenu.classList.toggle("show");
   });
 
-  // Close the dropdown if clicked outside
-  document.addEventListener("click", () => {
-    dropdownMenu.classList.remove("show");
-  });
+  // Close when clicking outside
+  document.addEventListener("click", () =>
+    dropdownMenu.classList.remove("show")
+  );
 
-  // Add event listeners for the dropdown options
+  // Handle button clicks
   dropdownMenu.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent the document click listener from firing immediately
+      e.stopPropagation();
       const format = button.dataset.format;
-      const justify = button.dataset.justify;
-
-      if (format) {
-        // Handle format options (e.g., apply Quill formatting)
-        console.log(`Applying format: ${format}`);
-      }
-
-      if (justify) {
-        // Handle justification options (e.g., apply CSS styles)
-        console.log(`Applying justification: ${justify}`);
-      }
-
-      dropdownMenu.classList.remove("show"); // Close the dropdown
+      if (format) console.log(`Applying format: ${format}`);
+      dropdownMenu.classList.remove("show");
     });
   });
 }

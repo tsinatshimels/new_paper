@@ -609,12 +609,21 @@ input.cell:focus {
   display: none; /* Hidden by default */
   z-index: 11; /* Above controls */
   width: 200px;
-  height: auto;
+  /* Remove the fixed height: height: auto;  */
+  max-height: 300px; /* Set a maximum height */
+}
+.dropdown-menu-paper.show {
+  display: flex;
+  flex-direction: column;
 }
 
-.dropdown-menu-paper.show {
-  display: block;
-}
 .dropdown-section {
-  /* height: 50px; */
+  /* Style for the sections within the dropdown (Formats, Justification) */
+  margin-bottom: 10px; /* Add spacing between sections */
+  height: 0;
+}
+
+.active-sort-button {
+  background: #8837e9 !important;
+  color: white !important;
 }

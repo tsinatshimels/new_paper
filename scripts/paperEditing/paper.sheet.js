@@ -648,6 +648,10 @@ $(() => {
   $("#sort-asc-btn, #sort-desc-btn").on("click", function () {
     const sortOrder = $(this).attr("id") === "sort-asc-btn" ? "asc" : "desc";
 
+    // ** NEW: Remove active class from all sort buttons, then add to the clicked button **
+    $("#sort-asc-btn, #sort-desc-btn").removeClass("active-sort-button"); // Remove from both buttons
+    $(this).addClass("active-sort-button"); // Add to the clicked button
+
     const $activeTab = $("#filter-column-tabs .filter-tab.active");
     if ($activeTab.length === 0) {
       alert("Please select a column tab to sort.");
