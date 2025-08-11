@@ -521,7 +521,8 @@ input.cell:focus {
   right: 0;
 }
 .math-expression {
-  display: inline-block;
+  /* display: inline-block; */
+  position: relative;
   /* Add any other wrapper styles here */
 }
 
@@ -600,7 +601,7 @@ input.cell:focus {
 .dropdown-menu-paper {
   position: absolute;
   top: 48px;
-  left: 50px;
+  left: 55px;
   background-color: white;
   border: 1px solid #ccc;
   padding: 5px;
@@ -609,12 +610,17 @@ input.cell:focus {
   display: none; /* Hidden by default */
   z-index: 11; /* Above controls */
   width: 200px;
-  /* Remove the fixed height: height: auto;  */
+  font-size: larger;
   max-height: 300px; /* Set a maximum height */
+}
+
+.dropdown-menu-paper > div:not(:nth-child(6)) {
+  padding: 0px 5px;
 }
 .dropdown-menu-paper.show {
   display: flex;
   flex-direction: column;
+  gap: 8px; /* Add some spacing between items */
 }
 
 .dropdown-section {
@@ -626,4 +632,24 @@ input.cell:focus {
 .active-sort-button {
   background: #8837e9 !important;
   color: white !important;
+}
+.justify-submenu {
+  display: none;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+  position: absolute;
+  top: 160px;
+  left: 200px;
+  cursor: pointer;
+  width: 180px; /* Set a fixed width for the submenu */
+}
+
+.justify-submenu.show {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
 }

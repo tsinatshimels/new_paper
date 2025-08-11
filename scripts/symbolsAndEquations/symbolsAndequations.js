@@ -711,6 +711,14 @@ function addDropdown(element) {
       dropdownMenu.classList.remove("show");
     });
   });
+  const justifySubmenu = document.getElementById("justifySubmenu");
+  justifySubmenu.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const submenus = document.querySelector(".justify-submenu");
+    submenus.classList.toggle("show");
+    justifySubmenu.classList.toggle("active-sort-button");
+    console.log("Justification submenu toggled");
+  });
 }
 
 function addControls(element) {
