@@ -1,6 +1,6 @@
 class ToggleComponent {
   constructor(buttonId, targetId) {
-    this.button = document.getElementsByClassName(buttonId);
+    this.button = document.querySelectorAll(`.${buttonId}`);
     this.target = document.getElementById(targetId);
     this.isVisible = false;
     this.button.forEach((button) => {
@@ -390,116 +390,158 @@ const expressions = {
   ],
 };
 
-/**
- * FIX 1: Correctly find the inserted blot and add listeners.
- */
+// --- SINGLE SOURCE OF TRUTH FOR STATE ---
+let activeBlotElement = null;
 
-let activeMathLayout = null; // Global reference to the active blot
-let savedRange = null; // Global reference for editor selection
+// --- CORE STATE MANAGEMENT ---
 
-// --- CORE LOGIC ---
+function deactivateActiveBlot() {
+  if (!activeBlotElement) return;
 
-/**
- * FIX #1: This function is now the single point of truth for activating a blot.
- * It handles the UI and state, ensuring controls are shown correctly.
- */
-function activateMathLayout(element) {
-  if (!element) return;
+  const elementToDeactivate = activeBlotElement;
+  activeBlotElement = null;
 
-  // First, deactivate any other layout that might be active
-  if (activeMathLayout && activeMathLayout !== element) {
-    deactivateMathLayout(activeMathLayout);
-  }
+  elementToDeactivate.classList.remove("active");
+  removeControls(elementToDeactivate);
 
-  // If the element is already active, do nothing.
-  if (element.classList.contains("active")) return;
-
-  // Set the new active layout
-  activeMathLayout = element;
-  element.classList.add("active");
-  addControls(element); // Add the resizer and dropdown icons
-  makeEditable(element); // Set up the inner fields for editing
-}
-
-function deactivateMathLayout(element) {
-  if (!element) return;
-
-  element.classList.remove("active");
-  removeControls(element);
-
-  // Make the inner boxes non-editable again
-  const editableBoxes = element.querySelectorAll(".editable-box");
+  // Handle editable boxes
+  const editableBoxes = elementToDeactivate.querySelectorAll(".editable-box");
   editableBoxes.forEach((box) => {
     box.removeAttribute("contenteditable");
   });
 
-  // Clear the global reference
-  activeMathLayout = null;
+  // Handle math-content divs
+  const mathContent = elementToDeactivate.querySelector(".math-content");
+  if (mathContent) {
+    mathContent.removeAttribute("contenteditable");
+  }
 }
 
-/**
- * Inserts content and correctly activates layouts that need controls.
- */
-function insertIntoEditor(data, range) {
+function activateBlot(elementToActivate) {
+  if (!elementToActivate || elementToActivate === activeBlotElement) {
+    return;
+  }
+
+  deactivateActiveBlot();
+
+  activeBlotElement = elementToActivate;
+  elementToActivate.classList.add("active");
+  addControls(elementToActivate);
+  makeEditable(elementToActivate);
+}
+
+// --- EDITOR AND UI LOGIC ---
+
+function insertIntoEditor(data, lastKnownRange) {
   const quill = window.focusedEditor;
   if (!quill) return;
 
-  range = range || quill.getSelection(true) || { index: 0, length: 0 };
+  // Restore focus to the editor
+  quill.focus();
+
+  // Restore cursor position
+  if (lastKnownRange) {
+    quill.setSelection(lastKnownRange.index, lastKnownRange.length, "silent");
+  }
+
+  const range = quill.getSelection(true);
+  if (!range) return;
 
   if (typeof data === "string") {
-    quill.insertText(range.index, data, Quill.sources.USER);
-    quill.setSelection(range.index + data.length, Quill.sources.SILENT);
+    quill.insertText(range.index, data, "user");
+    quill.setSelection(range.index + data.length, "silent");
     return;
   }
 
   if (data.type === "blot" && data.blotName) {
     const originalIndex = range.index;
-    quill.insertEmbed(
-      originalIndex,
-      data.blotName,
-      data.content,
-      Quill.sources.USER
-    );
-    quill.setSelection(originalIndex + 1, Quill.sources.SILENT);
+    quill.insertEmbed(originalIndex, data.blotName, data.content, "user");
+    quill.setSelection(originalIndex + 1, "silent");
 
-    // If the inserted blot is a special script, activate it immediately.
-    if (data.blotName === "sub-super-script") {
-      // Use setTimeout to ensure Quill has rendered the DOM.
-      setTimeout(() => {
-        const [leaf] = quill.getLeaf(originalIndex);
-        if (leaf && leaf.domNode) {
-          const blotNode = leaf.domNode;
+    // Activate both types of math expressions
+    setTimeout(() => {
+      const [leaf] = quill.getLeaf(originalIndex);
+      if (leaf && leaf.domNode) {
+        const blotNode = leaf.domNode;
+        activateBlot(blotNode);
 
-          // Activate the layout to show controls.
-          activateMathLayout(blotNode);
-
-          // Add a double-click listener for future re-activation.
+        if (!blotNode.hasAttribute("data-dblclick-attached")) {
+          blotNode.setAttribute("data-dblclick-attached", "true");
           blotNode.addEventListener("dblclick", (event) => {
             event.preventDefault();
             event.stopPropagation();
-            activateMathLayout(blotNode);
+            activateBlot(blotNode);
           });
         }
-      }, 0);
+      }
+    }, 0);
+  }
+}
+
+function makeEditable(element) {
+  const quill = window.focusedEditor;
+
+  // Handle sub-super-script with editable boxes
+  const editableBoxes = element.querySelectorAll(".editable-box");
+  if (editableBoxes.length > 0) {
+    editableBoxes.forEach((box) => {
+      box.contentEditable = "true";
+      box.addEventListener("focus", () => quill.disable());
+      box.addEventListener("blur", () => quill.enable());
+      box.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const blot = Quill.find(element);
+          deactivateActiveBlot();
+          if (blot) {
+            const index = quill.getIndex(blot) + blot.length();
+            quill.setSelection(index, 0, "user");
+            quill.focus();
+          }
+        }
+      });
+    });
+  }
+  // Handle math-expression with math-content div
+  else if (element.classList.contains("math-expression-blot")) {
+    const mathContent = element.querySelector(".math-content");
+    if (mathContent) {
+      mathContent.contentEditable = "true";
+      mathContent.addEventListener("focus", () => quill.disable());
+      mathContent.addEventListener("blur", () => quill.enable());
+      mathContent.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const blot = Quill.find(element);
+          deactivateActiveBlot();
+          if (blot) {
+            const index = quill.getIndex(blot) + blot.length();
+            quill.setSelection(index, 0, "user");
+            quill.focus();
+          }
+        }
+      });
     }
   }
 }
 
 function renderExpressions(containerId, expressionsArray) {
   const expressionGrid = document.getElementById(containerId);
-  expressionGrid.innerHTML = ""; // Clear existing content
+  expressionGrid.innerHTML = "";
+  if (!expressionsArray) return;
 
   expressionsArray.forEach((expressionObj) => {
     const div = document.createElement("div");
     div.className = "expression";
     div.innerHTML = expressionObj.display;
-
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (window.focusedEditor) {
-        savedRange = window.focusedEditor.getSelection();
-        insertIntoEditor(expressionObj, savedRange);
+      const quill = window.focusedEditor;
+      if (quill) {
+        // Save the selection *before* calling the insertion function.
+        savedRange = quill.getSelection();
+        insertIntoEditor(expressionObj);
       }
     });
     expressionGrid.appendChild(div);
@@ -508,41 +550,38 @@ function renderExpressions(containerId, expressionsArray) {
 
 function renderSymbols(containerId, symbolsArray) {
   const symbolGrid = document.getElementById(containerId);
-  symbolGrid.innerHTML = ""; // Clear existing content
-
+  symbolGrid.innerHTML = "";
   symbolsArray.forEach((symbol) => {
     const div = document.createElement("div");
     div.className = "symbol";
     div.textContent = symbol;
-
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      if (focusedEditor) {
-        savedRange = focusedEditor.getSelection();
-        insertIntoEditor(symbol, savedRange);
+      e.stopPropagation();
+      const quill = window.focusedEditor;
+      if (quill) {
+        // Save the selection *before* calling the insertion function.
+        savedRange = quill.getSelection();
+        insertIntoEditor(symbol);
       }
     });
     symbolGrid.appendChild(div);
   });
 }
 
+// --- Toggling and Initialization ---
+
 function toggleTab(event) {
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
-
   tabButtons.forEach((button) => button.classList.remove("active"));
   tabContents.forEach((content) => content.classList.remove("active"));
-
   const targetTab = event.target.dataset.tab;
-
   event.target.classList.add("active");
   document.getElementById(targetTab).classList.add("active");
-
-  if (targetTab === "symbols") {
-    renderSubcategory("basic-maths");
-  } else if (targetTab === "expressions") {
+  if (targetTab === "symbols") renderSubcategory("basic-maths");
+  else if (targetTab === "expressions")
     renderExpressionSubcategory("sub-super-scripts");
-  }
 }
 
 function toggleSubcategory(event) {
@@ -551,62 +590,52 @@ function toggleSubcategory(event) {
   const targetSubcat = event.target.dataset.subcat;
   event.target.classList.add("active");
   const activeTab = document.querySelector(".tab-content.active").id;
-
   if (activeTab === "symbols") {
-    switch (targetSubcat) {
-      case "basic-maths":
-        renderSymbols("symbolGrid", basicMathsSymbols);
-        break;
-      case "negations":
-        renderSymbols("symbolGrid", negationsSymbols);
-        break;
-      case "geometry":
-        renderSymbols("symbolGrid", geometrySymbols);
-        break;
-      default:
-        renderSymbols("symbolGrid", basicMathsSymbols);
-    }
+    const symbolMap = {
+      "basic-maths": basicMathsSymbols,
+      negations: negationsSymbols,
+      geometry: geometrySymbols,
+    };
+    renderSymbols("symbolGrid", symbolMap[targetSubcat] || basicMathsSymbols);
   } else if (activeTab === "expressions") {
-    renderExpressions("expressionGrid", expressions[targetSubcat]);
+    renderExpressions(
+      "expressionGrid",
+      expressions[targetSubcat] || expressions["sub-super-scripts"]
+    );
   }
 }
 
 function renderSubcategory(subcat) {
-  const subcatButtons = document.querySelectorAll(".subcat-button");
-  const symbolGrid = document.getElementById("symbolGrid");
-
-  subcatButtons.forEach((button) => button.classList.remove("active"));
-  document.querySelector(`[data-subcat="${subcat}"]`).classList.add("active");
-
-  switch (subcat) {
-    case "basic-maths":
-      renderSymbols("symbolGrid", basicMathsSymbols);
-      break;
-    case "negations":
-      renderSymbols("symbolGrid", negationsSymbols);
-      break;
-    case "geometry":
-      renderSymbols("symbolGrid", geometrySymbols);
-      break;
-    default:
-      renderSymbols("symbolGrid", basicMathsSymbols);
-  }
+  document
+    .querySelectorAll(".subcat-button")
+    .forEach((b) => b.classList.remove("active"));
+  document
+    .querySelector(`.subcat-button[data-subcat="${subcat}"]`)
+    .classList.add("active");
+  const symbolMap = {
+    "basic-maths": basicMathsSymbols,
+    negations: negationsSymbols,
+    geometry: geometrySymbols,
+  };
+  renderSymbols("symbolGrid", symbolMap[subcat] || basicMathsSymbols);
 }
 
 function renderExpressionSubcategory(subcat) {
-  const subcatButtons = document.querySelectorAll(".subcat-button");
-  const expressionGrid = document.getElementById("expressionGrid");
-
-  subcatButtons.forEach((button) => button.classList.remove("active"));
-  document.querySelector(`[data-subcat="${subcat}"]`).classList.add("active");
-
-  renderExpressions("expressionGrid", expressions[subcat]);
+  document
+    .querySelectorAll(".subcat-button")
+    .forEach((b) => b.classList.remove("active"));
+  document
+    .querySelector(`.subcat-button[data-subcat="${subcat}"]`)
+    .classList.add("active");
+  renderExpressions(
+    "expressionGrid",
+    expressions[subcat] || expressions["sub-super-scripts"]
+  );
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const tabButtons = document.querySelectorAll(".tab-button");
   const subcatButtons = document.querySelectorAll(".subcat-button");
-
   tabButtons.forEach((button) => button.addEventListener("click", toggleTab));
   subcatButtons.forEach((button) =>
     button.addEventListener("click", toggleSubcategory)
@@ -616,16 +645,27 @@ document.addEventListener("DOMContentLoaded", () => {
   renderExpressionSubcategory("sub-super-scripts");
 
   document.addEventListener(
-    "mousedown",
+    "click",
     (event) => {
-      if (activeMathLayout && !activeMathLayout.contains(event.target)) {
-        deactivateMathLayout(activeMathLayout);
-        activeMathLayout = null;
+      if (activeBlotElement && !activeBlotElement.contains(event.target)) {
+        deactivateActiveBlot();
       }
     },
     true
   );
 });
+
+// --- CONTROL-ADDING FUNCTIONS ---
+
+function addControls(element) {
+  if (element.querySelector(".controls")) return;
+  const controls = document.createElement("div");
+  controls.className = "controls";
+  controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
+  element.appendChild(controls);
+  enableRuler(element);
+  addDropdown(element);
+}
 
 function removeControls(element) {
   const controls = element.querySelector(".controls");
@@ -634,55 +674,21 @@ function removeControls(element) {
   }
 }
 
-/**
- * FIX 2: Defer focus with setTimeout to prevent stack overflow and improve 'Enter' key behavior.
- */
-
-function makeEditable(element) {
-  const editableBoxes = element.querySelectorAll(".editable-box");
-  const quill = window.focusedEditor;
-
-  editableBoxes.forEach((box) => {
-    box.contentEditable = "true";
-
-    // Temporarily disable Quill when typing inside a box to prevent conflicts
-    box.addEventListener("focus", () => quill.disable());
-    box.addEventListener("blur", () => quill.enable());
-
-    // Handle 'Enter' key to exit the blot gracefully
-    box.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        const blot = Quill.find(element);
-        if (blot) {
-          const index = quill.getIndex(blot) + blot.length();
-          deactivateMathLayout(element); // Deactivate first
-          quill.setSelection(index, 0, Quill.sources.USER); // Move cursor after
-          quill.focus(); // Return focus to the main editor
-        }
-      }
-    });
-  });
-}
 function enableRuler(element) {
   const resizer = element.querySelector(".resizer");
   if (!resizer) return;
   resizer.addEventListener("mousedown", (e) => {
     e.preventDefault();
-    console.log("Ruler Interaction");
-
+    e.stopPropagation();
     function drag(event) {
       element.style.transform = `translate(${event.clientX - e.clientX}px, ${
         event.clientY - e.clientY
       }px)`;
     }
-
     window.addEventListener("mousemove", drag);
     window.addEventListener(
       "mouseup",
-      () => {
-        window.removeEventListener("mousemove", drag);
-      },
+      () => window.removeEventListener("mousemove", drag),
       { once: true }
     );
   });
@@ -720,13 +726,13 @@ function addDropdown(element) {
   });
 }
 
-function addControls(element) {
-  if (element.querySelector(".controls")) return;
-  const controls = document.createElement("div");
-  controls.className = "controls";
-  controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
-  element.appendChild(controls);
+// function addControls(element) {
+//   if (element.querySelector(".controls")) return;
+//   const controls = document.createElement("div");
+//   controls.className = "controls";
+//   controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
+//   element.appendChild(controls);
 
-  enableRuler(element);
-  addDropdown(element);
-}
+//   enableRuler(element);
+//   addDropdown(element);
+// }

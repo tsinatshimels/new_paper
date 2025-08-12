@@ -436,7 +436,7 @@ input.cell:focus {
   min-height: 60px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   position: relative;
 }
 
@@ -526,15 +526,6 @@ input.cell:focus {
   /* Add any other wrapper styles here */
 }
 
-.math-layout {
-  border: 1px solid transparent;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
 /* Editable input boxes */
 .editable-box {
   width: 24px;
@@ -552,7 +543,7 @@ input.cell:focus {
   min-height: 60px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   position: relative;
 }
 
@@ -571,6 +562,7 @@ input.cell:focus {
 .math-layout.active {
   border: 2px solid #8837e9; /* Highlight when active */
   padding: 30px !important; /* Add some space around the element */
+  width: 12px;
 }
 
 .controls {

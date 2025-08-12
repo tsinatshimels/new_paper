@@ -1680,20 +1680,26 @@ SubSuperScriptBlot.tagName = "div";
 SubSuperScriptBlot.className = "sub-super-script-wrapper";
 Quill.register(SubSuperScriptBlot);
 
-// This blot remains the same
+// In quill.bolt.js
 class MathExpressionBlot extends BlockEmbed {
   static create(value) {
     const node = super.create();
     node.setAttribute("contenteditable", "false");
-    // The value now correctly comes in as an object { content: "..." }
-    node.innerHTML = value.content;
-    node.classList.add("math-expression-blot");
+    node.classList.add("math-expression-blot", "math-layout");
+
+    // Create a container for the content
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "math-content";
+    contentDiv.innerHTML = value.content;
+    node.appendChild(contentDiv);
+
     return node;
   }
 
   static value(node) {
+    const contentDiv = node.querySelector(".math-content");
     return {
-      content: node.innerHTML,
+      content: contentDiv.innerHTML,
     };
   }
 }
