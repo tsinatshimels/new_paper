@@ -161,231 +161,327 @@ const expressions = {
   "sub-super-scripts": [
     {
       type: "blot",
+      blotName: "sub-super-script",
       content: { layout: "diagonal-lr" },
       display:
         '<div class="math-layout diagonal"><span class="editable-box bottom-left"></span><span class="editable-box top-right"></span></div>',
     },
     {
       type: "blot",
+      blotName: "sub-super-script",
       content: { layout: "diagonal-rl" },
       display:
         '<div class="math-layout diagonal"><span class="editable-box top-left"></span><span class="editable-box bottom-right"></span></div>',
     },
     {
       type: "blot",
+      blotName: "sub-super-script",
       content: { layout: "vertical-right" },
       display:
         '<div class="math-layout dual"><span class="editable-box top-middle-left"></span><div class="vertical-right"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
     },
     {
       type: "blot",
+      blotName: "sub-super-script",
       content: { layout: "vertical-left" },
       display:
         '<div class="math-layout dual"><span class="editable-box top-middle-right"></span><div class="vertical-left"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
     },
     {
       type: "blot",
-      content: { layout: "e-power-neg-x" },
+      blotName: "math-expression",
+      content: { content: "e<sup>-x</sup>" },
       display: '<div class="math-layout"><span>e<sup>-x</sup></span></div>',
     },
     {
       type: "blot",
-      content: { layout: "x-squared" },
+      blotName: "math-expression",
+      content: { content: "x<sup>2</sup>" },
       display: '<div class="math-layout"><span>x<sup>2</sup></span></div>',
     },
     {
       type: "blot",
-      content: { layout: "n-sub-1-y" },
+      blotName: "math-expression",
+      content: { content: "n<sub>1</sub>Y" },
       display: '<div class="math-layout"><span>n<sub>1</sub>Y</span></div>',
     },
   ],
   fraction: [
-    { type: "html", content: "<sup>x</sup>/<sub>y</sub>" },
-    { type: "html", content: "<sup>a+b</sup>/<sub>c-d</sub>" },
-    { type: "html", content: "<sup>m^n</sup>/<sub>p^q</sub>" },
-  ],
-  fraction: [
     {
-      type: "html",
-      content: "<sup>x</sup>/<sub>y</sub>",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "<sup>x</sup>/<sub>y</sub>" },
       display: "<sup>x</sup>/<sub>y</sub>",
     },
     {
-      type: "html",
-      content: "<sup>a+b</sup>/<sub>c-d</sub>",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "<sup>a+b</sup>/<sub>c-d</sub>" },
       display: "<sup>a+b</sup>/<sub>c-d</sub>",
     },
     {
-      type: "html",
-      content: "<sup>m^n</sup>/<sub>p^q</sub>",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "<sup>m^n</sup>/<sub>p^q</sub>" },
       display: "<sup>m^n</sup>/<sub>p^q</sub>",
     },
   ],
   radicals: [
-    { type: "html", content: "√x", display: "√x" },
-    { type: "html", content: "∛y", display: "∛y" },
-    { type: "html", content: "∜z", display: "∜z" },
-    { type: "html", content: "∜[n]{a}", display: "∜[n]{a}" },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "√x" },
+      display: "√x",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∛y" },
+      display: "∛y",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∜z" },
+      display: "∜z",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∜[n]{a}" },
+      display: "∜[n]{a}",
+    },
   ],
   brackets: [
-    { type: "html", content: "(x)", display: "(x)" },
-    { type: "html", content: "[y]", display: "[y]" },
-    { type: "html", content: "{z}", display: "{z}" },
-    { type: "html", content: "<x>", display: "<x>" }, // Use HTML entity for <
-    { type: "html", content: "|v|", display: "|v|" },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "(x)" },
+      display: "(x)",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "[y]" },
+      display: "[y]",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "{z}" },
+      display: "{z}",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "<x>" },
+      display: "<x>",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "|v|" },
+      display: "|v|",
+    },
   ],
   summations: [
     {
-      type: "html",
-      content: "∑<sub>i=1</sub><sup>n</sup> i",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∑<sub>i=1</sub><sup>n</sup> i" },
       display: "∑<sub>i=1</sub><sup>n</sup> i",
     },
     {
-      type: "html",
-      content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>" },
       display: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
     },
     {
-      type: "html",
-      content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>" },
       display: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
     },
   ],
   trigonometry: [
-    { type: "html", content: "sin θ", display: "sin θ" },
-    { type: "html", content: "cos φ", display: "cos φ" },
-    { type: "html", content: "tan ψ", display: "tan ψ" },
     {
-      type: "html",
-      content: "sin<sup>-1</sup> x",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "sin θ" },
+      display: "sin θ",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "cos φ" },
+      display: "cos φ",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "tan ψ" },
+      display: "tan ψ",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "sin<sup>-1</sup> x" },
       display: "sin<sup>-1</sup> x",
     },
     {
-      type: "html",
-      content: "cos<sup>-1</sup> y",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "cos<sup>-1</sup> y" },
       display: "cos<sup>-1</sup> y",
     },
     {
-      type: "html",
-      content: "tan<sup>-1</sup> z",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "tan<sup>-1</sup> z" },
       display: "tan<sup>-1</sup> z",
     },
   ],
   integrals: [
-    { type: "html", content: "∫ f(x) dx", display: "∫ f(x) dx" },
     {
-      type: "html",
-      content: "∫<sub>a</sub><sup>b</sup> g(x) dx",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∫ f(x) dx" },
+      display: "∫ f(x) dx",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∫<sub>a</sub><sup>b</sup> g(x) dx" },
       display: "∫<sub>a</sub><sup>b</sup> g(x) dx",
     },
-    { type: "html", content: "∬ f(x, y) dxdy", display: "∬ f(x, y) dxdy" },
-    { type: "html", content: "∮ C f(z) dz", display: "∮ C f(z) dz" },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∬ f(x, y) dxdy" },
+      display: "∬ f(x, y) dxdy",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "∮ C f(z) dz" },
+      display: "∮ C f(z) dz",
+    },
   ],
   logs: [
     {
-      type: "html",
-      content: "log<sub>2</sub> x",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "log<sub>2</sub> x" },
       display: "log<sub>2</sub> x",
     },
-    { type: "html", content: "ln x", display: "ln x" },
     {
-      type: "html",
-      content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "ln x" },
+      display: "ln x",
+    },
+    {
+      type: "blot",
+      blotName: "math-expression",
+      content: { content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>" },
       display: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
     },
   ],
 };
 
-let activeMathLayout = null; // Keep track of the currently active math-layout element
+/**
+ * FIX 1: Correctly find the inserted blot and add listeners.
+ */
 
+let activeMathLayout = null; // Global reference to the active blot
+let savedRange = null; // Global reference for editor selection
+
+// --- CORE LOGIC ---
+
+/**
+ * FIX #1: This function is now the single point of truth for activating a blot.
+ * It handles the UI and state, ensuring controls are shown correctly.
+ */
+function activateMathLayout(element) {
+  if (!element) return;
+
+  // First, deactivate any other layout that might be active
+  if (activeMathLayout && activeMathLayout !== element) {
+    deactivateMathLayout(activeMathLayout);
+  }
+
+  // If the element is already active, do nothing.
+  if (element.classList.contains("active")) return;
+
+  // Set the new active layout
+  activeMathLayout = element;
+  element.classList.add("active");
+  addControls(element); // Add the resizer and dropdown icons
+  makeEditable(element); // Set up the inner fields for editing
+}
+
+function deactivateMathLayout(element) {
+  if (!element) return;
+
+  element.classList.remove("active");
+  removeControls(element);
+
+  // Make the inner boxes non-editable again
+  const editableBoxes = element.querySelectorAll(".editable-box");
+  editableBoxes.forEach((box) => {
+    box.removeAttribute("contenteditable");
+  });
+
+  // Clear the global reference
+  activeMathLayout = null;
+}
+
+/**
+ * Inserts content and correctly activates layouts that need controls.
+ */
 function insertIntoEditor(data, range) {
   const quill = window.focusedEditor;
-  if (!quill) {
-    console.warn("No editor is currently focused.");
-    return;
-  }
+  if (!quill) return;
 
-  if (!range) {
-    range = quill.getSelection(true);
-  }
+  range = range || quill.getSelection(true) || { index: 0, length: 0 };
 
-  // Check if the data is a plain string (from the symbols tab)
   if (typeof data === "string") {
     quill.insertText(range.index, data, Quill.sources.USER);
     quill.setSelection(range.index + data.length, Quill.sources.SILENT);
     return;
   }
 
-  // Otherwise, it's an object from the expressions tab
-  switch (data.type) {
-    case "blot":
-      quill.insertEmbed(
-        range.index,
-        "sub-super-script",
-        data.content,
-        Quill.sources.USER
-      );
-      quill.setSelection(range.index + 1, Quill.sources.SILENT);
+  if (data.type === "blot" && data.blotName) {
+    const originalIndex = range.index;
+    quill.insertEmbed(
+      originalIndex,
+      data.blotName,
+      data.content,
+      Quill.sources.USER
+    );
+    quill.setSelection(originalIndex + 1, Quill.sources.SILENT);
 
-      // Use setTimeout to ensure DOM is updated and Quill has finished its rendering
+    // If the inserted blot is a special script, activate it immediately.
+    if (data.blotName === "sub-super-script") {
+      // Use setTimeout to ensure Quill has rendered the DOM.
       setTimeout(() => {
-        const insertedBlot = quill.container.querySelector(
-          ".ql-editor .math-layout:not(.ql-blank)"
-        ); // Select the math-layout that was just inserted
-        if (insertedBlot) {
-          activateMathLayout(insertedBlot);
+        const [leaf] = quill.getLeaf(originalIndex);
+        if (leaf && leaf.domNode) {
+          const blotNode = leaf.domNode;
 
-          // Add double-click handler
-          insertedBlot.addEventListener("dblclick", (event) => {
+          // Activate the layout to show controls.
+          activateMathLayout(blotNode);
+
+          // Add a double-click listener for future re-activation.
+          blotNode.addEventListener("dblclick", (event) => {
             event.preventDefault();
-            event.stopPropagation(); // Prevent the document click listener from firing immediately
-            activateMathLayout(insertedBlot);
+            event.stopPropagation();
+            activateMathLayout(blotNode);
           });
         }
       }, 0);
-      break;
-
-    case "html":
-      // Check for active math layout
-      if (activeMathLayout) {
-        // Insert HTML into the active math layout
-        activeMathLayout.insertAdjacentHTML("beforeend", data.content + " "); // Or 'afterbegin', depending on desired insertion point
-      } else {
-        // Create a new math layout and insert HTML
-        const insertIndex = range.index;
-        quill.insertText(insertIndex, " ", Quill.sources.USER); // Insert a space first
-        quill.clipboard.dangerouslyPasteHTML(
-          insertIndex,
-          `<div class="math-layout">${data.content}</div> `, //Wrap with math-layout
-          Quill.sources.USER
-        );
-
-        //Activate the new math layout
-        setTimeout(() => {
-          const insertedBlot = quill.container.querySelector(
-            ".ql-editor .math-layout:not(.ql-blank)"
-          ); // Select the math-layout that was just inserted
-          if (insertedBlot) {
-            activateMathLayout(insertedBlot);
-
-            // Add double-click handler
-            insertedBlot.addEventListener("dblclick", (event) => {
-              event.preventDefault();
-              event.stopPropagation(); // Prevent the document click listener from firing immediately
-              activateMathLayout(insertedBlot);
-            });
-          }
-        }, 0);
-      }
-      break;
-
-    case "text":
-      quill.insertText(range.index, data.content, Quill.sources.USER);
-      quill.setSelection(
-        range.index + data.content.length,
-        Quill.sources.SILENT
-      );
-      break;
+    }
   }
 }
 
@@ -400,6 +496,7 @@ function renderExpressions(containerId, expressionsArray) {
 
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (window.focusedEditor) {
         savedRange = window.focusedEditor.getSelection();
         insertIntoEditor(expressionObj, savedRange);
@@ -419,7 +516,7 @@ function renderSymbols(containerId, symbolsArray) {
     div.textContent = symbol;
 
     div.addEventListener("mousedown", (e) => {
-      e.preventDefault(); // Stops focus shift
+      e.preventDefault();
       if (focusedEditor) {
         savedRange = focusedEditor.getSelection();
         insertIntoEditor(symbol, savedRange);
@@ -442,20 +539,17 @@ function toggleTab(event) {
   document.getElementById(targetTab).classList.add("active");
 
   if (targetTab === "symbols") {
-    renderSubcategory("basic-maths"); // Default to Basic Maths
+    renderSubcategory("basic-maths");
   } else if (targetTab === "expressions") {
-    renderExpressionSubcategory("sub-super-scripts"); // Default to Sub/Super Scripts
+    renderExpressionSubcategory("sub-super-scripts");
   }
 }
 
 function toggleSubcategory(event) {
   const subcatButtons = document.querySelectorAll(".subcat-button");
-
   subcatButtons.forEach((button) => button.classList.remove("active"));
-
   const targetSubcat = event.target.dataset.subcat;
   event.target.classList.add("active");
-
   const activeTab = document.querySelector(".tab-content.active").id;
 
   if (activeTab === "symbols") {
@@ -518,90 +612,61 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", toggleSubcategory)
   );
 
-  renderSubcategory("basic-maths"); // For Symbols
-  renderExpressionSubcategory("sub-super-scripts"); // For Expressions
+  renderSubcategory("basic-maths");
+  renderExpressionSubcategory("sub-super-scripts");
 
-  // Add a global click listener to deactivate the math layout
-  document.addEventListener("mousedown", (event) => {
-    if (activeMathLayout && !activeMathLayout.contains(event.target)) {
-      deactivateMathLayout(activeMathLayout);
-      activeMathLayout = null;
-    }
-  });
+  document.addEventListener(
+    "mousedown",
+    (event) => {
+      if (activeMathLayout && !activeMathLayout.contains(event.target)) {
+        deactivateMathLayout(activeMathLayout);
+        activeMathLayout = null;
+      }
+    },
+    true
+  );
 });
 
-let savedRange = null; // Keep track of the saved range
-
-function activateMathLayout(element) {
-  if (!element) return;
-
-  // Deactivate any previously active element
-  if (activeMathLayout && activeMathLayout !== element) {
-    deactivateMathLayout(activeMathLayout);
-  }
-
-  activeMathLayout = element; // Set the currently active element
-
-  element.classList.add("active"); // Add the 'active' class to show the border/icons
-  addControls(element); // Add controls here
-
-  makeEditable(element); // Make the editable boxes editable
-
-  // Save the current selection range before activating
-  savedRange = window.focusedEditor.getSelection();
-}
-
-function deactivateMathLayout(element) {
-  if (!element) return;
-
-  element.classList.remove("active"); // Remove the 'active' class to hide the border/icons
-  removeControls(element);
-
-  // Remove contenteditable from the editable boxes
-  const editableBoxes = element.querySelectorAll(".editable-box");
-  editableBoxes.forEach((box) => {
-    box.removeAttribute("contenteditable");
-  });
-}
 function removeControls(element) {
   const controls = element.querySelector(".controls");
   if (controls) {
     controls.remove();
   }
 }
+
+/**
+ * FIX 2: Defer focus with setTimeout to prevent stack overflow and improve 'Enter' key behavior.
+ */
+
 function makeEditable(element) {
   const editableBoxes = element.querySelectorAll(".editable-box");
+  const quill = window.focusedEditor;
+
   editableBoxes.forEach((box) => {
     box.contentEditable = "true";
 
+    // Temporarily disable Quill when typing inside a box to prevent conflicts
+    box.addEventListener("focus", () => quill.disable());
+    box.addEventListener("blur", () => quill.enable());
+
+    // Handle 'Enter' key to exit the blot gracefully
     box.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        event.preventDefault(); // Prevent default line break in contenteditable
-
-        const quill = window.focusedEditor;
-        if (quill) {
-          const range = quill.getSelection(true);
-          quill.insertText(range.index + 1, "\n", Quill.sources.USER); // Insert a newline character
-          quill.setSelection(range.index + 2, Quill.sources.SILENT); // Move the cursor after the newline
+        event.preventDefault();
+        const blot = Quill.find(element);
+        if (blot) {
+          const index = quill.getIndex(blot) + blot.length();
+          deactivateMathLayout(element); // Deactivate first
+          quill.setSelection(index, 0, Quill.sources.USER); // Move cursor after
+          quill.focus(); // Return focus to the main editor
         }
-        deactivateMathLayout(element); // Deactivate after pressing enter.
       }
     });
-    box.focus();
   });
-
-  // Focus the first editable box, or the element itself if no boxes exist
-  if (editableBoxes.length > 0) {
-    editableBoxes.forEach((box) => box.focus());
-  } else {
-    element.focus();
-  }
 }
-
 function enableRuler(element) {
   const resizer = element.querySelector(".resizer");
   if (!resizer) return;
-
   resizer.addEventListener("mousedown", (e) => {
     e.preventDefault();
     console.log("Ruler Interaction");
@@ -623,86 +688,20 @@ function enableRuler(element) {
   });
 }
 
-// function addDropdown(element) {
-//   const dropdownTrigger = element.querySelector(".dropdown-trigger");
-//   if (!dropdownTrigger) return;
-
-//   const dropdownMenu = document.createElement("div");
-//   dropdownMenu.className = "dropdown-menu-paper";
-//   dropdownMenu.innerHTML = `
-//         <div class="dropdown-section">
-//             <div class="dropdown-title">Formats</div>
-//             <button data-format="inline">Inline Text</button>
-//             <button data-format="math">Math Display</button>
-//             <button data-format="inline-all">Inline Text (All)</button>
-//             <button data-format="math-all">Math Display (All)</button>
-//         </div>
-
-//         `; // Replace with your actual menu items
-//   // <div class="dropdown-section">
-//   //     <div class="dropdown-title">Justification</div>
-//   //     <button data-justify="left">Left</button>
-//   //     <button data-justify="right">Right</button>
-//   //     <button data-justify="center">Centered</button>
-//   //     <button data-justify="center-group">Centered as a Group</button>
-//   // </div>
-//   element.appendChild(dropdownMenu);
-
-//   dropdownTrigger.addEventListener("click", (e) => {
-//     e.stopPropagation();
-//     dropdownMenu.classList.toggle("show");
-//   });
-
-//   // Close the dropdown if clicked outside
-//   document.addEventListener("click", () => {
-//     dropdownMenu.classList.remove("show");
-//   });
-
-//   // Add event listeners for the dropdown options
-//   dropdownMenu.querySelectorAll("button").forEach((button) => {
-//     button.addEventListener("click", (e) => {
-//       e.stopPropagation(); // Prevent the document click listener from firing immediately
-//       const format = button.dataset.format;
-//       const justify = button.dataset.justify;
-
-//       if (format) {
-//         // Handle format options (e.g., apply Quill formatting)
-//         console.log(`Applying format: ${format}`);
-//       }
-
-//       if (justify) {
-//         // Handle justification options (e.g., apply CSS styles)
-//         console.log(`Applying justification: ${justify}`);
-//       }
-
-//       dropdownMenu.classList.remove("show"); // Close the dropdown
-//     });
-//   });
-// }
-
 function addDropdown(element) {
   const dropdownTrigger = element.querySelector(".dropdown-trigger");
   if (!dropdownTrigger) return;
-
-  // Clone template instead of creating HTML
   const template = document.getElementById("dropdown-template");
   if (!template) return;
-
   const dropdownMenu = template.content.cloneNode(true).firstElementChild;
   element.appendChild(dropdownMenu);
-
-  // Toggle dropdown visibility
   dropdownTrigger.addEventListener("click", (e) => {
     e.stopPropagation();
     dropdownMenu.classList.toggle("show");
   });
-
-  // Close when clicking outside
   document.addEventListener("click", () =>
     dropdownMenu.classList.remove("show")
   );
-
-  // Handle button clicks
   dropdownMenu.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -722,6 +721,7 @@ function addDropdown(element) {
 }
 
 function addControls(element) {
+  if (element.querySelector(".controls")) return;
   const controls = document.createElement("div");
   controls.className = "controls";
   controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;

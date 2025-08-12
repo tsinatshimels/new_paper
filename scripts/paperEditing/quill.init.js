@@ -1,35 +1,3 @@
-// Initialize Quill with multiple editors
-
-// const BlockEmbed = Quill.import("blots/block/embed");
-
-// class MathQuillBlot extends BlockEmbed {
-//   static create(value) {
-//     const node = super.create();
-//     node.classList.add("mathquill-container");
-
-//     const span = document.createElement("span");
-//     span.classList.add("mathquill-field");
-
-//     const MQ = MathQuill.getInterface(2);
-//     const mathField = MQ.StaticMath(span);
-//     mathField.latex(value || "");
-
-//     node.appendChild(span);
-//     return node;
-//   }
-
-//   static value(node) {
-//     const latex = node.querySelector(".mathquill-field").textContent;
-//     return latex || "";
-//   }
-// }
-
-// MathQuillBlot.blotName = "mathquill";
-// MathQuillBlot.tagName = "div";
-// MathQuillBlot.className = "mathquill-wrapper";
-
-// Quill.register(MathQuillBlot);
-
 const paperEditors = [];
 let currentEditorIndex = 0;
 const paperEditor = document.getElementById("editor_paper--wrapper");
@@ -125,45 +93,6 @@ function setupEditorListener(editor) {
     }
   });
 }
-
-// function handleOverflow(editor) {
-//   const editorElement = editor?.container?.querySelector(".ql-editor");
-//   const currentIndex = paperEditors.indexOf(editor);
-//   let nextEditor;
-
-//   nextEditor = createNewEditor();
-
-//   // Get the content that overflows
-//   const length = editor?.getLength();
-//   const text = editor?.getText();
-
-//   // Find the last paragraph break that fits
-//   let lastFittingIndex = findLastFittingParagraph(editor);
-
-//   if (lastFittingIndex < length - 1) {
-//     // Get the overflow content
-//     const overflowText = editor.getText(lastFittingIndex);
-//     const overflowContent = editor.getContents(lastFittingIndex);
-
-//     // Remove overflow content from current editor
-//     editor.deleteText(lastFittingIndex, length);
-
-//     // Insert overflow content at the beginning of next editor
-//     nextEditor.setContents(overflowContent);
-
-//     // Immediately scroll and focus the next editor
-//     const nextEditorElement = nextEditor.container.parentElement;
-//     nextEditorElement.scrollIntoView({
-//       behavior: "smooth",
-//       block: "start",
-//     });
-
-//     // Focus and place cursor at beginning of the next editor immediately
-//     nextEditor.focus();
-//     nextEditor.setSelection(0, 0);
-//   }
-// }
-// ... existing code ...
 
 function handleOverflow(editor) {
   const editorElement = editor?.container?.querySelector(".ql-editor");
