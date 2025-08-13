@@ -9,7 +9,6 @@ class ToggleComponent {
   }
 
   toggle() {
-    console.log(this.target);
     this.isVisible = !this.isVisible;
     this.target.style.display = this.isVisible ? "block" : "none";
   }
@@ -17,7 +16,7 @@ class ToggleComponent {
 
 const toggle = new ToggleComponent("equationButton", "equations_and_symbols");
 
-// Arrays of symbols for each subcategory
+// Arrays of symbols and expressions... (NO CHANGES HERE)
 const basicMathsSymbols = [
   "±",
   "∞",
@@ -136,7 +135,6 @@ const negationsSymbols = [
   "⇚",
   "⇛̸",
 ];
-
 const geometrySymbols = [
   "⌞",
   "∡",
@@ -156,7 +154,6 @@ const geometrySymbols = [
   "∵",
   "▮",
 ];
-
 const expressions = {
   "sub-super-scripts": [
     {
@@ -390,146 +387,111 @@ const expressions = {
   ],
 };
 
-// --- SINGLE SOURCE OF TRUTH FOR STATE ---
+// --- SIMPLIFIED STATE MANAGEMENT ---
 let activeBlotElement = null;
-
-// --- CORE STATE MANAGEMENT ---
+let isInserting = false; // Our guard flag
 
 function deactivateActiveBlot() {
   if (!activeBlotElement) return;
-
   const elementToDeactivate = activeBlotElement;
   activeBlotElement = null;
-
   elementToDeactivate.classList.remove("active");
   removeControls(elementToDeactivate);
-
-  // Handle editable boxes
-  const editableBoxes = elementToDeactivate.querySelectorAll(".editable-box");
-  editableBoxes.forEach((box) => {
-    box.removeAttribute("contenteditable");
-  });
-
-  // Handle math-content divs
-  const mathContent = elementToDeactivate.querySelector(".math-content");
-  if (mathContent) {
-    mathContent.removeAttribute("contenteditable");
-  }
 }
 
 function activateBlot(elementToActivate) {
-  if (!elementToActivate || elementToActivate === activeBlotElement) {
-    return;
-  }
-
-  deactivateActiveBlot();
-
+  if (!elementToActivate || elementToActivate === activeBlotElement) return;
+  deactivateActiveBlot(); // Deactivate any other blot first.
   activeBlotElement = elementToActivate;
   elementToActivate.classList.add("active");
   addControls(elementToActivate);
-  makeEditable(elementToActivate);
 }
 
-// --- EDITOR AND UI LOGIC ---
-
-function insertIntoEditor(data, lastKnownRange) {
+function insertIntoEditor(data) {
   const quill = window.focusedEditor;
   if (!quill) return;
 
-  // Restore focus to the editor
+  isInserting = true; // Set the guard
+
   quill.focus();
-
-  // Restore cursor position
-  if (lastKnownRange) {
-    quill.setSelection(lastKnownRange.index, lastKnownRange.length, "silent");
-  }
-
-  const range = quill.getSelection(true);
-  if (!range) return;
-
-  if (typeof data === "string") {
-    quill.insertText(range.index, data, "user");
-    quill.setSelection(range.index + data.length, "silent");
-    return;
-  }
+  const range = quill.getSelection(true) || { index: quill.getLength() };
 
   if (data.type === "blot" && data.blotName) {
     const originalIndex = range.index;
     quill.insertEmbed(originalIndex, data.blotName, data.content, "user");
     quill.setSelection(originalIndex + 1, "silent");
 
-    // Activate both types of math expressions
     setTimeout(() => {
       const [leaf] = quill.getLeaf(originalIndex);
       if (leaf && leaf.domNode) {
-        const blotNode = leaf.domNode;
-        activateBlot(blotNode);
-
-        if (!blotNode.hasAttribute("data-dblclick-attached")) {
-          blotNode.setAttribute("data-dblclick-attached", "true");
-          blotNode.addEventListener("dblclick", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            activateBlot(blotNode);
-          });
+        const blotNode = leaf.domNode.closest(
+          ".sub-super-script-wrapper, .math-expression-blot"
+        );
+        if (blotNode) {
+          activateBlot(blotNode);
+          const firstEditable = blotNode.querySelector(
+            '[contenteditable="true"]'
+          );
+          if (firstEditable) {
+            firstEditable.focus();
+          }
         }
       }
+      // After a short delay, remove the guard
+      setTimeout(() => {
+        isInserting = false;
+      }, 100);
     }, 0);
+  } else if (typeof data === "string") {
+    quill.insertText(range.index, data, "user");
+    quill.setSelection(range.index + data.length, "silent");
+    isInserting = false; // Remove guard immediately for simple text
   }
 }
 
-function makeEditable(element) {
-  const quill = window.focusedEditor;
+// Global click handler is now the primary controller
+document.addEventListener("DOMContentLoaded", () => {
+  renderSubcategory("basic-maths");
+  renderExpressionSubcategory("sub-super-scripts");
 
-  // Handle sub-super-script with editable boxes
-  const editableBoxes = element.querySelectorAll(".editable-box");
-  if (editableBoxes.length > 0) {
-    editableBoxes.forEach((box) => {
-      box.contentEditable = "true";
-      box.addEventListener("focus", () => quill.disable());
-      box.addEventListener("blur", () => quill.enable());
-      box.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          const blot = Quill.find(element);
-          deactivateActiveBlot();
-          if (blot) {
-            const index = quill.getIndex(blot) + blot.length();
-            quill.setSelection(index, 0, "user");
-            quill.focus();
-          }
-        }
-      });
-    });
-  }
-  // Handle math-expression with math-content div
-  else if (element.classList.contains("math-expression-blot")) {
-    const mathContent = element.querySelector(".math-content");
-    if (mathContent) {
-      mathContent.contentEditable = "true";
-      mathContent.addEventListener("focus", () => quill.disable());
-      mathContent.addEventListener("blur", () => quill.enable());
-      mathContent.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          const blot = Quill.find(element);
-          deactivateActiveBlot();
-          if (blot) {
-            const index = quill.getIndex(blot) + blot.length();
-            quill.setSelection(index, 0, "user");
-            quill.focus();
-          }
-        }
-      });
-    }
-  }
-}
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const subcatButtons = document.querySelectorAll(".subcat-button");
+  tabButtons.forEach((button) => button.addEventListener("click", toggleTab));
+  subcatButtons.forEach((button) =>
+    button.addEventListener("click", toggleSubcategory)
+  );
 
+  document.addEventListener(
+    "click",
+    (event) => {
+      // If we are in the middle of inserting, do nothing.
+      if (isInserting) return;
+
+      const clickedBlot = event.target.closest(
+        ".sub-super-script-wrapper, .math-expression-blot"
+      );
+
+      if (clickedBlot) {
+        // If the clicked blot is not already active, activate it.
+        if (clickedBlot !== activeBlotElement) {
+          activateBlot(clickedBlot);
+        }
+        // If it *is* the active blot, do nothing. Let the user edit.
+      } else {
+        // If the click was outside of any blot, deactivate the current one.
+        deactivateActiveBlot();
+      }
+    },
+    true
+  );
+});
+
+// --- NO CHANGES to rendering functions ---
 function renderExpressions(containerId, expressionsArray) {
+  /* ... */
   const expressionGrid = document.getElementById(containerId);
   expressionGrid.innerHTML = "";
   if (!expressionsArray) return;
-
   expressionsArray.forEach((expressionObj) => {
     const div = document.createElement("div");
     div.className = "expression";
@@ -537,18 +499,13 @@ function renderExpressions(containerId, expressionsArray) {
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const quill = window.focusedEditor;
-      if (quill) {
-        // Save the selection *before* calling the insertion function.
-        savedRange = quill.getSelection();
-        insertIntoEditor(expressionObj);
-      }
+      insertIntoEditor(expressionObj);
     });
     expressionGrid.appendChild(div);
   });
 }
-
 function renderSymbols(containerId, symbolsArray) {
+  /* ... */
   const symbolGrid = document.getElementById(containerId);
   symbolGrid.innerHTML = "";
   symbolsArray.forEach((symbol) => {
@@ -558,20 +515,13 @@ function renderSymbols(containerId, symbolsArray) {
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const quill = window.focusedEditor;
-      if (quill) {
-        // Save the selection *before* calling the insertion function.
-        savedRange = quill.getSelection();
-        insertIntoEditor(symbol);
-      }
+      insertIntoEditor(symbol);
     });
     symbolGrid.appendChild(div);
   });
 }
-
-// --- Toggling and Initialization ---
-
 function toggleTab(event) {
+  /* ... */
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
   tabButtons.forEach((button) => button.classList.remove("active"));
@@ -583,8 +533,8 @@ function toggleTab(event) {
   else if (targetTab === "expressions")
     renderExpressionSubcategory("sub-super-scripts");
 }
-
 function toggleSubcategory(event) {
+  /* ... */
   const subcatButtons = document.querySelectorAll(".subcat-button");
   subcatButtons.forEach((button) => button.classList.remove("active"));
   const targetSubcat = event.target.dataset.subcat;
@@ -604,8 +554,8 @@ function toggleSubcategory(event) {
     );
   }
 }
-
 function renderSubcategory(subcat) {
+  /* ... */
   document
     .querySelectorAll(".subcat-button")
     .forEach((b) => b.classList.remove("active"));
@@ -619,8 +569,8 @@ function renderSubcategory(subcat) {
   };
   renderSymbols("symbolGrid", symbolMap[subcat] || basicMathsSymbols);
 }
-
 function renderExpressionSubcategory(subcat) {
+  /* ... */
   document
     .querySelectorAll(".subcat-button")
     .forEach((b) => b.classList.remove("active"));
@@ -633,31 +583,9 @@ function renderExpressionSubcategory(subcat) {
   );
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const tabButtons = document.querySelectorAll(".tab-button");
-  const subcatButtons = document.querySelectorAll(".subcat-button");
-  tabButtons.forEach((button) => button.addEventListener("click", toggleTab));
-  subcatButtons.forEach((button) =>
-    button.addEventListener("click", toggleSubcategory)
-  );
-
-  renderSubcategory("basic-maths");
-  renderExpressionSubcategory("sub-super-scripts");
-
-  document.addEventListener(
-    "click",
-    (event) => {
-      if (activeBlotElement && !activeBlotElement.contains(event.target)) {
-        deactivateActiveBlot();
-      }
-    },
-    true
-  );
-});
-
-// --- CONTROL-ADDING FUNCTIONS ---
-
+// --- NO CHANGES to control-adding functions ---
 function addControls(element) {
+  /* ... */
   if (element.querySelector(".controls")) return;
   const controls = document.createElement("div");
   controls.className = "controls";
@@ -666,15 +594,15 @@ function addControls(element) {
   enableRuler(element);
   addDropdown(element);
 }
-
 function removeControls(element) {
+  /* ... */
   const controls = element.querySelector(".controls");
   if (controls) {
     controls.remove();
   }
 }
-
 function enableRuler(element) {
+  /* ... */
   const resizer = element.querySelector(".resizer");
   if (!resizer) return;
   resizer.addEventListener("mousedown", (e) => {
@@ -693,8 +621,8 @@ function enableRuler(element) {
     );
   });
 }
-
 function addDropdown(element) {
+  /* ... */
   const dropdownTrigger = element.querySelector(".dropdown-trigger");
   if (!dropdownTrigger) return;
   const template = document.getElementById("dropdown-template");
@@ -725,14 +653,3 @@ function addDropdown(element) {
     console.log("Justification submenu toggled");
   });
 }
-
-// function addControls(element) {
-//   if (element.querySelector(".controls")) return;
-//   const controls = document.createElement("div");
-//   controls.className = "controls";
-//   controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
-//   element.appendChild(controls);
-
-//   enableRuler(element);
-//   addDropdown(element);
-// }
