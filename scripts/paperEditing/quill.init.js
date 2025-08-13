@@ -26,8 +26,7 @@ function createNewEditor() {
       },
     },
     formats: [
-      "sub-super-script", // <--- ADD THIS LINE
-      "math-expression",
+      "math-live",
       "font",
       "size",
       "bold",

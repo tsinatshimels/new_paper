@@ -1519,15 +1519,16 @@ Quill.register(CitationBlot);
 
 // class SubSuperScriptBlot extends BlockEmbed {
 //   static create(value) {
-//     // value is now an object, e.g., { layout: 'diagonal-lr' }
-//     const node = super.create(value); // Let super create the wrapper
-//     node.setAttribute("contenteditable", "false");
+//     const node = super.create(value);
 
-//     // Create the inner structure based on the layout value
+//     // NO LONGER SETTING contenteditable="false" on the root node.
+//     // The class name is handled by Quill, but being explicit is fine.
+//     node.classList.add("sub-super-script-wrapper");
+
 //     const layout = document.createElement("div");
 //     node.appendChild(layout);
 
-//     // Build the DOM programmatically
+//     // --- THE FIX: SET contenteditable="true" ON THE CHILDREN AT CREATION ---
 //     switch (value.layout) {
 //       case "diagonal-lr":
 //         layout.className = "math-layout diagonal";
@@ -1547,33 +1548,17 @@ Quill.register(CitationBlot);
 //       case "vertical-left":
 //         layout.className = "math-layout dual";
 //         layout.innerHTML =
-//           '<span class="editable-box top-middle-right" contenteditable="true"></span><div class="vertical-left"><span class="editable-box sup" contenteditable="true"></span><span class="editable-box sub" contenteditable="true"></span></div>';
-//         break;
-//       case "e-power-neg-x":
-//         layout.className = "math-layout";
-//         layout.innerHTML =
-//           '<span>e<sup><span class="editable-inline" contenteditable="true">-x</span></sup></span>';
-//         break;
-//       case "x-squared":
-//         layout.className = "math-layout";
-//         layout.innerHTML =
-//           '<span>x<sup><span class="editable-inline" contenteditable="true">2</span></sup></span>';
-//         break;
-//       case "n-sub-1-y":
-//         layout.className = "math-layout";
-//         layout.innerHTML =
-//           '<span>n<sub><span class="editable-inline" contenteditable="true">1</span></sub>Y</span>';
+//           '<div class="vertical-left"><span class="editable-box sup" contenteditable="true"></span><span class="editable-box sub" contenteditable="true"></span></div><span class="editable-box top-middle-right" contenteditable="true"></span>';
 //         break;
 //       default:
-//         // Handle unknown layout or provide a default
 //         break;
 //     }
 //     return node;
 //   }
 
 //   static value(node) {
-//     // Return the data object that can be used to recreate the blot
 //     const layoutDiv = node.querySelector(".math-layout");
+//     if (!layoutDiv) return {};
 //     if (
 //       layoutDiv.classList.contains("diagonal") &&
 //       layoutDiv.querySelector(".bottom-left")
@@ -1594,115 +1579,83 @@ Quill.register(CitationBlot);
 //       layoutDiv.querySelector(".vertical-left")
 //     )
 //       return { layout: "vertical-left" };
-//     if (node.querySelector("e sup")) return { layout: "e-power-neg-x" };
-//     if (node.querySelector("x sup")) return { layout: "x-squared" };
-//     if (node.querySelector("n sub")) return { layout: "n-sub-1-y" };
-//     return {}; // Fallback
+//     return {};
 //   }
 // }
 
 // SubSuperScriptBlot.blotName = "sub-super-script";
 // SubSuperScriptBlot.tagName = "div";
-// SubSuperScriptBlot.className = "math-expression";
+// SubSuperScriptBlot.className = "sub-super-script-wrapper"; // The class Quill looks for
 // Quill.register(SubSuperScriptBlot);
-// Add this to your quill.bolt.js file
 
-class SubSuperScriptBlot extends BlockEmbed {
+// class MathExpressionBlot extends BlockEmbed {
+//   static create(value) {
+//     const node = super.create();
+//     // NO LONGER SETTING contenteditable="false" on the root node.
+//     node.classList.add("math-expression-blot", "math-layout");
+
+//     const contentDiv = document.createElement("div");
+//     contentDiv.className = "math-content";
+//     contentDiv.innerHTML = value.content;
+//     // --- THE FIX: SET contenteditable="true" ON THE CHILD AT CREATION ---
+//     contentDiv.setAttribute("contenteditable", "true");
+//     node.appendChild(contentDiv);
+
+//     return node;
+//   }
+
+//   static value(node) {
+//     const contentDiv = node.querySelector(".math-content");
+//     return {
+//       content: contentDiv ? contentDiv.innerHTML : "",
+//     };
+//   }
+// }
+
+// MathExpressionBlot.blotName = "math-expression";
+// MathExpressionBlot.tagName = "DIV";
+// MathExpressionBlot.className = "math-expression-blot"; // The class Quill looks for
+// Quill.register(MathExpressionBlot);
+class MathLiveBlot extends BlockEmbed {
   static create(value) {
+    // Create the wrapper node for the blot
     const node = super.create(value);
+    node.classList.add("mathlive-blot-wrapper");
 
-    // NO LONGER SETTING contenteditable="false" on the root node.
-    // The class name is handled by Quill, but being explicit is fine.
-    node.classList.add("sub-super-script-wrapper");
+    // Create the MathLive web component
+    const mathField = document.createElement("math-field");
 
-    const layout = document.createElement("div");
-    node.appendChild(layout);
+    // Set the initial LaTeX value from the palette
+    // The `value` here will be an object like { latex: "..." }
+    mathField.setValue(value.latex || "", {
+      suppressChangeNotifications: true,
+    });
 
-    // --- THE FIX: SET contenteditable="true" ON THE CHILDREN AT CREATION ---
-    switch (value.layout) {
-      case "diagonal-lr":
-        layout.className = "math-layout diagonal";
-        layout.innerHTML =
-          '<span class="editable-box bottom-left" contenteditable="true"></span><span class="editable-box top-right" contenteditable="true"></span>';
-        break;
-      case "diagonal-rl":
-        layout.className = "math-layout diagonal";
-        layout.innerHTML =
-          '<span class="editable-box top-left" contenteditable="true"></span><span class="editable-box bottom-right" contenteditable="true"></span>';
-        break;
-      case "vertical-right":
-        layout.className = "math-layout dual";
-        layout.innerHTML =
-          '<span class="editable-box top-middle-left" contenteditable="true"></span><div class="vertical-right"><span class="editable-box sup" contenteditable="true"></span><span class="editable-box sub" contenteditable="true"></span></div>';
-        break;
-      case "vertical-left":
-        layout.className = "math-layout dual";
-        layout.innerHTML =
-          '<div class="vertical-left"><span class="editable-box sup" contenteditable="true"></span><span class="editable-box sub" contenteditable="true"></span></div><span class="editable-box top-middle-right" contenteditable="true"></span>';
-        break;
-      default:
-        break;
-    }
+    // Ensure the main Quill editor is disabled when editing the math field
+    mathField.addEventListener("focus", () => {
+      window.focusedEditor.disable();
+    });
+    // Re-enable the Quill editor when focus leaves the math field
+    mathField.addEventListener("blur", () => {
+      window.focusedEditor.enable();
+    });
+
+    node.appendChild(mathField);
     return node;
   }
 
-  static value(node) {
-    const layoutDiv = node.querySelector(".math-layout");
-    if (!layoutDiv) return {};
-    if (
-      layoutDiv.classList.contains("diagonal") &&
-      layoutDiv.querySelector(".bottom-left")
-    )
-      return { layout: "diagonal-lr" };
-    if (
-      layoutDiv.classList.contains("diagonal") &&
-      layoutDiv.querySelector(".top-left")
-    )
-      return { layout: "diagonal-rl" };
-    if (
-      layoutDiv.classList.contains("dual") &&
-      layoutDiv.querySelector(".vertical-right")
-    )
-      return { layout: "vertical-right" };
-    if (
-      layoutDiv.classList.contains("dual") &&
-      layoutDiv.querySelector(".vertical-left")
-    )
-      return { layout: "vertical-left" };
-    return {};
-  }
-}
-
-SubSuperScriptBlot.blotName = "sub-super-script";
-SubSuperScriptBlot.tagName = "div";
-SubSuperScriptBlot.className = "sub-super-script-wrapper"; // The class Quill looks for
-Quill.register(SubSuperScriptBlot);
-
-class MathExpressionBlot extends BlockEmbed {
-  static create(value) {
-    const node = super.create();
-    // NO LONGER SETTING contenteditable="false" on the root node.
-    node.classList.add("math-expression-blot", "math-layout");
-
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "math-content";
-    contentDiv.innerHTML = value.content;
-    // --- THE FIX: SET contenteditable="true" ON THE CHILD AT CREATION ---
-    contentDiv.setAttribute("contenteditable", "true");
-    node.appendChild(contentDiv);
-
-    return node;
-  }
-
-  static value(node) {
-    const contentDiv = node.querySelector(".math-content");
+  // This is how Quill gets the data to save
+  static value(domNode) {
+    const mathField = domNode.querySelector("math-field");
     return {
-      content: contentDiv ? contentDiv.innerHTML : "",
+      latex: mathField ? mathField.getValue() : "",
     };
   }
 }
 
-MathExpressionBlot.blotName = "math-expression";
-MathExpressionBlot.tagName = "DIV";
-MathExpressionBlot.className = "math-expression-blot"; // The class Quill looks for
-Quill.register(MathExpressionBlot);
+// Register the blot with Quill
+MathLiveBlot.blotName = "math-live"; // The name we'll use to insert it
+MathLiveBlot.tagName = "div";
+MathLiveBlot.className = "mathlive-blot-wrapper";
+
+Quill.register(MathLiveBlot);

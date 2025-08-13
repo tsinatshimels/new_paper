@@ -154,306 +154,324 @@ const geometrySymbols = [
   "∵",
   "▮",
 ];
-const expressions = {
-  "sub-super-scripts": [
-    {
-      type: "blot",
-      blotName: "sub-super-script",
-      content: { layout: "diagonal-lr" },
-      display:
-        '<div class="math-layout diagonal"><span class="editable-box bottom-left"></span><span class="editable-box top-right"></span></div>',
-    },
-    {
-      type: "blot",
-      blotName: "sub-super-script",
-      content: { layout: "diagonal-rl" },
-      display:
-        '<div class="math-layout diagonal"><span class="editable-box top-left"></span><span class="editable-box bottom-right"></span></div>',
-    },
-    {
-      type: "blot",
-      blotName: "sub-super-script",
-      content: { layout: "vertical-right" },
-      display:
-        '<div class="math-layout dual"><span class="editable-box top-middle-left"></span><div class="vertical-right"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
-    },
-    {
-      type: "blot",
-      blotName: "sub-super-script",
-      content: { layout: "vertical-left" },
-      display:
-        '<div class="math-layout dual"><span class="editable-box top-middle-right"></span><div class="vertical-left"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "e<sup>-x</sup>" },
-      display: '<div class="math-layout"><span>e<sup>-x</sup></span></div>',
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "x<sup>2</sup>" },
-      display: '<div class="math-layout"><span>x<sup>2</sup></span></div>',
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "n<sub>1</sub>Y" },
-      display: '<div class="math-layout"><span>n<sub>1</sub>Y</span></div>',
-    },
-  ],
-  fraction: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "<sup>x</sup>/<sub>y</sub>" },
-      display: "<sup>x</sup>/<sub>y</sub>",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "<sup>a+b</sup>/<sub>c-d</sub>" },
-      display: "<sup>a+b</sup>/<sub>c-d</sub>",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "<sup>m^n</sup>/<sub>p^q</sub>" },
-      display: "<sup>m^n</sup>/<sub>p^q</sub>",
-    },
-  ],
-  radicals: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "√x" },
-      display: "√x",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∛y" },
-      display: "∛y",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∜z" },
-      display: "∜z",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∜[n]{a}" },
-      display: "∜[n]{a}",
-    },
-  ],
-  brackets: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "(x)" },
-      display: "(x)",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "[y]" },
-      display: "[y]",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "{z}" },
-      display: "{z}",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "<x>" },
-      display: "<x>",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "|v|" },
-      display: "|v|",
-    },
-  ],
-  summations: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∑<sub>i=1</sub><sup>n</sup> i" },
-      display: "∑<sub>i=1</sub><sup>n</sup> i",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>" },
-      display: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>" },
-      display: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
-    },
-  ],
-  trigonometry: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "sin θ" },
-      display: "sin θ",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "cos φ" },
-      display: "cos φ",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "tan ψ" },
-      display: "tan ψ",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "sin<sup>-1</sup> x" },
-      display: "sin<sup>-1</sup> x",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "cos<sup>-1</sup> y" },
-      display: "cos<sup>-1</sup> y",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "tan<sup>-1</sup> z" },
-      display: "tan<sup>-1</sup> z",
-    },
-  ],
-  integrals: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∫ f(x) dx" },
-      display: "∫ f(x) dx",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∫<sub>a</sub><sup>b</sup> g(x) dx" },
-      display: "∫<sub>a</sub><sup>b</sup> g(x) dx",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∬ f(x, y) dxdy" },
-      display: "∬ f(x, y) dxdy",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "∮ C f(z) dz" },
-      display: "∮ C f(z) dz",
-    },
-  ],
-  logs: [
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "log<sub>2</sub> x" },
-      display: "log<sub>2</sub> x",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "ln x" },
-      display: "ln x",
-    },
-    {
-      type: "blot",
-      blotName: "math-expression",
-      content: { content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>" },
-      display: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
-    },
-  ],
-};
+// const expressions = {
+//   "sub-super-scripts": [
+//     {
+//       type: "blot",
+//       blotName: "sub-super-script",
+//       content: { layout: "diagonal-lr" },
+//       display:
+//         '<div class="math-layout diagonal"><span class="editable-box bottom-left"></span><span class="editable-box top-right"></span></div>',
+//     },
+//     {
+//       type: "blot",
+//       blotName: "sub-super-script",
+//       content: { layout: "diagonal-rl" },
+//       display:
+//         '<div class="math-layout diagonal"><span class="editable-box top-left"></span><span class="editable-box bottom-right"></span></div>',
+//     },
+//     {
+//       type: "blot",
+//       blotName: "sub-super-script",
+//       content: { layout: "vertical-right" },
+//       display:
+//         '<div class="math-layout dual"><span class="editable-box top-middle-left"></span><div class="vertical-right"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
+//     },
+//     {
+//       type: "blot",
+//       blotName: "sub-super-script",
+//       content: { layout: "vertical-left" },
+//       display:
+//         '<div class="math-layout dual"><span class="editable-box top-middle-right"></span><div class="vertical-left"><span class="editable-box sup"></span><span class="editable-box sub"></span></div></div>',
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "e<sup>-x</sup>" },
+//       display: '<div class="math-layout"><span>e<sup>-x</sup></span></div>',
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "x<sup>2</sup>" },
+//       display: '<div class="math-layout"><span>x<sup>2</sup></span></div>',
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "n<sub>1</sub>Y" },
+//       display: '<div class="math-layout"><span>n<sub>1</sub>Y</span></div>',
+//     },
+//   ],
+//   fraction: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "<sup>x</sup>/<sub>y</sub>" },
+//       display: "<sup>x</sup>/<sub>y</sub>",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "<sup>a+b</sup>/<sub>c-d</sub>" },
+//       display: "<sup>a+b</sup>/<sub>c-d</sub>",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "<sup>m^n</sup>/<sub>p^q</sub>" },
+//       display: "<sup>m^n</sup>/<sub>p^q</sub>",
+//     },
+//   ],
+//   radicals: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "√x" },
+//       display: "√x",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∛y" },
+//       display: "∛y",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∜z" },
+//       display: "∜z",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∜[n]{a}" },
+//       display: "∜[n]{a}",
+//     },
+//   ],
+//   brackets: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "(x)" },
+//       display: "(x)",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "[y]" },
+//       display: "[y]",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "{z}" },
+//       display: "{z}",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "<x>" },
+//       display: "<x>",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "|v|" },
+//       display: "|v|",
+//     },
+//   ],
+//   summations: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∑<sub>i=1</sub><sup>n</sup> i" },
+//       display: "∑<sub>i=1</sub><sup>n</sup> i",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>" },
+//       display: "∑<sub>k=0</sub><sup>∞</sup> x<sup>k</sup>",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>" },
+//       display: "∑<sub>j=1</sub><sup>m</sup> j<sup>2</sup>",
+//     },
+//   ],
+//   trigonometry: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "sin θ" },
+//       display: "sin θ",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "cos φ" },
+//       display: "cos φ",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "tan ψ" },
+//       display: "tan ψ",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "sin<sup>-1</sup> x" },
+//       display: "sin<sup>-1</sup> x",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "cos<sup>-1</sup> y" },
+//       display: "cos<sup>-1</sup> y",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "tan<sup>-1</sup> z" },
+//       display: "tan<sup>-1</sup> z",
+//     },
+//   ],
+//   integrals: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∫ f(x) dx" },
+//       display: "∫ f(x) dx",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∫<sub>a</sub><sup>b</sup> g(x) dx" },
+//       display: "∫<sub>a</sub><sup>b</sup> g(x) dx",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∬ f(x, y) dxdy" },
+//       display: "∬ f(x, y) dxdy",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "∮ C f(z) dz" },
+//       display: "∮ C f(z) dz",
+//     },
+//   ],
+//   logs: [
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "log<sub>2</sub> x" },
+//       display: "log<sub>2</sub> x",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "ln x" },
+//       display: "ln x",
+//     },
+//     {
+//       type: "blot",
+//       blotName: "math-expression",
+//       content: { content: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>" },
+//       display: "lim<sub>n→∞</sub> (1 + 1/n)<sup>n</sup>",
+//     },
+//   ],
+// };
 
 // --- SIMPLIFIED STATE MANAGEMENT ---
+
+const expressions = {
+  "sub-super-scripts": [
+    { latex: "x^{2}", display: "x²" },
+    { latex: "x_{n}", display: "xₙ" },
+    { latex: "x_{n}^{2}", display: "xₙ²" },
+    { latex: "{}_{n}^{m}X", display: "ₙ™X" },
+    { latex: "e^{-\\placeholder{}}", display: "e⁻ˣ" },
+  ],
+  fraction: [
+    { latex: "\\frac{\\placeholder{}}{\\placeholder{}}", display: "x/y" },
+  ],
+  radicals: [
+    { latex: "\\sqrt{\\placeholder{}}", display: "√x" },
+    { latex: "\\sqrt[n]{\\placeholder{}}", display: "ⁿ√x" },
+  ],
+  brackets: [
+    { latex: "(\\placeholder{})", display: "( )" },
+    { latex: "[\\placeholder{}]", display: "[ ]" },
+    { latex: "\\{\\placeholder{}\\}", display: "{ }" },
+    { latex: "|\\placeholder{}|", display: "| |" },
+  ],
+  summations: [
+    { latex: "\\sum_{\\placeholder{}}^{\\placeholder{}}", display: "∑" },
+    { latex: "\\sum_{i=1}^{n}", display: "∑" },
+  ],
+  integrals: [
+    { latex: "\\int_{\\placeholder{}}^{\\placeholder{}}", display: "∫" },
+    { latex: "\\oint_{\\placeholder{}}^{\\placeholder{}}", display: "∮" },
+  ],
+  trigonometry: [
+    { latex: "\\sin(\\placeholder{})", display: "sin" },
+    { latex: "\\cos(\\placeholder{})", display: "cos" },
+    { latex: "\\tan(\\placeholder{})", display: "tan" },
+    { latex: "\\sin^{-1}(\\placeholder{})", display: "sin⁻¹" },
+  ],
+  logs: [
+    { latex: "\\log_{\\placeholder{}}(\\placeholder{})", display: "log□" },
+    { latex: "\\ln(\\placeholder{})", display: "ln" },
+    { latex: "\\lim_{n\\to\\infty} \\placeholder{}", display: "lim" },
+  ],
+};
 let activeBlotElement = null;
-let isInserting = false; // Our guard flag
 
 function deactivateActiveBlot() {
   if (!activeBlotElement) return;
   const elementToDeactivate = activeBlotElement;
   activeBlotElement = null;
   elementToDeactivate.classList.remove("active");
-  removeControls(elementToDeactivate);
+  removeControls(elementToDeactivate); // Hides the purple controller
 }
 
 function activateBlot(elementToActivate) {
   if (!elementToActivate || elementToActivate === activeBlotElement) return;
   deactivateActiveBlot(); // Deactivate any other blot first.
   activeBlotElement = elementToActivate;
-  elementToActivate.classList.add("active");
-  addControls(elementToActivate);
+  activeBlotElement.classList.add("active");
+  addControls(activeBlotElement); // Shows the purple controller
 }
 
+// This is now incredibly simple.
 function insertIntoEditor(data) {
   const quill = window.focusedEditor;
   if (!quill) return;
-
-  isInserting = true; // Set the guard
-
   quill.focus();
   const range = quill.getSelection(true) || { index: quill.getLength() };
 
-  if (data.type === "blot" && data.blotName) {
-    const originalIndex = range.index;
-    quill.insertEmbed(originalIndex, data.blotName, data.content, "user");
-    quill.setSelection(originalIndex + 1, "silent");
-
-    setTimeout(() => {
-      const [leaf] = quill.getLeaf(originalIndex);
-      if (leaf && leaf.domNode) {
-        const blotNode = leaf.domNode.closest(
-          ".sub-super-script-wrapper, .math-expression-blot"
-        );
-        if (blotNode) {
-          activateBlot(blotNode);
-          const firstEditable = blotNode.querySelector(
-            '[contenteditable="true"]'
-          );
-          if (firstEditable) {
-            firstEditable.focus();
-          }
-        }
-      }
-      // After a short delay, remove the guard
-      setTimeout(() => {
-        isInserting = false;
-      }, 100);
-    }, 0);
-  } else if (typeof data === "string") {
+  // Check if we are inserting a math expression
+  if (data.latex) {
+    // Insert the blot with the LaTeX payload
+    quill.insertEmbed(range.index, "math-live", { latex: data.latex }, "user");
+    quill.setSelection(range.index + 1, "silent");
+  }
+  // Handle plain symbols
+  else if (typeof data === "string") {
     quill.insertText(range.index, data, "user");
     quill.setSelection(range.index + data.length, "silent");
-    isInserting = false; // Remove guard immediately for simple text
   }
 }
 
-// Global click handler is now the primary controller
 document.addEventListener("DOMContentLoaded", () => {
+  // Setup tabs and symbols...
   renderSubcategory("basic-maths");
-  renderExpressionSubcategory("sub-super-scripts");
-
+  renderExpressionSubcategory("sub-super-scripts"); // Default to showing first category
   const tabButtons = document.querySelectorAll(".tab-button");
   const subcatButtons = document.querySelectorAll(".subcat-button");
   tabButtons.forEach((button) => button.addEventListener("click", toggleTab));
@@ -461,24 +479,18 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", toggleSubcategory)
   );
 
+  // The single, global click handler for activation/deactivation
   document.addEventListener(
     "click",
     (event) => {
-      // If we are in the middle of inserting, do nothing.
-      if (isInserting) return;
+      const clickedBlot = event.target.closest(".mathlive-blot-wrapper");
 
-      const clickedBlot = event.target.closest(
-        ".sub-super-script-wrapper, .math-expression-blot"
-      );
-
+      // If a blot was clicked, activate it.
       if (clickedBlot) {
-        // If the clicked blot is not already active, activate it.
-        if (clickedBlot !== activeBlotElement) {
-          activateBlot(clickedBlot);
-        }
-        // If it *is* the active blot, do nothing. Let the user edit.
-      } else {
-        // If the click was outside of any blot, deactivate the current one.
+        activateBlot(clickedBlot);
+      }
+      // If the click was anywhere else, deactivate the current blot.
+      else if (activeBlotElement) {
         deactivateActiveBlot();
       }
     },
@@ -486,16 +498,18 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-// --- NO CHANGES to rendering functions ---
+// --- RENDERING & UI FUNCTIONS (small change to renderExpressions) ---
 function renderExpressions(containerId, expressionsArray) {
-  /* ... */
   const expressionGrid = document.getElementById(containerId);
   expressionGrid.innerHTML = "";
   if (!expressionsArray) return;
+
   expressionsArray.forEach((expressionObj) => {
     const div = document.createElement("div");
-    div.className = "expression";
-    div.innerHTML = expressionObj.display;
+    div.className = "expression"; // Keep your styling
+    // Use the simple `display` text for the button
+    div.textContent = expressionObj.display;
+
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -504,6 +518,7 @@ function renderExpressions(containerId, expressionsArray) {
     expressionGrid.appendChild(div);
   });
 }
+
 function renderSymbols(containerId, symbolsArray) {
   /* ... */
   const symbolGrid = document.getElementById(containerId);
