@@ -185,6 +185,103 @@ const rows = 50;
 
 const $sheet = $("#spreadsheet");
 
+const $cellsWrapper = $("#cells_wrapper");
+const $rulerCols = $sheet.find(".ruler_cols");
+const $rulerRows = $sheet.find(".ruler_rows");
+const cellAddressInput = document.querySelector('nav input[placeholder="A2"]');
+const cellContentInput = document.querySelector("nav label input");
+
+// --- GOAL 1: FLOATING MATH EDITOR SETUP ---
+const $floatingMathEditor = $("#floating-math-editor");
+const mathFieldInstance = document.getElementById("math-field-instance");
+let activeMathCell = null; // The spreadsheet cell we are currently editing
+
+/**
+ * Positions and shows the floating math editor over a target cell.
+ * @param {jQuery} $targetCell - The spreadsheet cell (<input>) to edit.
+ */
+function showMathEditorForCell($targetCell) {
+  if (!$targetCell || $targetCell.length === 0) return;
+
+  hideMathEditor(); // Hide any previous instance
+  activeMathCell = $targetCell;
+
+  const cellOffset = $targetCell.offset();
+  const sheetOffset = $sheet.offset();
+
+  // Position the editor over the cell
+  $floatingMathEditor.css({
+    top: cellOffset.top - sheetOffset.top + $sheet.scrollTop(),
+    left: cellOffset.left - sheetOffset.left + $sheet.scrollLeft(),
+  });
+
+  // Load the cell's LaTeX into the editor, or start fresh
+  const existingLatex = $targetCell.data("latex") || "";
+  mathFieldInstance.setValue(existingLatex);
+
+  $floatingMathEditor.removeClass("paper--hidden");
+  mathFieldInstance.focus();
+}
+
+/**
+ * Saves the math editor's content and hides it.
+ */
+function hideMathEditor() {
+  if (!activeMathCell) return;
+
+  const newLatex = mathFieldInstance.getValue();
+
+  // Save the raw LaTeX data to the cell
+  activeMathCell.data("latex", newLatex);
+
+  // For display, you can show the LaTeX or render it.
+  // Showing the LaTeX is simplest for now.
+  activeMathCell.val(
+    newLatex.length > 15 ? newLatex.substring(0, 12) + "..." : newLatex
+  );
+
+  // Update the top formula bar
+  if (document.activeElement === mathFieldInstance) {
+    cellContentInput.value = newLatex;
+  }
+
+  $floatingMathEditor.addClass("paper--hidden");
+  activeMathCell = null;
+}
+
+// Add listeners to the MathLive instance
+mathFieldInstance.addEventListener("blur", hideMathEditor);
+mathFieldInstance.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    hideMathEditor();
+  }
+});
+
+// --- MODIFIED insertIntoEditor from your other file ---
+// This function needs to be in THIS file to access sheet variables.
+function insertIntoSheetEditor(data) {
+  // Check if we are in "sheet mode"
+  const isSheetMode = document
+    .getElementById("main_white_paper_board")
+    .classList.contains("sheet-active");
+  const lastFocusedCell = $(".cell:focus");
+
+  if (isSheetMode) {
+    if (lastFocusedCell.length === 0) {
+      alert("Please select a cell to insert the formula into.");
+      return;
+    }
+    // GOAL 1: Instead of inserting into Quill, show the floating editor
+    if (data.latex) {
+      showMathEditorForCell(lastFocusedCell);
+      mathFieldInstance.setValue(data.latex); // Overwrite with palette latex
+    }
+  } else {
+    // This is where you would put the original Quill insertion logic if needed
+    console.log("In document mode, would insert into Quill.");
+  }
+}
+
 $sheet.css("--col-count", cols);
 $sheet.css("--row-count", rows);
 
@@ -308,8 +405,6 @@ $(document).on("focus", "input.cell[data-col][data-row]", function () {
 //   $('.ruler_cols > span, .ruler_rows > span').removeClass('active-col active-row');
 // });
 // Get references to the input elements
-const cellAddressInput = document.querySelector('nav input[placeholder="A2"]');
-const cellContentInput = document.querySelector("nav label input");
 
 // Update the address input when a cell is focused
 $(document).on("focus", "input.cell[data-col][data-row]", function () {

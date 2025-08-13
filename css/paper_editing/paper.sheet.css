@@ -645,3 +645,19 @@ input.cell:focus {
   justify-content: flex-start;
   flex-direction: column;
 }
+#floating-math-editor {
+  position: absolute; /* Allows us to position it precisely */
+  z-index: 1000; /* Ensures it's on top of the sheet grid */
+  background-color: white;
+  border: 2px solid #8837e9; /* Highlight to show it's active */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  /* The math-field inside will determine the size */
+}
+
+/* Optional: Make the math-field itself look good */
+#math-field-instance {
+  min-width: 150px; /* Give it a minimum width */
+  font-size: 16px;
+  padding: 5px;
+}

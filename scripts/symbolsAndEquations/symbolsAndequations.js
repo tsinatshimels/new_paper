@@ -513,7 +513,12 @@ function renderExpressions(containerId, expressionsArray) {
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      insertIntoEditor(expressionObj);
+      if (typeof insertIntoSheetEditor === "function") {
+        insertIntoSheetEditor(expressionObj);
+      } else {
+        // Fallback to old Quill editor if the sheet function isn't available
+        insertIntoEditor(expressionObj);
+      }
     });
     expressionGrid.appendChild(div);
   });
