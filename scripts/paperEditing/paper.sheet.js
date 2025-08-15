@@ -1,21 +1,18 @@
+// --- START: sheet.js (with Toast and Display Fixes) ---
+
 window.currentEditorMode = "true";
 let buttonsToDisable = [
-  // Original buttons
   "sizemug_emoji--btn",
   "sizemug_boomark--btn",
-  // "import_media--tools",
   "add_bar_chart",
   "import_video_tool",
   "add_line_chart",
   "sizemug_add_horizontal_line--btn",
-  // "sizemug_equation--btn",
   "add_pie_chart",
   "sizemug_quotation--btn",
-  "sizemug_citation--btn", // Already included in original list
+  "sizemug_citation--btn",
   "sizemug_special_characters--btn",
   "sizemug_add_date--btn",
-
-  // Shape/Table/Grid buttons
   "sizemug_rectangle_shape--btn",
   "sizemug_pen--btn",
   "sizemug_add_cell--btn",
@@ -34,10 +31,33 @@ let buttonsToDisable = [
   "sizemug_column_grid_center--btn",
   "sizemug_row_grid_top--btn",
   "sizemug_outline_grid--btn",
-
-  // Additional buttons you requested
   "sizemug_frame--btn",
 ];
+
+// --- START: NEW TOAST NOTIFICATION LOGIC ---
+let toastTimeout;
+function showToast(message) {
+  let toast = document.getElementById("toast-notification");
+  // If the toast element doesn't exist, create it once.
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast-notification";
+    document.body.appendChild(toast);
+  }
+
+  // Set the message and show the toast
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  // Clear any existing timer
+  clearTimeout(toastTimeout);
+
+  // After 3 seconds, start the fade out process
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+// --- END: NEW TOAST NOTIFICATION LOGIC ---
 
 document.addEventListener("DOMContentLoaded", () => {
   const sheetTools = document.getElementById("sheet_tools");
@@ -45,9 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdownSelectButton = document.querySelector(
     "#SheetToDocsDropdown .dropdown-select button"
   );
-  // let currentMode = "true"; // Initial mode: Sheet
 
-  // Function to update dropdown-select text and apply mode
   function setMode(mode) {
     window.currentEditorMode = mode;
     updateDropdownText(mode);
@@ -79,391 +97,207 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateDropdownText(mode) {
     const wordDropdown = document.getElementById("exportWord--dropdown");
     const sheetDropdown = document.getElementById("exportSheet--dropdown");
-    const exportButton = document.getElementById("exportButton");
-    const dropdownSelect = document.querySelector(".dropdown-select");
-
     if (mode === "true") {
-      // Show Word dropdown content
       dropdownSelectButton.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 4px;">
-                <img src="./icons/word-icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
-                <span>Word</span>
-            </div>
-        `;
-
-      // Hide sheet dropdown and show word dropdown
+        <div style="display: flex; align-items: center; gap: 4px;">
+            <img src="./icons/word-icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
+            <span>Word</span>
+        </div>`;
       sheetDropdown.classList.add("paper--hidden");
       wordDropdown.classList.remove("paper--hidden");
-
-      // Update dropdown instance
-      const dropdown = document.getElementById("exportWordSheet");
-      if (dropdown.dropdownInstance) {
-        dropdown.dropdownInstance.menu = wordDropdown;
-      }
     } else if (mode === "false") {
-      // Show Sheet dropdown content
       dropdownSelectButton.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 4px;">
-                <img src="./icons/sheet_icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
-                <span>Sheet</span>
-            </div>
-        `;
-
-      // Hide word dropdown and show sheet dropdown
+        <div style="display: flex; align-items: center; gap: 4px;">
+            <img src="./icons/sheet_icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
+            <span>Sheet</span>
+        </div>`;
       wordDropdown.classList.add("paper--hidden");
       sheetDropdown.classList.remove("paper--hidden");
-
-      // Update dropdown instance
-      const dropdown = document.getElementById("exportWordSheet");
-      if (dropdown.dropdownInstance) {
-        dropdown.dropdownInstance.menu = sheetDropdown;
-      }
     }
   }
 
-  // Initialize with default state (Sheet)
-  // updateDropdownText("false");
-
-  // Initialize with Sheet mode
-  // setMode(currentMode);
   setMode(window.currentEditorMode);
-  // Add event listeners for dropdown items
-  document.querySelector("#docsButton").addEventListener("click", () => {
-    if (window.currentEditorMode !== "true") {
-      setMode("true");
-    }
-  });
 
-  document.querySelector("#sheetButton").addEventListener("click", () => {
-    if (window.currentEditorMode !== "false") {
-      setMode("false");
-    }
-  });
-
-  // Optional: Add click event to dropdown-select to toggle dropdown menu (if not already handled by CSS)
-  const dropdown = document.getElementById("SheetToDocsDropdown");
-  const dropdownMenu = dropdown.querySelector(".dropdown-menu");
-  // dropdownSelectButton.addEventListener("click", (e) => {
-  //   e.preventDefault();
-  //   dropdownMenu.style.display =
-  //     dropdownMenu.style.display === "block" ? "none" : "block";
-  // });
+  document
+    .querySelector("#docsButton")
+    .addEventListener("click", () => setMode("true"));
+  document
+    .querySelector("#sheetButton")
+    .addEventListener("click", () => setMode("false"));
 });
 
-function generateCellInput() {
-  const cellInputsLengths = Array.from({ length: 1050 }, (_, i) => i + 1);
-
-  cellInputsLengths.forEach((cell) => {
-    const markup = `<input type="text" class="cell" data-col="1" data-row="1" style="--cell-col: 1; --cell-row: 1" />`;
-  });
-}
-
-///////////////////////////////////////////////
-///////////////////////////////////////////////
-///////////////////////////////////////////////
-///////////////////////////////////////////////
 const cols = 21;
 const rows = 50;
-
 const $sheet = $("#spreadsheet");
-
 const $cellsWrapper = $("#cells_wrapper");
-const $rulerCols = $sheet.find(".ruler_cols");
-const $rulerRows = $sheet.find(".ruler_rows");
 const cellAddressInput = document.querySelector('nav input[placeholder="A2"]');
 const cellContentInput = document.querySelector("nav label input");
 
-// --- GOAL 1: FLOATING MATH EDITOR SETUP ---
-const $floatingMathEditor = $("#floating-math-editor");
-const mathFieldInstance = document.getElementById("math-field-instance");
-let activeMathCell = null; // The spreadsheet cell we are currently editing
+let activeMathSheetField = null;
 
+// --- START: NEW HELPER FUNCTION FOR DISPLAY ---
 /**
- * Positions and shows the floating math editor over a target cell.
- * @param {jQuery} $targetCell - The spreadsheet cell (<input>) to edit.
+ * Removes the editing placeholders from a LaTeX string for cleaner display.
+ * @param {string} latex - The raw LaTeX string.
+ * @returns {string} The cleaned LaTeX string.
  */
-function showMathEditorForCell($targetCell) {
-  if (!$targetCell || $targetCell.length === 0) return;
-
-  hideMathEditor(); // Hide any previous instance
-  activeMathCell = $targetCell;
-
-  const cellOffset = $targetCell.offset();
-  const sheetOffset = $sheet.offset();
-
-  // Position the editor over the cell
-  $floatingMathEditor.css({
-    top: cellOffset.top - sheetOffset.top + $sheet.scrollTop(),
-    left: cellOffset.left - sheetOffset.left + $sheet.scrollLeft(),
-  });
-
-  // Load the cell's LaTeX into the editor, or start fresh
-  const existingLatex = $targetCell.data("latex") || "";
-  mathFieldInstance.setValue(existingLatex);
-
-  $floatingMathEditor.removeClass("paper--hidden");
-  mathFieldInstance.focus();
+function cleanLatexForDisplay(latex) {
+  // This regex replaces all instances of `\placeholder{}` with an empty string.
+  return latex.replace(/\\placeholder\{\}/g, "");
 }
+// --- END: NEW HELPER FUNCTION FOR DISPLAY ---
 
-/**
- * Saves the math editor's content and hides it.
- */
-function hideMathEditor() {
-  if (!activeMathCell) return;
+function deactivateActiveMathSheetField() {
+  if (activeMathSheetField) {
+    activeMathSheetField.readOnly = true;
+    const rawLatex = activeMathSheetField.getValue();
+    const cleanLatex = cleanLatexForDisplay(rawLatex);
 
-  const newLatex = mathFieldInstance.getValue();
-
-  // Save the raw LaTeX data to the cell
-  activeMathCell.data("latex", newLatex);
-
-  // For display, you can show the LaTeX or render it.
-  // Showing the LaTeX is simplest for now.
-  activeMathCell.val(
-    newLatex.length > 15 ? newLatex.substring(0, 12) + "..." : newLatex
-  );
-
-  // Update the top formula bar
-  if (document.activeElement === mathFieldInstance) {
-    cellContentInput.value = newLatex;
+    // Sync the clean value to the hidden input for data consistency.
+    $(activeMathSheetField).siblings("input.cell").val(cleanLatex);
+    activeMathSheetField = null;
   }
-
-  $floatingMathEditor.addClass("paper--hidden");
-  activeMathCell = null;
 }
 
-// Add listeners to the MathLive instance
-mathFieldInstance.addEventListener("blur", hideMathEditor);
-mathFieldInstance.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    hideMathEditor();
+function activateMathSheetField(mathField) {
+  if (mathField === activeMathSheetField) return;
+  deactivateActiveMathSheetField();
+  activeMathSheetField = mathField;
+  activeMathSheetField.readOnly = false;
+  activeMathSheetField.focus();
+}
+
+document.addEventListener("click", (event) => {
+  if (window.currentEditorMode === "false") {
+    const clickedMathField = event.target.closest(".cell-math-field");
+    if (clickedMathField) {
+      activateMathSheetField(clickedMathField);
+    } else {
+      deactivateActiveMathSheetField();
+    }
   }
 });
 
-// --- MODIFIED insertIntoEditor from your other file ---
-// This function needs to be in THIS file to access sheet variables.
-// IN: sheet.js
-
-// --- REPLACE the existing function with this enhanced version ---
 window.insertIntoSheetEditor = function (data) {
-  // Check if we are in "sheet mode"
-  const isSheetMode = document
-    .getElementById("main_white_paper_board")
-    .classList.contains("sheet-active");
+  const $lastFocusedCell = $(".cell:focus");
 
-  const lastFocusedCell = $(".cell:focus");
+  if ($lastFocusedCell.length === 0) {
+    // --- CHANGE: Replaced alert with new toast function ---
+    showToast("Please select a cell first.");
+    return;
+  }
 
-  if (isSheetMode) {
-    if (lastFocusedCell.length === 0) {
-      alert("Please select a cell to insert the item into.");
-      return;
+  if (data && data.latex) {
+    const $wrapper = $lastFocusedCell.parent(".cell-wrapper");
+    let mathField = $wrapper.find(".cell-math-field")[0];
+    if (!mathField) {
+      mathField = document.createElement("math-field");
+      mathField.classList.add("cell-math-field");
+      $wrapper.append(mathField);
+      $lastFocusedCell.addClass("cell-input-hidden");
     }
-
-    // --- THIS IS THE NEW LOGIC ---
-
-    // Case 1: The data is a LaTeX expression object.
-    if (data && data.latex) {
-      // Show the floating math editor.
-      showMathEditorForCell(lastFocusedCell);
-      if (mathFieldInstance) {
-        mathFieldInstance.setValue(data.latex);
-      }
-    }
-    // Case 2: The data is a plain string symbol.
-    else if (typeof data === "string") {
-      // Get the current text in the cell.
-      const currentText = lastFocusedCell.val();
-
-      // Get the cursor's current position within the cell's text.
-      const cursorPos = lastFocusedCell[0].selectionStart;
-
-      // Construct the new text by inserting the symbol at the cursor's position.
-      const newText =
-        currentText.substring(0, cursorPos) +
-        data +
-        currentText.substring(cursorPos);
-
-      // Update the cell's value with the new text.
-      lastFocusedCell.val(newText);
-
-      // Also update the main formula bar at the top.
-      if (cellContentInput) {
-        cellContentInput.value = newText;
-      }
-
-      // Set focus back to the cell and move the cursor to after the inserted symbol.
-      lastFocusedCell.focus();
-      const newCursorPos = cursorPos + data.length;
-      lastFocusedCell[0].setSelectionRange(newCursorPos, newCursorPos);
-    }
-    // ----------------------------
-  } else {
-    console.log("In document mode, would insert into Quill.");
+    mathField.setValue(data.latex);
+    activateMathSheetField(mathField);
+  } else if (typeof data === "string") {
+    const currentText = $lastFocusedCell.val();
+    const cursorPos = $lastFocusedCell[0].selectionStart;
+    const newText =
+      currentText.substring(0, cursorPos) +
+      data +
+      currentText.substring(cursorPos);
+    $lastFocusedCell.val(newText);
+    cellContentInput.value = newText;
+    $lastFocusedCell.focus();
+    const newCursorPos = cursorPos + data.length;
+    $lastFocusedCell[0].setSelectionRange(newCursorPos, newCursorPos);
   }
 };
 
 $sheet.css("--col-count", cols);
 $sheet.css("--row-count", rows);
 
-/**
- * update the spreadsheet
- * @param {number} cols - column count
- * @param {number} rows - row count
- */
-function updateSheet(cols, rows, reverseRows = false, reverseCols = false) {
-  const $cellsWrapper = $sheet.find("#cells_wrapper");
-  const $rulerCols = $sheet.find(".ruler_cols");
-  const $rulerRows = $sheet.find(".ruler_rows");
-  const chars = "ABCDEFGHIJKLMNOPQRST";
-
-  // Clear existing content
-  $rulerCols.empty();
-  $rulerRows.empty();
+function updateSheet(cols, rows) {
   $cellsWrapper.empty();
+  $sheet.find(".ruler_cols").empty();
+  $sheet.find(".ruler_rows").empty();
 
-  // Handle column ruler and cells
-  const colStart = reverseCols ? cols : 1;
-  const colEnd = reverseCols ? 0 : cols;
-  const colStep = reverseCols ? -1 : 1;
-  for (let c = colStart; c !== colEnd + colStep; c += colStep) {
-    const $cell = $(`<span/>`).attr("data-col", c).text(generateIndex(c));
-    $rulerCols.append($cell);
+  for (let c = 1; c <= cols; c++) {
+    $sheet
+      .find(".ruler_cols")
+      .append($(`<span/>`).attr("data-col", c).text(generateIndex(c)));
+  }
+  for (let r = 1; r <= rows; r++) {
+    $sheet.find(".ruler_rows").append($(`<span/>`).attr("data-row", r).text(r));
   }
 
-  // Handle row ruler
-  const rowStart = reverseRows ? rows : 1;
-  const rowEnd = reverseRows ? 0 : rows;
-  const rowStep = reverseRows ? -1 : 1;
-  for (let r = rowStart; r !== rowEnd + rowStep; r += rowStep) {
-    const $cell = $(`<span/>`).attr("data-row", r).text(r);
-    $rulerRows.append($cell);
-  }
-
-  // Handle cells
   for (let r = 1; r <= rows; r++) {
     for (let c = 1; c <= cols; c++) {
-      // 1. Create the wrapper
       const $cellWrapper = $('<div class="cell-wrapper"></div>')
-        .css("--cell-col", c)
-        .css("--cell-row", r)
-        .attr("data-col", c)
-        .attr("data-row", r);
-
-      // 2. Create the input cell
-      const $cellInput = $('<input type="text" class="cell" />')
-        .attr("data-col", c)
-        .attr("data-row", r);
-
-      // 3. Append input to wrapper, and wrapper to the sheet
+        .css({ "--cell-col": c, "--cell-row": r })
+        .attr({ "data-col": c, "data-row": r });
+      const $cellInput = $('<input type="text" class="cell" />').attr({
+        "data-col": c,
+        "data-row": r,
+      });
       $cellWrapper.append($cellInput);
       $cellsWrapper.append($cellWrapper);
     }
   }
 }
-/**
- * generates alpha numertic index
- * @param {number} num - index of the column
- */
+
 function generateIndex(num) {
-  const letters = "abcdefghijklmnopqrstuvwxyz";
   let index = "";
-  while (num > 0) {
-    index = letters.at((num - 1) % 26) + index;
-    num = Math.floor((num - 1) / 26);
+  for (; num > 0; num = Math.floor((num - 1) / 26)) {
+    index = String.fromCharCode(((num - 1) % 26) + 97) + index;
   }
-  return index;
+  return index.toUpperCase();
 }
 
 $(() => {
   updateSheet(cols, rows);
 });
 
-//Trigger row and column ordering functionalities
-$(() => {
-  $("#rowReverse").on("click", () => updateSheet(cols, rows, true, false));
-  $("#columnReverse").on("click", () => updateSheet(cols, rows, false, true));
-  $("#rowNormal").on("click", () => updateSheet(cols, rows, false, false));
-  $("#columnNormal").on("click", () => updateSheet(cols, rows, false, false));
-});
+$(document).on("focusin", ".cell-wrapper", function () {
+  const $wrapper = $(this);
+  const col = $wrapper.data("col");
+  const row = $wrapper.data("row");
 
-$(document).on("keydown", "input.cell[data-col][data-row]", (event) => {
-  const $input = $(event.currentTarget);
-
-  const col = Number($input.attr("data-col"));
-  const row = Number($input.attr("data-row"));
-  // configure behavior on press enter key
-  if (event.which === 13 || event.key === "Enter") {
-    const nextRow = event.shiftKey ? row - 1 : row + 1;
-    // change focus to next or previous row
-    $input
-      .parent()
-      .find(`input.cell[data-row=${nextRow}][data-col=${col}]`)
-      .trigger("focus");
-    event.preventDefault();
-  }
-});
-
-// Handle cell focus
-$(document).on("focus", "input.cell[data-col][data-row]", function () {
-  const $input = $(this);
-  const col = $input.attr("data-col");
-  const row = $input.attr("data-row");
-
-  // Remove previous highlights
-  $(".ruler_cols > span").removeClass("active-col");
-  $(".ruler_rows > span").removeClass("active-row");
-
-  // Highlight current column header (letter)
+  $(".ruler_cols > span, .ruler_rows > span").removeClass(
+    "active-col active-row"
+  );
   $(`.ruler_cols > span[data-col="${col}"]`).addClass("active-col");
-
-  // Highlight current row header (number)
   $(`.ruler_rows > span[data-row="${row}"]`).addClass("active-row");
-});
 
-// Optional: Clear highlights when losing focus
-// $(document).on('blur', 'input.cell', function() {
-//   $('.ruler_cols > span, .ruler_rows > span').removeClass('active-col active-row');
-// });
-// Get references to the input elements
+  cellAddressInput.value = `${generateIndex(col)}${row}`;
 
-// Update the address input when a cell is focused
-$(document).on("focus", "input.cell[data-col][data-row]", function () {
-  const $input = $(this);
-  const col = Number($input.attr("data-col"));
-  const row = Number($input.attr("data-row"));
-
-  // Convert column number to letter (1 -> A, 2 -> B, etc.)
-  const colLetter = String.fromCharCode(64 + col);
-
-  // Update the address input
-  cellAddressInput.value = `${colLetter}${row}`;
-
-  // Update the content input with the cell's current value
-  cellContentInput.value = $input.val();
-});
-
-// Update cell content when typing in the formula bar
-cellContentInput.addEventListener("input", function () {
-  const activeCell = document.querySelector("input.cell:focus");
-  if (activeCell) {
-    activeCell.value = this.value;
+  const mathField = $wrapper.find(".cell-math-field")[0];
+  if (mathField) {
+    // --- CHANGE: Show the full LaTeX (with placeholders) in the formula bar for editing ---
+    cellContentInput.value = mathField.getValue();
+  } else {
+    cellContentInput.value = $wrapper.find("input.cell").val();
   }
 });
 
-// Update formula bar when typing directly in a cell
+cellContentInput.addEventListener("input", function () {
+  if (activeMathSheetField) {
+    activeMathSheetField.setValue(this.value);
+  } else {
+    const $activeCell = $("input.cell:focus");
+    if ($activeCell.length) {
+      $activeCell.val(this.value);
+    }
+  }
+});
+
 $(document).on("input", "input.cell", function () {
-  const activeCell = document.querySelector("input.cell:focus");
-  if (activeCell === this) {
+  if ($(this).is(":focus")) {
     cellContentInput.value = this.value;
   }
 });
 
-// Handle the Fx button if needed
-document.querySelector("nav button").addEventListener("click", function () {
-  // Add any formula-specific functionality here
-  console.log("Formula button clicked");
-});
-
-// For selection and math equation functionality
+// ... (The rest of your sheet.js file remains unchanged)
+// Paste all your other functions for sorting, filtering, selection, etc., here.
 $(() => {
   // --- INFINITE SCROLL LOGIC ---
   const $cellsWrapper = $("#cells_wrapper");
@@ -880,12 +714,12 @@ $(() => {
       const $wrapper = $(`.cell-wrapper[data-col=${c}][data-row=${headerRow}]`);
       if ($wrapper.find(".cell-filter-icon").length === 0) {
         const filterIcon = $(`
-                <span class="cell-filter-icon">
-                    <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12.3333 1.66699H1.66667L5.40001 6.64479C5.5731 6.87559 5.66667 7.15626 5.66667 7.44479V12.3337L8.33334 11.0003V7.44479C8.33334 7.15626 8.42694 6.87559 8.6 6.64479L12.3333 1.66699Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                    </svg>
-                </span>
-            `);
+                  <span class="cell-filter-icon">
+                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12.3333 1.66699H1.66667L5.40001 6.64479C5.5731 6.87559 5.66667 7.15626 5.66667 7.44479V12.3337L8.33334 11.0003V7.44479C8.33334 7.15626 8.42694 6.87559 8.6 6.64479L12.3333 1.66699Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                      </svg>
+                  </span>
+              `);
         $wrapper.append(filterIcon);
       }
       $wrapper.toggleClass("filter-enabled");
@@ -912,11 +746,11 @@ $(() => {
     const $valuesList = $("#filter-values-list").empty();
     uniqueValues.forEach((value) => {
       const itemHTML = `
-        <label class="filter-value-item">
-            ${value}
-            <input type="checkbox" checked value="${value}">
-            <span class="custom-checkmark"></span>
-        </label>`;
+          <label class="filter-value-item">
+              ${value}
+              <input type="checkbox" checked value="${value}">
+              <span class="custom-checkmark"></span>
+          </label>`;
       $valuesList.append(itemHTML);
     });
   }

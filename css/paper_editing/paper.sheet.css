@@ -281,8 +281,51 @@ input.cell:focus {
   padding: 0;
   margin: 0;
   display: flex;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d5db;
   margin: -0.5px 0 0 -1px;
+}
+
+.cell-math-field {
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 14px; /* Match your cell font-size */
+  box-sizing: border-box;
+}
+
+/* Class to hide the original input when a math-field takes its place */
+.cell-input-hidden {
+  display: none !important;
+}
+/* --- START: Toast Notification CSS --- */
+/* Add this to your main stylesheet */
+
+#toast-notification {
+  visibility: hidden; /* Hidden by default */
+  /* min-width: 250px; */
+  background-color: #ede1fc;
+  color: #000;
+  text-align: center;
+  border-radius: 4px;
+  border-left: 4px solid #8837e9; /* Purple left border */
+  height: 50px;
+  padding: 16px;
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top of everything */
+  left: 150px;
+  transform: translateX(-50%);
+  top: 20px; /* Position at the bottom */
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.5s, visibility 0.5s, bottom 0.5s;
+}
+
+/* This class is added by JavaScript to show the toast */
+#toast-notification.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 50px; /* Slide up */
 }
 
 .cell-wrapper .cell {

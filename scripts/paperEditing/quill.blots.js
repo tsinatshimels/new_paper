@@ -1616,30 +1616,27 @@ Quill.register(CitationBlot);
 // MathExpressionBlot.tagName = "DIV";
 // MathExpressionBlot.className = "math-expression-blot"; // The class Quill looks for
 // Quill.register(MathExpressionBlot);
+// In your blot.js file
 const Embed = Quill.import("blots/embed");
+
 class MathLiveBlot extends Embed {
   static create(value) {
     // Create the wrapper node for the blot
     const node = super.create(value);
-    node.classList.add("mathlive-blot-wrapper");
+    node.classList.add("mathlive-blot-wrapper"); // Keep the wrapper for easy targeting
 
     // Create the MathLive web component
     const mathField = document.createElement("math-field");
 
-    // Set the initial LaTeX value from the palette
-    // The `value` here will be an object like { latex: "..." }
+    // Set the initial LaTeX value
     mathField.setValue(value.latex || "", {
       suppressChangeNotifications: true,
     });
 
-    // Ensure the main Quill editor is disabled when editing the math field
-    mathField.addEventListener("focus", () => {
-      window.focusedEditor.disable();
-    });
-    // Re-enable the Quill editor when focus leaves the math field
-    mathField.addEventListener("blur", () => {
-      window.focusedEditor.enable();
-    });
+    // --- KEY CHANGE ---
+    // Start in read-only mode. This hides the virtual keyboard
+    // and makes the field non-interactive until it's clicked.
+    mathField.readOnly = true;
 
     node.appendChild(mathField);
     return node;
@@ -1655,7 +1652,7 @@ class MathLiveBlot extends Embed {
 }
 
 // Register the blot with Quill
-MathLiveBlot.blotName = "math-live"; // The name we'll use to insert it
+MathLiveBlot.blotName = "math-live";
 MathLiveBlot.tagName = "span";
 MathLiveBlot.className = "mathlive-blot-wrapper";
 

@@ -155,8 +155,6 @@ const geometrySymbols = [
   "▮",
 ];
 
-// --- SIMPLIFIED STATE MANAGEMENT ---
-
 const expressions = {
   "sub-super-scripts": [
     { latex: "x^{2}", display: "x²" },
@@ -167,13 +165,9 @@ const expressions = {
   ],
   fraction: [
     { latex: "\\frac{\\placeholder{}}{\\placeholder{}}", display: "□/□" },
-    // dy/dx
     { latex: "\\frac{dy}{dx}", display: "dy/dx" },
-    // Δx/Δy
     { latex: "\\frac{\\Delta y}{\\Delta x}", display: "Δy/Δx" },
-    // ∂y/∂x
     { latex: "\\frac{\\partial y}{\\partial x}", display: "∂y/∂x" },
-    // δy/δx
     { latex: "\\frac{\\delta y}{\\delta x}", display: "δy/δx" },
   ],
   radicals: [
@@ -201,28 +195,22 @@ const expressions = {
     { latex: "\\sin(\\placeholder{})", display: "sin□" },
     { latex: "\\cos(\\placeholder{})", display: "cos□" },
     { latex: "\\tan(\\placeholder{})", display: "tan□" },
-    // csc
     { latex: "\\csc(\\placeholder{})", display: "csc□" },
     { latex: "\\sec(\\placeholder{})", display: "sec□" },
     { latex: "\\cot(\\placeholder{})", display: "cot□" },
     { latex: "\\sin^{-1}(\\placeholder{})", display: "sin⁻¹□" },
     { latex: "\\cos^{-1}(\\placeholder{})", display: "cos⁻¹□" },
     { latex: "\\tan^{-1}(\\placeholder{})", display: "tan⁻¹□" },
-    // csc⁻¹
     { latex: "\\csc^{-1}(\\placeholder{})", display: "csc⁻¹□" },
     { latex: "\\sec^{-1}(\\placeholder{})", display: "sec⁻¹□" },
     { latex: "\\cot^{-1}(\\placeholder{})", display: "cot⁻¹□" },
-    // sinh
     { latex: "\\sinh(\\placeholder{})", display: "sinh□" },
     { latex: "\\cosh(\\placeholder{})", display: "cosh□" },
     { latex: "\\tanh(\\placeholder{})", display: "tanh□" },
-    // coth
     { latex: "\\coth(\\placeholder{})", display: "coth□" },
-    // sinh⁻¹
     { latex: "\\sinh^{-1}(\\placeholder{})", display: "sinh⁻¹□" },
     { latex: "\\cosh^{-1}(\\placeholder{})", display: "cosh⁻¹□" },
     { latex: "\\tanh^{-1}(\\placeholder{})", display: "tanh⁻¹□" },
-    // coth⁻¹
     { latex: "\\coth^{-1}(\\placeholder{})", display: "coth⁻¹□" },
   ],
   logs: [
@@ -232,25 +220,59 @@ const expressions = {
   ],
 };
 
-let activeBlotElement = null;
+// --- START: NEW LOGIC FOR MATHLIVE ACTIVATION ---
 
-function deactivateActiveBlot() {
-  if (!activeBlotElement) return;
-  const elementToDeactivate = activeBlotElement;
-  activeBlotElement = null;
-  elementToDeactivate.classList.remove("active");
-  removeControls(elementToDeactivate); // Hides the purple controller
+// This variable will hold a reference to the currently active <math-field> element.
+let activeMathField = null;
+
+/**
+ * Deactivates the currently active math field.
+ * This makes it read-only (hiding the keyboard) and re-enables the Quill editor.
+ */
+function deactivateActiveMathField() {
+  if (activeMathField) {
+    // Make the math field read-only to hide its UI.
+    activeMathField.readOnly = true;
+
+    // Re-enable the main Quill editor for regular typing.
+    if (window.focusedEditor) {
+      window.focusedEditor.enable();
+    }
+
+    // Clear the reference.
+    activeMathField = null;
+  }
 }
 
-function activateBlot(elementToActivate) {
-  if (!elementToActivate || elementToActivate === activeBlotElement) return;
-  deactivateActiveBlot(); // Deactivate any other blot first.
-  activeBlotElement = elementToActivate;
-  activeBlotElement.classList.add("active");
-  addControls(activeBlotElement); // Shows the purple controller
+/**
+ * Activates a specific math field.
+ * This makes it editable (showing the keyboard) and disables the Quill editor.
+ * @param {HTMLElement} mathFieldToActivate The <math-field> element to activate.
+ */
+function activateMathField(mathFieldToActivate) {
+  // Do nothing if the element is invalid or already active.
+  if (!mathFieldToActivate || mathFieldToActivate === activeMathField) return;
+
+  // First, deactivate any other field that might be active.
+  deactivateActiveMathField();
+
+  // Set the new active field.
+  activeMathField = mathFieldToActivate;
+
+  // Make it editable, which will show the virtual keyboard.
+  activeMathField.readOnly = false;
+
+  // Disable the main Quill editor to prevent conflicting inputs.
+  if (window.focusedEditor) {
+    window.focusedEditor.disable();
+  }
+
+  // Focus the element to start editing.
+  activeMathField.focus();
 }
 
-// This is now incredibly simple.
+// --- END: NEW LOGIC ---
+
 function insertIntoQuill(data) {
   const quill = window.focusedEditor;
   if (!quill) return;
@@ -265,15 +287,11 @@ function insertIntoQuill(data) {
     quill.setSelection(range.index + data.length, "silent");
   }
 }
+
 function insertIntoEditor(data) {
-  // Check the global variable set by sheet.js
-  // "true" means Word/Docs mode. "false" means Sheet mode.
   if (window.currentEditorMode === "true") {
-    // If in Word mode, call the Quill insertion function.
     insertIntoQuill(data);
   } else {
-    // If in Sheet mode, call the globally exposed function from sheet.js.
-    // We check if the function exists to prevent errors.
     if (window.insertIntoSheetEditor) {
       window.insertIntoSheetEditor(data);
     } else {
@@ -285,7 +303,7 @@ function insertIntoEditor(data) {
 document.addEventListener("DOMContentLoaded", () => {
   // Setup tabs and symbols...
   renderSubcategory("basic-maths");
-  renderExpressionSubcategory("sub-super-scripts"); // Default to showing first category
+  renderExpressionSubcategory("sub-super-scripts");
   const tabButtons = document.querySelectorAll(".tab-button");
   const subcatButtons = document.querySelectorAll(".subcat-button");
   tabButtons.forEach((button) => button.addEventListener("click", toggleTab));
@@ -293,26 +311,28 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", toggleSubcategory)
   );
 
-  // The single, global click handler for activation/deactivation
+  // --- START: MODIFIED GLOBAL CLICK HANDLER ---
   document.addEventListener(
     "click",
     (event) => {
-      const clickedBlot = event.target.closest(".mathlive-blot-wrapper");
+      // Find the closest <math-field> element to where the user clicked.
+      const clickedMathField = event.target.closest("math-field");
 
-      // If a blot was clicked, activate it.
-      if (clickedBlot) {
-        activateBlot(clickedBlot);
-      }
-      // If the click was anywhere else, deactivate the current blot.
-      else if (activeBlotElement) {
-        deactivateActiveBlot();
+      if (clickedMathField) {
+        // If the user clicked on a math field (or inside one), activate it.
+        activateMathField(clickedMathField);
+      } else {
+        // If the user clicked anywhere else, deactivate the currently active field.
+        deactivateActiveMathField();
       }
     },
     true
   );
+  // --- END: MODIFIED GLOBAL CLICK HANDLER ---
 });
 
-// --- RENDERING & UI FUNCTIONS (small change to renderExpressions) ---
+// --- NO CHANGES to the functions below this line ---
+
 function renderExpressions(containerId, expressionsArray) {
   const expressionGrid = document.getElementById(containerId);
   expressionGrid.innerHTML = "";
@@ -320,8 +340,7 @@ function renderExpressions(containerId, expressionsArray) {
 
   expressionsArray.forEach((expressionObj) => {
     const div = document.createElement("div");
-    div.className = "expression"; // Keep your styling
-    // Use the simple `display` text for the button
+    div.className = "expression";
     div.textContent = expressionObj.display;
 
     div.addEventListener("mousedown", (e) => {
@@ -334,7 +353,6 @@ function renderExpressions(containerId, expressionsArray) {
 }
 
 function renderSymbols(containerId, symbolsArray) {
-  /* ... */
   const symbolGrid = document.getElementById(containerId);
   symbolGrid.innerHTML = "";
   symbolsArray.forEach((symbol) => {
@@ -349,8 +367,8 @@ function renderSymbols(containerId, symbolsArray) {
     symbolGrid.appendChild(div);
   });
 }
+
 function toggleTab(event) {
-  /* ... */
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
   tabButtons.forEach((button) => button.classList.remove("active"));
@@ -362,8 +380,8 @@ function toggleTab(event) {
   else if (targetTab === "expressions")
     renderExpressionSubcategory("sub-super-scripts");
 }
+
 function toggleSubcategory(event) {
-  /* ... */
   const subcatButtons = document.querySelectorAll(".subcat-button");
   subcatButtons.forEach((button) => button.classList.remove("active"));
   const targetSubcat = event.target.dataset.subcat;
@@ -383,8 +401,8 @@ function toggleSubcategory(event) {
     );
   }
 }
+
 function renderSubcategory(subcat) {
-  /* ... */
   document
     .querySelectorAll(".subcat-button")
     .forEach((b) => b.classList.remove("active"));
@@ -398,8 +416,8 @@ function renderSubcategory(subcat) {
   };
   renderSymbols("symbolGrid", symbolMap[subcat] || basicMathsSymbols);
 }
+
 function renderExpressionSubcategory(subcat) {
-  /* ... */
   document
     .querySelectorAll(".subcat-button")
     .forEach((b) => b.classList.remove("active"));
@@ -410,75 +428,4 @@ function renderExpressionSubcategory(subcat) {
     "expressionGrid",
     expressions[subcat] || expressions["sub-super-scripts"]
   );
-}
-
-// --- NO CHANGES to control-adding functions ---
-function addControls(element) {
-  /* ... */
-  if (element.querySelector(".controls")) return;
-  const controls = document.createElement("div");
-  controls.className = "controls";
-  controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
-  element.appendChild(controls);
-  enableRuler(element);
-  addDropdown(element);
-}
-function removeControls(element) {
-  /* ... */
-  const controls = element.querySelector(".controls");
-  if (controls) {
-    controls.remove();
-  }
-}
-function enableRuler(element) {
-  /* ... */
-  const resizer = element.querySelector(".resizer");
-  if (!resizer) return;
-  resizer.addEventListener("mousedown", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    function drag(event) {
-      element.style.transform = `translate(${event.clientX - e.clientX}px, ${
-        event.clientY - e.clientY
-      }px)`;
-    }
-    window.addEventListener("mousemove", drag);
-    window.addEventListener(
-      "mouseup",
-      () => window.removeEventListener("mousemove", drag),
-      { once: true }
-    );
-  });
-}
-function addDropdown(element) {
-  /* ... */
-  const dropdownTrigger = element.querySelector(".dropdown-trigger");
-  if (!dropdownTrigger) return;
-  const template = document.getElementById("dropdown-template");
-  if (!template) return;
-  const dropdownMenu = template.content.cloneNode(true).firstElementChild;
-  element.appendChild(dropdownMenu);
-  dropdownTrigger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropdownMenu.classList.toggle("show");
-  });
-  document.addEventListener("click", () =>
-    dropdownMenu.classList.remove("show")
-  );
-  dropdownMenu.querySelectorAll("button").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const format = button.dataset.format;
-      if (format) console.log(`Applying format: ${format}`);
-      dropdownMenu.classList.remove("show");
-    });
-  });
-  const justifySubmenu = document.getElementById("justifySubmenu");
-  justifySubmenu.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const submenus = document.querySelector(".justify-submenu");
-    submenus.classList.toggle("show");
-    justifySubmenu.classList.toggle("active-sort-button");
-    console.log("Justification submenu toggled");
-  });
 }
