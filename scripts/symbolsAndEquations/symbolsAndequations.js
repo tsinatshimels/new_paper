@@ -251,22 +251,34 @@ function activateBlot(elementToActivate) {
 }
 
 // This is now incredibly simple.
-function insertIntoEditor(data) {
+function insertIntoQuill(data) {
   const quill = window.focusedEditor;
   if (!quill) return;
   quill.focus();
   const range = quill.getSelection(true) || { index: quill.getLength() };
 
-  // Check if we are inserting a math expression
   if (data.latex) {
-    // Insert the blot with the LaTeX payload
     quill.insertEmbed(range.index, "math-live", { latex: data.latex }, "user");
     quill.setSelection(range.index + 1, "silent");
-  }
-  // Handle plain symbols
-  else if (typeof data === "string") {
+  } else if (typeof data === "string") {
     quill.insertText(range.index, data, "user");
     quill.setSelection(range.index + data.length, "silent");
+  }
+}
+function insertIntoEditor(data) {
+  // Check the global variable set by sheet.js
+  // "true" means Word/Docs mode. "false" means Sheet mode.
+  if (window.currentEditorMode === "true") {
+    // If in Word mode, call the Quill insertion function.
+    insertIntoQuill(data);
+  } else {
+    // If in Sheet mode, call the globally exposed function from sheet.js.
+    // We check if the function exists to prevent errors.
+    if (window.insertIntoSheetEditor) {
+      window.insertIntoSheetEditor(data);
+    } else {
+      console.error("Sheet insertion function is not available.");
+    }
   }
 }
 
