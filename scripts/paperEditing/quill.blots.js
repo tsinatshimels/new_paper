@@ -1616,7 +1616,8 @@ Quill.register(CitationBlot);
 // MathExpressionBlot.tagName = "DIV";
 // MathExpressionBlot.className = "math-expression-blot"; // The class Quill looks for
 // Quill.register(MathExpressionBlot);
-class MathLiveBlot extends BlockEmbed {
+const Embed = Quill.import("blots/embed");
+class MathLiveBlot extends Embed {
   static create(value) {
     // Create the wrapper node for the blot
     const node = super.create(value);
@@ -1655,7 +1656,7 @@ class MathLiveBlot extends BlockEmbed {
 
 // Register the blot with Quill
 MathLiveBlot.blotName = "math-live"; // The name we'll use to insert it
-MathLiveBlot.tagName = "div";
+MathLiveBlot.tagName = "span";
 MathLiveBlot.className = "mathlive-blot-wrapper";
 
 Quill.register(MathLiveBlot);

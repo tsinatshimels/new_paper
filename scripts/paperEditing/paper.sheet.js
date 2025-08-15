@@ -75,25 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // function updateDropdownText(mode) {
-  //   if (mode === "true") {
-  //     dropdownSelectButton.innerHTML = `
-  //     <div style="display: flex; align-items: center; gap: 4px;">
-  //       <img src="./icons/word-icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
-  //       <span>Word</span>
-  //     </div>
-  //   `;
-
-  //   } else if (mode === "false") {
-  //     dropdownSelectButton.innerHTML = `
-  //       <div style="display: flex; align-items: center; gap: 4px;">
-  //         <img src="./icons/sheet_icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
-  //         <span>Sheet</span>
-  //       </div>
-  //   `;
-  //   }
-  // }
-
   function updateDropdownText(mode) {
     const wordDropdown = document.getElementById("exportWord--dropdown");
     const sheetDropdown = document.getElementById("exportSheet--dropdown");
@@ -449,7 +430,9 @@ $(() => {
   // --- INFINITE SCROLL LOGIC ---
   const $cellsWrapper = $("#cells_wrapper");
   let currentRowCount = rows; // Initially 50 from your global variable
+  let currentColCount = cols;
   const rowsPerBatch = 50; // How many new rows to add at a time
+  const colsPerBatch = 21;
 
   // Function to add a new batch of rows
   function addMoreRows() {
@@ -482,15 +465,61 @@ $(() => {
     currentRowCount = newRowsLimit;
     $sheet.css("--row-count", currentRowCount); // Update the grid layout
   }
+  function addMoreColumns() {
+    const newColsLimit = currentColCount + colsPerBatch;
+    const $rulerCols = $sheet.find(".ruler_cols");
+    const $rulerRows = $sheet.find(".ruler_rows");
+
+    // Add new column rulers
+    for (let c = currentColCount + 1; c <= newColsLimit; c++) {
+      const $cell = $(`<span/>`).attr("data-col", c).text(generateIndex(c));
+      $rulerCols.append($cell);
+    }
+
+    // Add new cells for each row
+    for (let r = 1; r <= currentRowCount; r++) {
+      for (let c = currentColCount + 1; c <= newColsLimit; c++) {
+        const $cellWrapper = $('<div class="cell-wrapper"></div>')
+          .css("--cell-col", c)
+          .css("--cell-row", r)
+          .attr("data-col", c)
+          .attr("data-row", r);
+
+        const $cellInput = $('<input type="text" class="cell" />')
+          .attr("data-col", c)
+          .attr("data-row", r);
+
+        $cellWrapper.append($cellInput);
+        $cellsWrapper.append($cellWrapper);
+      }
+    }
+
+    currentColCount = newColsLimit;
+    $sheet.css("--col-count", currentColCount); // Update the grid layout for columns
+  }
 
   // Attach the scroll event listener to the spreadsheet container
   $sheet.on("scroll", function () {
-    // Check if the user has scrolled to the bottom
-    if (this.scrollTop + this.clientHeight >= this.scrollHeight - 10) {
-      // -10px buffer
+    // Check if the user has scrolled to the bottom (for rows)
+    if (this.scrollTop + this.clientHeight >= this.scrollHeight - 20) {
+      // 20px buffer
       addMoreRows();
     }
+
+    // NEW: Check if the user has scrolled to the far right (for columns)
+    if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 20) {
+      // 20px buffer
+      addMoreColumns();
+    }
   });
+  // Attach the scroll event listener to the spreadsheet container
+  // $sheet.on("scroll", function () {
+  //   // Check if the user has scrolled to the bottom
+  //   if (this.scrollTop + this.clientHeight >= this.scrollHeight - 10) {
+  //     // -10px buffer
+  //     addMoreRows();
+  //   }
+  // });
   // --- SETUP & STATE MANAGEMENT ---
   let isSelecting = false;
   let startCell = null;

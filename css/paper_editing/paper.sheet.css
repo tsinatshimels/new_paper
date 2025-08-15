@@ -90,18 +90,37 @@
   border-right: 0;
 }
 
-#spreadsheet .ruler_cols {
+/* #spreadsheet .ruler_cols {
   grid-area: cols;
   grid-template-columns: repeat(21, 150px);
   position: sticky;
   top: 0;
   z-index: 50;
   display: grid;
+} */
+#spreadsheet .ruler_cols {
+  grid-area: cols;
+  /* Use the CSS variable for columns */
+  grid-template-columns: repeat(var(--col-count, 21), 150px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: grid;
 }
 
-#spreadsheet .ruler_rows {
+/* #spreadsheet .ruler_rows {
   grid-area: rows;
   grid-template-rows: repeat(50, 2rem);
+  position: sticky;
+  left: 0;
+  display: grid;
+  min-width: 3rem;
+  padding-bottom: 2.5rem;
+} */
+#spreadsheet .ruler_rows {
+  grid-area: rows;
+  /* Use the CSS variable for rows */
+  grid-template-rows: repeat(var(--row-count, 50), 2rem);
   position: sticky;
   left: 0;
   display: grid;
@@ -119,10 +138,11 @@
   margin-top: -1px; */
   display: grid;
   grid-auto-flow: row;
-  grid-template-columns: repeat(21, 150px);
-  grid-template-rows: repeat(50, 2rem);
+  /* Use the CSS variable for columns */
+  grid-template-columns: repeat(var(--col-count, 21), 150px);
+  /* Use the CSS variable for rows */
+  grid-template-rows: repeat(var(--row-count, 50), 2rem);
 }
-
 #spreadsheet .cell {
   border-radius: 0;
 
