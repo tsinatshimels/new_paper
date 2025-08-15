@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       dropdownSelectButton.innerHTML = `
         <div style="display: flex; align-items: center; gap: 4px;">
             <img src="./icons/word-icon.svg" style="width: 18px; height: 18px; vertical-align: middle;" />
-            <span>Word</span>
+            <span>Docs</span>
         </div>`;
       sheetDropdown.classList.add("paper--hidden");
       wordDropdown.classList.remove("paper--hidden");

@@ -274,8 +274,6 @@ input.cell:focus {
   margin-bottom: 10px;
 }
 
-/* --- FIX for Cell Layout Distortion & Icon Positioning --- */
-
 .cell-wrapper {
   position: relative; /* CRITICAL FIX: This makes the wrapper the positioning context for the icon. */
   padding: 0;
