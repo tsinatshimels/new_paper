@@ -1,4 +1,4 @@
-// --- START: sheet.js (with Toast and Display Fixes) ---
+// --- START: sheet.js (Final Version with Insertion and Deletion Fixes) ---
 
 window.currentEditorMode = "true";
 let buttonsToDisable = [
@@ -34,30 +34,21 @@ let buttonsToDisable = [
   "sizemug_frame--btn",
 ];
 
-// --- START: NEW TOAST NOTIFICATION LOGIC ---
 let toastTimeout;
 function showToast(message) {
   let toast = document.getElementById("toast-notification");
-  // If the toast element doesn't exist, create it once.
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "toast-notification";
     document.body.appendChild(toast);
   }
-
-  // Set the message and show the toast
   toast.textContent = message;
   toast.classList.add("show");
-
-  // Clear any existing timer
   clearTimeout(toastTimeout);
-
-  // After 3 seconds, start the fade out process
   toastTimeout = setTimeout(() => {
     toast.classList.remove("show");
   }, 3000);
 }
-// --- END: NEW TOAST NOTIFICATION LOGIC ---
 
 document.addEventListener("DOMContentLoaded", () => {
   const sheetTools = document.getElementById("sheet_tools");
@@ -134,28 +125,16 @@ const cellAddressInput = document.querySelector('nav input[placeholder="A2"]');
 const cellContentInput = document.querySelector("nav label input");
 
 let activeMathSheetField = null;
-
-// --- START: NEW HELPER FUNCTION FOR DISPLAY ---
-/**
- * Removes the editing placeholders from a LaTeX string for cleaner display.
- * @param {string} latex - The raw LaTeX string.
- * @returns {string} The cleaned LaTeX string.
- */
-function cleanLatexForDisplay(latex) {
-  // This regex replaces all instances of `\placeholder{}` with an empty string.
-  return latex.replace(/\\placeholder\{\}/g, "");
-}
-// --- END: NEW HELPER FUNCTION FOR DISPLAY ---
+let lastFocusedCell = null;
 
 function deactivateActiveMathSheetField() {
   if (activeMathSheetField) {
     activeMathSheetField.readOnly = true;
-    const rawLatex = activeMathSheetField.getValue();
-    const cleanLatex = cleanLatexForDisplay(rawLatex);
-
-    // Sync the clean value to the hidden input for data consistency.
-    $(activeMathSheetField).siblings("input.cell").val(cleanLatex);
+    $(activeMathSheetField).removeClass("is-editing");
     activeMathSheetField = null;
+    if (lastFocusedCell) {
+      updateFormulaBarForCell(lastFocusedCell);
+    }
   }
 }
 
@@ -164,54 +143,81 @@ function activateMathSheetField(mathField) {
   deactivateActiveMathSheetField();
   activeMathSheetField = mathField;
   activeMathSheetField.readOnly = false;
+  $(activeMathSheetField).addClass("is-editing");
   activeMathSheetField.focus();
+  cellContentInput.value = activeMathSheetField.getValue();
 }
+
+$sheet.on("click", "math-field", function (e) {
+  if (window.currentEditorMode === "false") {
+    e.stopPropagation();
+    activateMathSheetField(this);
+  }
+});
 
 document.addEventListener("click", (event) => {
   if (window.currentEditorMode === "false") {
-    const clickedMathField = event.target.closest(".cell-math-field");
-    if (clickedMathField) {
-      activateMathSheetField(clickedMathField);
-    } else {
+    if (!event.target.closest("math-field.is-editing")) {
       deactivateActiveMathSheetField();
     }
   }
 });
 
 window.insertIntoSheetEditor = function (data) {
-  const $lastFocusedCell = $(".cell:focus");
-
-  if ($lastFocusedCell.length === 0) {
-    // --- CHANGE: Replaced alert with new toast function ---
+  const selection = window.getSelection();
+  if (
+    !selection.rangeCount ||
+    selection.rangeCount === 0 ||
+    !selection.focusNode
+  ) {
     showToast("Please select a cell first.");
     return;
   }
+  const parentCell = $(selection.focusNode).closest(".cell");
+  if (parentCell.length === 0) {
+    showToast("Please select a cell first.");
+    return;
+  }
+  const range = selection.getRangeAt(0);
+  range.deleteContents();
 
   if (data && data.latex) {
-    const $wrapper = $lastFocusedCell.parent(".cell-wrapper");
-    let mathField = $wrapper.find(".cell-math-field")[0];
-    if (!mathField) {
-      mathField = document.createElement("math-field");
-      mathField.classList.add("cell-math-field");
-      $wrapper.append(mathField);
-      $lastFocusedCell.addClass("cell-input-hidden");
-    }
+    const mathField = document.createElement("math-field");
     mathField.setValue(data.latex);
-    activateMathSheetField(mathField);
+    mathField.readOnly = true;
+    mathField.setAttribute("data-display-text", data.display || data.latex);
+    range.insertNode(mathField);
+    range.setStartAfter(mathField);
+    range.setEndAfter(mathField);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    updateFormulaBarForCell(parentCell);
   } else if (typeof data === "string") {
-    const currentText = $lastFocusedCell.val();
-    const cursorPos = $lastFocusedCell[0].selectionStart;
-    const newText =
-      currentText.substring(0, cursorPos) +
-      data +
-      currentText.substring(cursorPos);
-    $lastFocusedCell.val(newText);
-    cellContentInput.value = newText;
-    $lastFocusedCell.focus();
-    const newCursorPos = cursorPos + data.length;
-    $lastFocusedCell[0].setSelectionRange(newCursorPos, newCursorPos);
+    const textNode = document.createTextNode(data);
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    updateFormulaBarForCell(parentCell);
   }
 };
+
+function updateFormulaBarForCell($cell) {
+  if (!$cell || $cell.length === 0) {
+    cellContentInput.value = "";
+    return;
+  }
+  let displayText = "";
+  $cell.contents().each(function () {
+    if (this.nodeType === Node.TEXT_NODE) {
+      displayText += this.textContent;
+    } else if (this.tagName === "MATH-FIELD") {
+      displayText += $(this).attr("data-display-text") || "[formula]";
+    }
+  });
+  cellContentInput.value = displayText;
+}
 
 $sheet.css("--col-count", cols);
 $sheet.css("--row-count", rows);
@@ -220,7 +226,6 @@ function updateSheet(cols, rows) {
   $cellsWrapper.empty();
   $sheet.find(".ruler_cols").empty();
   $sheet.find(".ruler_rows").empty();
-
   for (let c = 1; c <= cols; c++) {
     $sheet
       .find(".ruler_cols")
@@ -229,17 +234,15 @@ function updateSheet(cols, rows) {
   for (let r = 1; r <= rows; r++) {
     $sheet.find(".ruler_rows").append($(`<span/>`).attr("data-row", r).text(r));
   }
-
   for (let r = 1; r <= rows; r++) {
     for (let c = 1; c <= cols; c++) {
       const $cellWrapper = $('<div class="cell-wrapper"></div>')
         .css({ "--cell-col": c, "--cell-row": r })
         .attr({ "data-col": c, "data-row": r });
-      const $cellInput = $('<input type="text" class="cell" />').attr({
-        "data-col": c,
-        "data-row": r,
-      });
-      $cellWrapper.append($cellInput);
+      const $cellDiv = $(
+        '<div class="cell" contenteditable="true"></div>'
+      ).attr({ "data-col": c, "data-row": r });
+      $cellWrapper.append($cellDiv);
       $cellsWrapper.append($cellWrapper);
     }
   }
@@ -257,10 +260,11 @@ $(() => {
   updateSheet(cols, rows);
 });
 
-$(document).on("focusin", ".cell-wrapper", function () {
-  const $wrapper = $(this);
-  const col = $wrapper.data("col");
-  const row = $wrapper.data("row");
+$(document).on("focusin", ".cell", function () {
+  const $cell = $(this);
+  lastFocusedCell = $cell;
+  const col = $cell.data("col");
+  const row = $cell.data("row");
 
   $(".ruler_cols > span, .ruler_rows > span").removeClass(
     "active-col active-row"
@@ -270,564 +274,458 @@ $(document).on("focusin", ".cell-wrapper", function () {
 
   cellAddressInput.value = `${generateIndex(col)}${row}`;
 
-  const mathField = $wrapper.find(".cell-math-field")[0];
-  if (mathField) {
-    // --- CHANGE: Show the full LaTeX (with placeholders) in the formula bar for editing ---
-    cellContentInput.value = mathField.getValue();
-  } else {
-    cellContentInput.value = $wrapper.find("input.cell").val();
+  if (!activeMathSheetField) {
+    updateFormulaBarForCell($cell);
+  }
+});
+
+// --- FIX #1: Use CLICK event to reliably set the cursor for insertion ---
+$sheet.on("click", ".cell", function () {
+  const cellElement = this;
+  if (window.getSelection && document.createRange) {
+    const range = document.createRange();
+    range.selectNodeContents(cellElement);
+    range.collapse(false); // false collapses to the end
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+});
+
+$(document).on("input", "div.cell", function () {
+  if ($(this).is(":focus") && !activeMathSheetField) {
+    updateFormulaBarForCell($(this));
   }
 });
 
 cellContentInput.addEventListener("input", function () {
   if (activeMathSheetField) {
     activeMathSheetField.setValue(this.value);
-  } else {
-    const $activeCell = $("input.cell:focus");
-    if ($activeCell.length) {
-      $activeCell.val(this.value);
-    }
+  } else if (lastFocusedCell) {
+    lastFocusedCell.text(this.value);
   }
 });
 
-$(document).on("input", "input.cell", function () {
-  if ($(this).is(":focus")) {
-    cellContentInput.value = this.value;
-  }
-});
+// --- FIX #2: Add Keydown listener to handle deleting math fields ---
+$sheet.on("keydown", ".cell", function (e) {
+  if (e.key === "Backspace") {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
 
-// ... (The rest of your sheet.js file remains unchanged)
-// Paste all your other functions for sorting, filtering, selection, etc., here.
-$(() => {
-  // --- INFINITE SCROLL LOGIC ---
-  const $cellsWrapper = $("#cells_wrapper");
-  let currentRowCount = rows; // Initially 50 from your global variable
-  let currentColCount = cols;
-  const rowsPerBatch = 50; // How many new rows to add at a time
-  const colsPerBatch = 21;
+    const range = selection.getRangeAt(0);
+    if (range.collapsed) {
+      const container = range.startContainer;
+      let nodeToDelete = null;
 
-  // Function to add a new batch of rows
-  function addMoreRows() {
-    const newRowsLimit = currentRowCount + rowsPerBatch;
+      if (range.startOffset === 0 && container.nodeType === Node.TEXT_NODE) {
+        // Cursor is at the start of a text node, check previous sibling
+        nodeToDelete = container.previousSibling;
+      } else if (
+        container.nodeType === Node.ELEMENT_NODE &&
+        container.classList.contains("cell")
+      ) {
+        // Cursor is in the cell itself, check the node at the offset
+        nodeToDelete = container.childNodes[range.startOffset - 1];
+      }
 
-    // Add new row rulers
-    const $rulerRows = $sheet.find(".ruler_rows");
-    for (let r = currentRowCount + 1; r <= newRowsLimit; r++) {
-      const $cell = $(`<span/>`).attr("data-row", r).text(r);
-      $rulerRows.append($cell);
-    }
-
-    // Add new cells
-    for (let r = currentRowCount + 1; r <= newRowsLimit; r++) {
-      for (let c = 1; c <= cols; c++) {
-        const $cellWrapper = $('<div class="cell-wrapper"></div>')
-          .css("--cell-col", c)
-          .css("--cell-row", r)
-          .attr("data-col", c)
-          .attr("data-row", r);
-
-        const $cellInput = $('<input type="text" class="cell" />')
-          .attr("data-col", c)
-          .attr("data-row", r);
-
-        $cellWrapper.append($cellInput);
-        $cellsWrapper.append($cellWrapper);
+      // If the node to delete is a math field, remove it manually
+      if (nodeToDelete && nodeToDelete.tagName === "MATH-FIELD") {
+        e.preventDefault();
+        nodeToDelete.remove();
+        updateFormulaBarForCell($(this));
       }
     }
-    currentRowCount = newRowsLimit;
-    $sheet.css("--row-count", currentRowCount); // Update the grid layout
   }
-  function addMoreColumns() {
-    const newColsLimit = currentColCount + colsPerBatch;
-    const $rulerCols = $sheet.find(".ruler_cols");
-    const $rulerRows = $sheet.find(".ruler_rows");
+});
 
-    // Add new column rulers
+let currentRowCount = rows;
+let currentColCount = cols;
+const rowsPerBatch = 50;
+const colsPerBatch = 21;
+
+function addMoreRows() {
+  const newRowsLimit = currentRowCount + rowsPerBatch;
+  const $rulerRows = $sheet.find(".ruler_rows");
+  for (let r = currentRowCount + 1; r <= newRowsLimit; r++) {
+    $rulerRows.append($(`<span/>`).attr("data-row", r).text(r));
+  }
+  for (let r = currentRowCount + 1; r <= newRowsLimit; r++) {
+    for (let c = 1; c <= currentColCount; c++) {
+      const $cellWrapper = $('<div class="cell-wrapper"></div>')
+        .css({ "--cell-col": c, "--cell-row": r })
+        .attr({ "data-col": c, "data-row": r });
+      const $cellDiv = $(
+        '<div class="cell" contenteditable="true"></div>'
+      ).attr({ "data-col": c, "data-row": r });
+      $cellWrapper.append($cellDiv);
+      $cellsWrapper.append($cellWrapper);
+    }
+  }
+  currentRowCount = newRowsLimit;
+  $sheet.css("--row-count", currentRowCount);
+}
+
+function addMoreColumns() {
+  const newColsLimit = currentColCount + colsPerBatch;
+  const $rulerCols = $sheet.find(".ruler_cols");
+  for (let c = currentColCount + 1; c <= newColsLimit; c++) {
+    $rulerCols.append($(`<span/>`).attr("data-col", c).text(generateIndex(c)));
+  }
+  for (let r = 1; r <= currentRowCount; r++) {
     for (let c = currentColCount + 1; c <= newColsLimit; c++) {
-      const $cell = $(`<span/>`).attr("data-col", c).text(generateIndex(c));
-      $rulerCols.append($cell);
+      const $cellWrapper = $('<div class="cell-wrapper"></div>')
+        .css({ "--cell-col": c, "--cell-row": r })
+        .attr({ "data-col": c, "data-row": r });
+      const $cellDiv = $(
+        '<div class="cell" contenteditable="true"></div>'
+      ).attr({ "data-col": c, "data-row": r });
+      $cellWrapper.append($cellDiv);
+      $cellsWrapper.append($cellWrapper);
     }
-
-    // Add new cells for each row
-    for (let r = 1; r <= currentRowCount; r++) {
-      for (let c = currentColCount + 1; c <= newColsLimit; c++) {
-        const $cellWrapper = $('<div class="cell-wrapper"></div>')
-          .css("--cell-col", c)
-          .css("--cell-row", r)
-          .attr("data-col", c)
-          .attr("data-row", r);
-
-        const $cellInput = $('<input type="text" class="cell" />')
-          .attr("data-col", c)
-          .attr("data-row", r);
-
-        $cellWrapper.append($cellInput);
-        $cellsWrapper.append($cellWrapper);
-      }
-    }
-
-    currentColCount = newColsLimit;
-    $sheet.css("--col-count", currentColCount); // Update the grid layout for columns
   }
+  currentColCount = newColsLimit;
+  $sheet.css("--col-count", currentColCount);
+}
 
-  // Attach the scroll event listener to the spreadsheet container
-  $sheet.on("scroll", function () {
-    // Check if the user has scrolled to the bottom (for rows)
-    if (this.scrollTop + this.clientHeight >= this.scrollHeight - 20) {
-      // 20px buffer
-      addMoreRows();
-    }
-
-    // NEW: Check if the user has scrolled to the far right (for columns)
-    if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 20) {
-      // 20px buffer
-      addMoreColumns();
-    }
-  });
-  // Attach the scroll event listener to the spreadsheet container
-  // $sheet.on("scroll", function () {
-  //   // Check if the user has scrolled to the bottom
-  //   if (this.scrollTop + this.clientHeight >= this.scrollHeight - 10) {
-  //     // -10px buffer
-  //     addMoreRows();
-  //   }
-  // });
-  // --- SETUP & STATE MANAGEMENT ---
-  let isSelecting = false;
-  let startCell = null;
-  let endCell = null;
-  let lastFocusedCell = null;
-
-  // --- HELPER FUNCTIONS ---
-  function toA1(col, row) {
-    let colName = "";
-    let num = col;
-    while (num > 0) {
-      let rem = (num - 1) % 26;
-      colName = String.fromCharCode(65 + rem) + colName;
-      num = Math.floor((num - 1) / 26);
-    }
-    return `${colName}${row}`;
+$sheet.on("scroll", function () {
+  if (this.scrollTop + this.clientHeight >= this.scrollHeight - 20) {
+    addMoreRows();
   }
-
-  function fromA1(a1) {
-    const colMatch = a1.match(/[A-Z]+/i);
-    const rowMatch = a1.match(/\d+/);
-    if (!colMatch || !rowMatch) return null;
-    let col = 0;
-    const colName = colMatch[0].toUpperCase();
-    for (let i = 0; i < colName.length; i++) {
-      col = col * 26 + (colName.charCodeAt(i) - 64);
-    }
-    return { col, row: parseInt(rowMatch[0], 10) };
+  if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 20) {
+    addMoreColumns();
   }
+});
 
-  // --- SELECTION LOGIC ---
-  function getSelectedRange() {
-    if (!startCell || !endCell) return null;
-    const minCol = Math.min(startCell.col, endCell.col);
-    const maxCol = Math.max(startCell.col, endCell.col);
-    const minRow = Math.min(startCell.row, endCell.row);
-    const maxRow = Math.max(startCell.row, endCell.row);
-    const startA1 = toA1(minCol, minRow);
-    const endA1 = toA1(maxCol, maxRow);
-    return {
-      minCol,
-      maxCol,
-      minRow,
-      maxRow,
-      rangeA1: startA1 === endA1 ? startA1 : `${startA1}:${endA1}`,
-    };
+let isSelecting = false;
+let startCell = null;
+let endCell = null;
+
+function toA1(col, row) {
+  let colName = "";
+  let num = col;
+  while (num > 0) {
+    let rem = (num - 1) % 26;
+    colName = String.fromCharCode(65 + rem) + colName;
+    num = Math.floor((num - 1) / 26);
   }
+  return `${colName}${row}`;
+}
 
-  // --- In your selection logic section ---
+function fromA1(a1) {
+  const colMatch = a1.match(/[A-Z]+/i);
+  const rowMatch = a1.match(/\d+/);
+  if (!colMatch || !rowMatch) return null;
+  let col = 0;
+  const colName = colMatch[0].toUpperCase();
+  for (let i = 0; i < colName.length; i++) {
+    col = col * 26 + (colName.charCodeAt(i) - 64);
+  }
+  return { col, row: parseInt(rowMatch[0], 10) };
+}
 
-  function highlightSelection() {
-    // Clear previous cell selections
-    $(".cell").removeClass("selected");
+function getSelectedRange() {
+  if (!startCell || !endCell) return null;
+  const minCol = Math.min(startCell.col, endCell.col);
+  const maxCol = Math.max(startCell.col, endCell.col);
+  const minRow = Math.min(startCell.row, endCell.row);
+  const maxRow = Math.max(startCell.row, endCell.row);
+  const startA1 = toA1(minCol, minRow);
+  const endA1 = toA1(maxCol, maxRow);
+  return {
+    minCol,
+    maxCol,
+    minRow,
+    maxRow,
+    rangeA1: startA1 === endA1 ? startA1 : `${startA1}:${endA1}`,
+  };
+}
 
-    // NEW: Clear all previous ruler highlights (both for selection and single focus)
-    $(".ruler_cols > span, .ruler_rows > span").removeClass(
-      "ruler-selected active-col active-row"
-    );
-
-    const range = getSelectedRange();
-    if (range) {
-      cellAddressInput.value = range.rangeA1;
-    }
-    // If a valid selection range exists...
-    if (range) {
-      // 1. Highlight all the cells in the range (Existing Logic)
-      for (let c = range.minCol; c <= range.maxCol; c++) {
-        for (let r = range.minRow; r <= range.maxRow; r++) {
-          $(`input.cell[data-col=${c}][data-row=${r}]`).addClass("selected");
-        }
-      }
-
-      // 2. NEW: Highlight all the corresponding column rulers
-      for (let c = range.minCol; c <= range.maxCol; c++) {
-        $(`.ruler_cols > span[data-col=${c}]`).addClass("ruler-selected");
-      }
-
-      // 3. NEW: Highlight all the corresponding row rulers
+function highlightSelection() {
+  $(".cell").removeClass("selected");
+  $(".ruler_cols > span, .ruler_rows > span").removeClass(
+    "ruler-selected active-col active-row"
+  );
+  const range = getSelectedRange();
+  if (range) {
+    cellAddressInput.value = range.rangeA1;
+    for (let c = range.minCol; c <= range.maxCol; c++) {
       for (let r = range.minRow; r <= range.maxRow; r++) {
-        $(`.ruler_rows > span[data-row=${r}]`).addClass("ruler-selected");
+        $(`div.cell[data-col=${c}][data-row=${r}]`).addClass("selected");
       }
     }
+    for (let c = range.minCol; c <= range.maxCol; c++) {
+      $(`.ruler_cols > span[data-col=${c}]`).addClass("ruler-selected");
+    }
+    for (let r = range.minRow; r <= range.maxRow; r++) {
+      $(`.ruler_rows > span[data-row=${r}]`).addClass("ruler-selected");
+    }
   }
+}
 
-  $sheet.on("mousedown", ".cell", function (e) {
-    isSelecting = true;
+$sheet.on("mousedown", ".cell", function (e) {
+  isSelecting = true;
+  const data = $(this).data();
+  startCell = { col: data.col, row: data.row };
+  endCell = { col: data.col, row: data.row };
+  highlightSelection();
+});
+
+$sheet.on("mouseover", ".cell", function () {
+  if (isSelecting) {
     const data = $(this).data();
-    startCell = { col: data.col, row: data.row };
     endCell = { col: data.col, row: data.row };
     highlightSelection();
-  });
+  }
+});
 
-  $sheet.on("mouseover", ".cell", function () {
-    if (isSelecting) {
-      const data = $(this).data();
-      endCell = { col: data.col, row: data.row };
-      highlightSelection();
-    }
-  });
+$(document).on("mouseup", () => {
+  isSelecting = false;
+});
 
-  $(document).on("mouseup", () => {
-    isSelecting = false;
-  });
+$(document).on("focus", "div.cell", function () {
+  const $cell = $(this);
+  $(".cell").removeClass("is-focused");
+  $cell.addClass("is-focused");
+  if ($cell.data("formula")) {
+    $cell.text($cell.data("formula"));
+  }
+});
 
-  // --- FORMULA & CELL INTERACTION LOGIC ---
-  $(document).on("focus", "input.cell", function () {
-    const $cell = $(this);
-    lastFocusedCell = $cell;
-    if ($cell.data("formula")) {
-      $cell.val($cell.data("formula"));
-    }
-    // Ruler highlighting...
-    const col = $cell.attr("data-col");
-    const row = $cell.attr("data-row");
-    $(".ruler_cols > span, .ruler_rows > span").removeClass(
-      "active-col active-row"
-    );
-    $(`.ruler_cols > span[data-col="${col}"]`).addClass("active-col");
-    $(`.ruler_rows > span[data-row="${row}"]`).addClass("active-row");
-  });
+$(document).on("blur", "div.cell", function () {
+  const $cell = $(this);
+  $cell.removeClass("is-focused");
+  const content = $cell.text();
+  if (content.startsWith("=")) {
+    $cell.data("formula", content);
+    const result = evaluateFormula(content);
+    $cell.html(result);
+  }
+});
 
-  $(document).on("blur", "input.cell", function () {
-    const $cell = $(this);
-    const content = $cell.val();
-    if (content.startsWith("=")) {
-      $cell.data("formula", content);
-      const result = evaluateFormula(content);
-      $cell.val(result);
-    }
-  });
-
-  function evaluateFormula(formula) {
-    const match = formula.match(/=\s*([A-Z]+)\s*\(([^)]+)\)/i);
-    if (!match) return formula;
-    const funcName = match[1].toUpperCase();
-    const rangeStr = match[2];
-    const rangeParts = rangeStr.split(":").map(fromA1);
-    const start = rangeParts[0];
-    const end = rangeParts.length > 1 ? rangeParts[1] : start;
-    if (!start || !end) return "#ERROR!";
-    const values = [];
-    for (let c = start.col; c <= end.col; c++) {
-      for (let r = start.row; r <= end.row; r++) {
-        const cellValue = $(`input.cell[data-col=${c}][data-row=${r}]`).val();
-        if (
-          $(`input.cell[data-col=${c}][data-row=${r}]`).data("formula") !==
-          formula
-        ) {
-          const numValue = parseFloat(cellValue);
-          if (!isNaN(numValue)) values.push(numValue);
-        }
+function evaluateFormula(formula) {
+  const match = formula.match(/=\s*([A-Z]+)\s*\(([^)]+)\)/i);
+  if (!match) return formula;
+  const funcName = match[1].toUpperCase();
+  const rangeStr = match[2];
+  const rangeParts = rangeStr.split(":").map(fromA1);
+  const start = rangeParts[0];
+  const end = rangeParts.length > 1 ? rangeParts[1] : start;
+  if (!start || !end) return "#ERROR!";
+  const values = [];
+  for (let c = start.col; c <= end.col; c++) {
+    for (let r = start.row; r <= end.row; r++) {
+      const cellValue = $(`div.cell[data-col=${c}][data-row=${r}]`).text();
+      if (
+        $(`div.cell[data-col=${c}][data-row=${r}]`).data("formula") !== formula
+      ) {
+        const numValue = parseFloat(cellValue);
+        if (!isNaN(numValue)) values.push(numValue);
       }
     }
-    switch (funcName) {
-      case "SUM":
-        return values.reduce((acc, val) => acc + val, 0);
-      case "AVERAGE":
-        return values.length
-          ? values.reduce((acc, val) => acc + val, 0) / values.length
-          : 0;
-      case "COUNT":
-        return values.length;
-      case "MAX":
-        return Math.max(...values);
-      case "MIN":
-        return Math.min(...values);
-      default:
-        return "#NAME?";
-    }
   }
-
-  // --- NEW: Smart function to find where the formula should go and what it should sum ---
-  function findTargetAndRange(selectedRange) {
-    if (!selectedRange) return null;
-
-    const dataCells = [];
-    const emptyCells = [];
-
-    for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
-      for (let r = selectedRange.minRow; r <= selectedRange.maxRow; r++) {
-        const cell = $(`input.cell[data-col=${c}][data-row=${r}]`);
-        if (cell.val().trim() === "") {
-          emptyCells.push(cell);
-        } else {
-          dataCells.push(cell);
-        }
-      }
-    }
-
-    // The "smart" condition: we have both empty cells for the result and data cells to calculate.
-    if (emptyCells.length > 0 && dataCells.length > 0) {
-      const targetCell = emptyCells[0]; // Target the first empty cell
-
-      // Find the min/max range of the data cells only
-      const firstDataCell = dataCells[0].data();
-      const lastDataCell = dataCells[dataCells.length - 1].data();
-      const dataRange =
-        toA1(firstDataCell.col, firstDataCell.row) +
-        ":" +
-        toA1(lastDataCell.col, lastDataCell.row);
-
-      return {
-        target: targetCell,
-        range: dataRange,
-      };
-    }
-
-    // Fallback for all other cases
-    return null;
+  switch (funcName) {
+    case "SUM":
+      return values.reduce((acc, val) => acc + val, 0);
+    case "AVERAGE":
+      return values.length
+        ? values.reduce((acc, val) => acc + val, 0) / values.length
+        : 0;
+    case "COUNT":
+      return values.length;
+    case "MAX":
+      return Math.max(...values);
+    case "MIN":
+      return Math.min(...values);
+    default:
+      return "#NAME?";
   }
+}
 
-  // --- DROPDOWN MENU INTEGRATION (UPDATED) ---
-  $(".dropdown-menu-math").on("click", ".submenu button", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!lastFocusedCell) {
-      alert("Please select a cell first.");
-      return;
-    }
-
-    const functionName = $(this).text().split(" ")[0];
-    const selectedRange = getSelectedRange();
-
-    let targetCell = lastFocusedCell; // Default target
-    let formulaRange = selectedRange
-      ? selectedRange.rangeA1
-      : toA1(targetCell.data("col"), targetCell.data("row")); // Default range
-
-    // Try to use our new smart function
-    const smartTarget = findTargetAndRange(selectedRange);
-    if (smartTarget) {
-      targetCell = smartTarget.target;
-      formulaRange = smartTarget.range;
-    }
-
-    const formula = `=${functionName}(${formulaRange})`;
-
-    targetCell.val(formula).focus(); // Place formula and focus the cell
-    cellContentInput.value = formula; // Update the top formula bar
-
-    // Manually close the dropdown
-    $(".dropdown-menu-math").removeClass("show");
-    $("#matematicalEquation")
-      .closest(".dropdown-select")
-      .removeClass("open active-category");
-  });
-  // --- SORTING LOGIC FOR FILTER PANE ---
-
-  $("#sort-asc-btn, #sort-desc-btn").on("click", function () {
-    const sortOrder = $(this).attr("id") === "sort-asc-btn" ? "asc" : "desc";
-
-    // ** NEW: Remove active class from all sort buttons, then add to the clicked button **
-    $("#sort-asc-btn, #sort-desc-btn").removeClass("active-sort-button"); // Remove from both buttons
-    $(this).addClass("active-sort-button"); // Add to the clicked button
-
-    const $activeTab = $("#filter-column-tabs .filter-tab.active");
-    if ($activeTab.length === 0) {
-      alert("Please select a column tab to sort.");
-      return;
-    }
-
-    const col = $activeTab.data("col");
-    const headerRow = 1;
-
-    // 1. Gather all rows into an array of objects (This part is fine)
-    const rowsToSort = [];
-    for (let r = headerRow + 1; r <= currentRowCount; r++) {
-      const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).val();
-      rowsToSort.push({ row: r, value: cellValue || "" });
-    }
-
-    // 2. Sort the array with new rules for handling blanks
-    rowsToSort.sort((a, b) => {
-      const valA = a.value;
-      const valB = b.value;
-      const options = { numeric: true, sensitivity: "base" };
-
-      // *** NEW LOGIC TO HANDLE BLANKS ***
-      const aIsEmpty = valA === "";
-      const bIsEmpty = valB === "";
-
-      if (aIsEmpty && bIsEmpty) return 0; // If both are empty, their order doesn't matter
-      if (aIsEmpty) return 1; // Always push empty 'a' to the bottom
-      if (bIsEmpty) return -1; // Always push empty 'b' to the bottom
-      // **********************************
-
-      // If we reach this point, neither cell is empty, so we perform the normal sort
-      if (sortOrder === "asc") {
-        return valA.localeCompare(valB, undefined, options);
+function findTargetAndRange(selectedRange) {
+  if (!selectedRange) return null;
+  const dataCells = [],
+    emptyCells = [];
+  for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
+    for (let r = selectedRange.minRow; r <= selectedRange.maxRow; r++) {
+      const cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
+      if (cell.text().trim() === "") {
+        emptyCells.push(cell);
       } else {
-        // 'desc'
-        return valB.localeCompare(valA, undefined, options);
+        dataCells.push(cell);
       }
-    });
-
-    // 3. Re-append the rows to the DOM in the new sorted order (This part is fine)
-    const $cellsWrapper = $("#cells_wrapper");
-    rowsToSort.forEach((sortedItem) => {
-      const $rowElements = $cellsWrapper.find(
-        `.cell-wrapper[data-row=${sortedItem.row}]`
-      );
-      $cellsWrapper.append($rowElements);
-    });
-
-    // 4. Close the filter pane
-    // $("#filter-pane").removeClass("open");
-  });
-  // 1. Main Filter Button: Toggle filtering on the selected header row
-  $("#sizemug_lfilter--btn").on("click", function () {
-    const $filterBtn = $(this);
-    const selectedRange = getSelectedRange();
-    if (!selectedRange) {
-      alert("Please select the table or header row you want to filter.");
-      return;
     }
+  }
+  if (emptyCells.length > 0 && dataCells.length > 0) {
+    const targetCell = emptyCells[0];
+    const firstDataCell = dataCells[0].data();
+    const lastDataCell = dataCells[dataCells.length - 1].data();
+    const dataRange =
+      toA1(firstDataCell.col, firstDataCell.row) +
+      ":" +
+      toA1(lastDataCell.col, lastDataCell.row);
+    return { target: targetCell, range: dataRange };
+  }
+  return null;
+}
 
-    const headerRow = selectedRange.minRow;
-    for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
-      const $wrapper = $(`.cell-wrapper[data-col=${c}][data-row=${headerRow}]`);
-      if ($wrapper.find(".cell-filter-icon").length === 0) {
-        const filterIcon = $(`
-                  <span class="cell-filter-icon">
-                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12.3333 1.66699H1.66667L5.40001 6.64479C5.5731 6.87559 5.66667 7.15626 5.66667 7.44479V12.3337L8.33334 11.0003V7.44479C8.33334 7.15626 8.42694 6.87559 8.6 6.64479L12.3333 1.66699Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                      </svg>
-                  </span>
-              `);
-        $wrapper.append(filterIcon);
-      }
-      $wrapper.toggleClass("filter-enabled");
-    }
+$(".dropdown-menu-math").on("click", ".submenu button", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!lastFocusedCell) {
+    alert("Please select a cell first.");
+    return;
+  }
+  const functionName = $(this).text().split(" ")[0];
+  const selectedRange = getSelectedRange();
+  let targetCell = lastFocusedCell;
+  let formulaRange = selectedRange
+    ? selectedRange.rangeA1
+    : toA1(targetCell.data("col"), targetCell.data("row"));
+  const smartTarget = findTargetAndRange(selectedRange);
+  if (smartTarget) {
+    targetCell = smartTarget.target;
+    formulaRange = smartTarget.range;
+  }
+  const formula = `=${functionName}(${formulaRange})`;
+  targetCell.text(formula).focus();
+  cellContentInput.value = formula;
+  $(".dropdown-menu-math").removeClass("show");
+  $("#matematicalEquation")
+    .closest(".dropdown-select")
+    .removeClass("open active-category");
+});
 
-    // **FIX 2:** After toggling, check if any filters are active and style the button.
-    if ($(".cell-wrapper.filter-enabled").length > 0) {
-      $filterBtn.addClass("active-category");
+$("#sort-asc-btn, #sort-desc-btn").on("click", function () {
+  const sortOrder = $(this).attr("id") === "sort-asc-btn" ? "asc" : "desc";
+  $("#sort-asc-btn, #sort-desc-btn").removeClass("active-sort-button");
+  $(this).addClass("active-sort-button");
+  const $activeTab = $("#filter-column-tabs .filter-tab.active");
+  if ($activeTab.length === 0) {
+    alert("Please select a column tab to sort.");
+    return;
+  }
+  const col = $activeTab.data("col");
+  const headerRow = 1;
+  const rowsToSort = [];
+  for (let r = headerRow + 1; r <= currentRowCount; r++) {
+    const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).text();
+    rowsToSort.push({ row: r, value: cellValue || "" });
+  }
+  rowsToSort.sort((a, b) => {
+    const valA = a.value,
+      valB = b.value,
+      options = { numeric: true, sensitivity: "base" };
+    const aIsEmpty = valA === "",
+      bIsEmpty = valB === "";
+    if (aIsEmpty && bIsEmpty) return 0;
+    if (aIsEmpty) return 1;
+    if (bIsEmpty) return -1;
+    if (sortOrder === "asc") {
+      return valA.localeCompare(valB, undefined, options);
     } else {
-      $filterBtn.removeClass("active-category");
+      return valB.localeCompare(valA, undefined, options);
     }
   });
+  const $cellsWrapper = $("#cells_wrapper");
+  rowsToSort.forEach((sortedItem) => {
+    const $rowElements = $cellsWrapper.find(
+      `.cell-wrapper[data-row=${sortedItem.row}]`
+    );
+    $cellsWrapper.append($rowElements);
+  });
+});
 
-  // **FIX 1:** Function to populate the values list for the ACTIVE tab
-  function populateFilterValues(col, headerRow) {
-    const headerText = $(`.cell[data-col=${col}][data-row=${headerRow}]`).val();
-    const uniqueValues = new Set();
-    const totalRows = 50;
-    for (let r = headerRow + 1; r <= totalRows; r++) {
-      const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).val();
-      if (cellValue.trim() !== "") uniqueValues.add(cellValue);
-    }
-
-    const $valuesList = $("#filter-values-list").empty();
-    uniqueValues.forEach((value) => {
-      const itemHTML = `
-          <label class="filter-value-item">
-              ${value}
-              <input type="checkbox" checked value="${value}">
-              <span class="custom-checkmark"></span>
-          </label>`;
-      $valuesList.append(itemHTML);
-    });
+$("#sizemug_lfilter--btn").on("click", function () {
+  const $filterBtn = $(this);
+  const selectedRange = getSelectedRange();
+  if (!selectedRange) {
+    alert("Please select the table or header row you want to filter.");
+    return;
   }
-
-  // 2. In-Cell Filter Icon or Tab Click: Open/update the filter pane
-  function openFilterPane(colToActivate, headerRow) {
-    // A. Manage Tabs
-    const $tabsContainer = $("#filter-column-tabs");
-    const headerText = $(
-      `.cell[data-col=${colToActivate}][data-row=${headerRow}]`
-    ).val();
-    let $tab = $tabsContainer.find(`.filter-tab[data-col=${colToActivate}]`);
-
-    // If tab doesn't exist, create it
-    if ($tab.length === 0) {
-      $tab = $(
-        `<button class="filter-tab" data-col="${colToActivate}">${headerText}</button>`
+  const headerRow = selectedRange.minRow;
+  for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
+    const $wrapper = $(`.cell-wrapper[data-col=${c}][data-row=${headerRow}]`);
+    if ($wrapper.find(".cell-filter-icon").length === 0) {
+      $wrapper.append(
+        $(
+          `<span class="cell-filter-icon"><svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.3333 1.66699H1.66667L5.40001 6.64479C5.5731 6.87559 5.66667 7.15626 5.66667 7.44479V12.3337L8.33334 11.0003V7.44479C8.33334 7.15626 8.42694 6.87559 8.6 6.64479L12.3333 1.66699Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>`
+        )
       );
-      $tabsContainer.append($tab);
     }
-
-    // Set the clicked/created tab to active
-    $tabsContainer.find(".filter-tab").removeClass("active");
-    $tab.addClass("active");
-
-    // B. Populate Values
-    populateFilterValues(colToActivate, headerRow);
-
-    // C. Open Pane
-    $("#filter-pane").addClass("open");
+    $wrapper.toggleClass("filter-enabled");
   }
+  if ($(".cell-wrapper.filter-enabled").length > 0) {
+    $filterBtn.addClass("active-category");
+  } else {
+    $filterBtn.removeClass("active-category");
+  }
+});
 
-  // Attach event handlers
-  $("#spreadsheet").on("click", ".cell-filter-icon", function (e) {
-    e.stopPropagation(); // Prevent other clicks from firing
-
-    $(this).addClass("filter-active");
-    const $wrapper = $(this).closest(".cell-wrapper");
-    openFilterPane($wrapper.data("col"), $wrapper.data("row"));
+function populateFilterValues(col, headerRow) {
+  const uniqueValues = new Set();
+  for (let r = headerRow + 1; r <= currentRowCount; r++) {
+    const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).text();
+    if (cellValue.trim() !== "") uniqueValues.add(cellValue);
+  }
+  const $valuesList = $("#filter-values-list").empty();
+  uniqueValues.forEach((value) => {
+    $valuesList.append(
+      $(
+        `<label class="filter-value-item">${value}<input type="checkbox" checked value="${value}"><span class="custom-checkmark"></span></label>`
+      )
+    );
   });
+}
 
-  $("#filter-column-tabs").on("click", ".filter-tab", function () {
-    // For now, assume header is always row 1. This could be made more robust.
-    openFilterPane($(this).data("col"), 1);
+function openFilterPane(colToActivate, headerRow) {
+  const $tabsContainer = $("#filter-column-tabs");
+  const headerText = $(
+    `.cell[data-col=${colToActivate}][data-row=${headerRow}]`
+  ).text();
+  let $tab = $tabsContainer.find(`.filter-tab[data-col=${colToActivate}]`);
+  if ($tab.length === 0) {
+    $tab = $(
+      `<button class="filter-tab" data-col="${colToActivate}">${headerText}</button>`
+    );
+    $tabsContainer.append($tab);
+  }
+  $tabsContainer.find(".filter-tab").removeClass("active");
+  $tab.addClass("active");
+  populateFilterValues(colToActivate, headerRow);
+  $("#filter-pane").addClass("open");
+}
+
+$("#spreadsheet").on("click", ".cell-filter-icon", function (e) {
+  e.stopPropagation();
+  $(this).addClass("filter-active");
+  const $wrapper = $(this).closest(".cell-wrapper");
+  openFilterPane($wrapper.data("col"), $wrapper.data("row"));
+});
+
+$("#filter-column-tabs").on("click", ".filter-tab", function () {
+  openFilterPane($(this).data("col"), 1);
+});
+
+$("#filter-cancel-btn").on("click", function () {
+  $("#filter-pane").removeClass("open");
+});
+
+$("#filter-save-btn").on("click", function () {
+  const $activeTab = $("#filter-column-tabs .filter-tab.active");
+  if ($activeTab.length === 0) return;
+  const col = $activeTab.data("col");
+  const allowedValues = new Set();
+  $("#filter-values-list input:checked").each(function () {
+    allowedValues.add($(this).val());
   });
-
-  // 3. Cancel Button: Close the pane
-  $("#filter-cancel-btn").on("click", function () {
-    $("#filter-pane").removeClass("open");
-  });
-
-  // 4. Save Button: Apply the filter
-  $("#filter-save-btn").on("click", function () {
-    // Apply filter for the ACTIVE tab
-    const $activeTab = $("#filter-column-tabs .filter-tab.active");
-    if ($activeTab.length === 0) return;
-
-    const col = $activeTab.data("col");
-    const allowedValues = new Set();
-    $("#filter-values-list input:checked").each(function () {
-      allowedValues.add($(this).val());
-    });
-
-    // Assume header is row 1
-    const totalRows = 50;
-    for (let r = 2; r <= totalRows; r++) {
-      const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).val();
-      const $rowWrappers = $(`.cell-wrapper[data-row=${r}]`);
-
-      // This logic can be improved to handle multi-column filtering
-      if (allowedValues.has(cellValue) || cellValue.trim() === "") {
-        $rowWrappers.css("display", "grid");
-      } else {
-        $rowWrappers.css("display", "none");
-      }
+  for (let r = 2; r <= currentRowCount; r++) {
+    const cellValue = $(`.cell[data-col=${col}][data-row=${r}]`).text();
+    const $rowWrappers = $(`.cell-wrapper[data-row=${r}]`);
+    if (allowedValues.has(cellValue) || cellValue.trim() === "") {
+      $rowWrappers.css("display", "grid");
+    } else {
+      $rowWrappers.css("display", "none");
     }
-
-    $("#filter-pane").removeClass("open");
-  });
+  }
+  $("#filter-pane").removeClass("open");
 });

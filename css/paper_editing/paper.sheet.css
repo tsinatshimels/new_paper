@@ -197,7 +197,14 @@ input.cell:focus {
 .cell.selected {
   background: rgba(136, 55, 233, 0.05);
 }
+.cell.selected:focus {
+  border: 3px solid #8837e9 !important;
 
+  z-index: 99999;
+}
+.ML__container {
+  padding: 0 !important;
+}
 /* Filter modal style */
 /* --- Filter Pane Styling --- */
 #filter-pane {
@@ -347,6 +354,7 @@ input.cell:focus {
 }
 .cell-wrapper:has(.cell.selected) {
   background: rgba(136, 55, 233, 0.05);
+  /* border: 3px solid #8837e9; */
   z-index: 1;
 }
 .cell-filter-icon.filter-active svg path {

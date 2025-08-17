@@ -1,0 +1,137 @@
+#ruler-system-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Adjust width and centering to match your paper editor */
+  width: 637px; /* 600px paper width + some padding */
+  margin: 0 auto;
+  height: 900px; /* Match paper height */
+  z-index: 5;
+  pointer-events: none; /* Allows clicks to go through to the editor below */
+}
+
+/* Corner block */
+#ruler-corner {
+  position: absolute;
+  top: 0;
+  left: 45px;
+  width: 30px;
+  height: 30px;
+  background: #f8f9fa;
+  border-right: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  box-sizing: border-box;
+}
+
+/* Horizontal Ruler */
+#horizontal-ruler {
+  position: absolute;
+  top: 0;
+  left: 75px;
+  right: 0;
+  height: 30px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #d1d5db;
+  box-sizing: border-box;
+  pointer-events: auto; /* Re-enable pointer events for the ruler itself */
+}
+
+/* Vertical Ruler */
+#vertical-ruler {
+  position: absolute;
+  top: 30px;
+  left: 45px;
+  bottom: 0;
+  width: 30px;
+  background: #f8f9fa;
+  border-right: 1px solid #d1d5db;
+  box-sizing: border-box;
+  z-index: 0;
+  height: 480px;
+}
+
+/* Ruler Marks (Ticks and Numbers) */
+.ruler-mark {
+  position: absolute;
+  background-color: #adb5bd;
+}
+.ruler-number {
+  position: absolute;
+  font-size: 10px;
+  color: #6c757d;
+  user-select: none;
+}
+
+/* Horizontal Marks */
+#h-ruler-marks .ruler-mark {
+  top: 15px;
+  width: 1px;
+  height: 15px;
+}
+#h-ruler-marks .ruler-mark.major {
+  height: 20px;
+  top: 10px;
+}
+#h-ruler-marks .ruler-mark.minor {
+  height: 10px;
+  top: 20px;
+}
+#h-ruler-marks .ruler-number {
+  top: 2px;
+  transform: translateX(-50%);
+}
+
+/* Vertical Marks */
+#v-ruler-marks .ruler-mark {
+  left: 15px;
+  height: 1px;
+  width: 15px;
+}
+#v-ruler-marks .ruler-mark.major {
+  width: 20px;
+  left: 10px;
+}
+#v-ruler-marks .ruler-mark.minor {
+  width: 10px;
+  left: 20px;
+}
+#v-ruler-marks .ruler-number {
+  left: 2px;
+  transform: translateY(-50%);
+}
+
+/* Indent Markers Styling */
+.indent-marker {
+  position: absolute;
+  top: 9px;
+  height: 0;
+  width: 0;
+  cursor: ew-resize;
+  z-index: 10;
+  border-style: solid;
+  pointer-events: auto; /* *** THIS IS THE CRITICAL FIX *** */
+}
+
+#left-indent-marker {
+  left: 0;
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent #4a90e2 transparent;
+}
+
+#first-line-marker {
+  position: absolute;
+  top: -9px;
+  left: -8px; /* Center it on the parent marker */
+  height: 0;
+  width: 0;
+  cursor: ew-resize;
+  border-width: 8px 8px 0 8px;
+  border-color: #4a90e2 transparent transparent transparent;
+}
+
+#right-indent-marker {
+  right: 0;
+  border-width: 8px 8px 0 8px; /* Pointing down */
+  border-color: #4a90e2 transparent transparent transparent;
+}

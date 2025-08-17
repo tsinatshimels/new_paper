@@ -1956,3 +1956,73 @@ function addControls(element) {
   enableRuler(element);
   addDropdown(element);
 }
+// --- NO CHANGES to control-adding functions ---
+// function addControls(element) {
+//   /* ... */
+//   if (element.querySelector(".controls")) return;
+//   const controls = document.createElement("div");
+//   controls.className = "controls";
+//   controls.innerHTML = `<span class="resizer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 12h-19m15.833 3.167L21.5 12l-3.167-3.167M5.667 15.167L2.5 12l3.167-3.167m3.166 9.5L12 21.5l3.167-3.167M8.833 5.667L12 2.5l3.167 3.167M12 21.5v-19"/></svg></span><span class="dropdown-trigger"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="none"/><path fill="#fff" d="m9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828L5.757 6.586L4.343 8z"/></svg></span>`;
+//   element.appendChild(controls);
+//   enableRuler(element);
+//   addDropdown(element);
+// }
+// function removeControls(element) {
+//   /* ... */
+//   const controls = element.querySelector(".controls");
+//   if (controls) {
+//     controls.remove();
+//   }
+// }
+// function enableRuler(element) {
+//   /* ... */
+//   const resizer = element.querySelector(".resizer");
+//   if (!resizer) return;
+//   resizer.addEventListener("mousedown", (e) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     function drag(event) {
+//       element.style.transform = `translate(${event.clientX - e.clientX}px, ${
+//         event.clientY - e.clientY
+//       }px)`;
+//     }
+//     window.addEventListener("mousemove", drag);
+//     window.addEventListener(
+//       "mouseup",
+//       () => window.removeEventListener("mousemove", drag),
+//       { once: true }
+//     );
+//   });
+// }
+// function addDropdown(element) {
+//   /* ... */
+//   const dropdownTrigger = element.querySelector(".dropdown-trigger");
+//   if (!dropdownTrigger) return;
+//   const template = document.getElementById("dropdown-template");
+//   if (!template) return;
+//   const dropdownMenu = template.content.cloneNode(true).firstElementChild;
+//   element.appendChild(dropdownMenu);
+//   dropdownTrigger.addEventListener("click", (e) => {
+//     e.stopPropagation();
+//     dropdownMenu.classList.toggle("show");
+//   });
+//   document.addEventListener("click", () =>
+//     dropdownMenu.classList.remove("show")
+//   );
+//   dropdownMenu.querySelectorAll("button").forEach((button) => {
+//     button.addEventListener("click", (e) => {
+//       e.stopPropagation();
+//       const format = button.dataset.format;
+//       if (format) console.log(`Applying format: ${format}`);
+//       dropdownMenu.classList.remove("show");
+//     });
+//   });
+//   const justifySubmenu = document.getElementById("justifySubmenu");
+//   justifySubmenu.addEventListener("click", (e) => {
+//     e.stopPropagation();
+//     const submenus = document.querySelector(".justify-submenu");
+//     submenus.classList.toggle("show");
+//     justifySubmenu.classList.toggle("active-sort-button");
+//     console.log("Justification submenu toggled");
+//   });
+// }
