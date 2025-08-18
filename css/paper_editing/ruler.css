@@ -33,6 +33,7 @@
   height: 30px;
   background: #f8f9fa;
   border-bottom: 1px solid #d1d5db;
+  width: 600px; /* Adjust width to fit the paper */
   box-sizing: border-box;
   pointer-events: auto; /* Re-enable pointer events for the ruler itself */
 }

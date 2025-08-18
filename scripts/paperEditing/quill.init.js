@@ -175,7 +175,7 @@ style.textContent = `
 
   .editor-wrapper {
     position: relative;
-    margin-bottom: 2rem;
+  
     flex-shrink: 0;
   }
 

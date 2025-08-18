@@ -1,5 +1,3 @@
-// --- START: sheet.js (Final Version with Insertion and Deletion Fixes) ---
-
 window.currentEditorMode = "true";
 let buttonsToDisable = [
   "sizemug_emoji--btn",
@@ -56,11 +54,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdownSelectButton = document.querySelector(
     "#SheetToDocsDropdown .dropdown-select button"
   );
+  const rulerSystem = document.getElementById("ruler-system-wrapper");
 
   function setMode(mode) {
     window.currentEditorMode = mode;
     updateDropdownText(mode);
     if (mode !== "true") {
+      rulerSystem.style.display = "none";
       sheetTools.classList.add("active");
       buttonsToDisable.forEach((btnId) => {
         const btn = document.getElementById(btnId);
