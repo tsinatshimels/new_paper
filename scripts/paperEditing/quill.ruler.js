@@ -1,13 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   // --- 1. Quill Customization: Register custom formats ---
   const Parchment = Quill.import("parchment");
-  // For right margin
   const RightIndent = new Parchment.Attributor.Style(
     "right-indent",
     "margin-right",
     { scope: Parchment.Scope.BLOCK }
   );
-  // For first-line indent
   const TextIndent = new Parchment.Attributor.Style(
     "text-indent",
     "text-indent",
@@ -34,27 +32,70 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // --- ROBUST, LAZY MEASUREMENT UTILITY ---
+  const IndentMeasurer = (() => {
+    let cachedWidth = null; // This will store the width after the first measurement
+
+    function measure() {
+      const tempEditor = document.createElement("div");
+      const tempParagraph = document.createElement("p");
+
+      // We must replicate the structure for styles to apply correctly
+      tempEditor.className = "ql-editor";
+      tempEditor.style.visibility = "hidden";
+      tempEditor.style.position = "absolute";
+      tempEditor.style.left = "-9999px";
+
+      tempParagraph.className = "ql-indent-1";
+      tempEditor.appendChild(tempParagraph);
+
+      // Append to the actual paper container to inherit all relevant styles (like font-size)
+      paperContainer.appendChild(tempEditor);
+
+      const computedStyle = window.getComputedStyle(tempParagraph);
+      const indentWidth = parseFloat(computedStyle.paddingLeft);
+
+      paperContainer.removeChild(tempEditor);
+
+      // Add a debug log to see what the browser is measuring
+      console.log("Measured Quill indent width:", indentWidth, "px");
+
+      // Use the measurement, or a much more realistic fallback based on a 16px font (16*3=48)
+      return indentWidth > 0 ? indentWidth : 48;
+    }
+
+    return {
+      getWidth: function () {
+        if (cachedWidth === null) {
+          cachedWidth = measure();
+        }
+        return cachedWidth;
+      },
+    };
+  })();
+
   let activeEditor = paperEditors[0];
   const PIXELS_PER_INCH = 96;
-  const INDENT_WIDTH_PX = 40; // How many pixels one Quill indent level is
+
+  // --- We will get the indent width on-demand later, not here ---
 
   // --- 3. Toggle Ruler Visibility ---
   toggleBtn.addEventListener("click", () => {
     const isVisible = rulerSystem.style.display === "block";
     rulerSystem.style.display = isVisible ? "none" : "block";
     if (!isVisible) {
+      // First time it's visible, generate the marks and update markers
       generateRulerMarks();
       updateRulerMarkers(activeEditor);
     }
   });
 
-  // --- 4. Generate Ruler Ticks and Numbers ---
+  // --- 4. Generate Ruler Ticks and Numbers --- (No changes here)
   function generateRulerMarks() {
     hRulerMarks.innerHTML = "";
     vRulerMarks.innerHTML = "";
     const paperWidth = paperContainer.clientWidth;
     const paperHeight = paperContainer.clientHeight;
-
     for (let i = 0; i < paperWidth; i += PIXELS_PER_INCH / 16) {
       const mark = document.createElement("div");
       mark.className = "ruler-mark";
@@ -95,8 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const selection = editor.getSelection();
     if (!selection) return;
 
+    const INDENT_WIDTH_PX = IndentMeasurer.getWidth(); // Get the width here
     const formats = editor.getFormat(selection.index) || {};
-    const indentPx = (formats.indent || 0) * INDENT_WIDTH_PX;
+    // const indentPx = (formats.indent || 0) * INDENT_WIDTH_PX;
+    const indentPx = 15 + (formats.indent || 0) * INDENT_WIDTH_PX; // Adjusted to start at 15px
+
     const textIndentPx = parseFloat(formats["text-indent"] || "0px");
     const rightIndentPx = parseFloat(formats["right-indent"] || "0px");
 
@@ -110,39 +154,31 @@ document.addEventListener("DOMContentLoaded", () => {
     marker.addEventListener("mousedown", (e) => {
       e.preventDefault();
       e.stopPropagation();
-
-      const startX = e.clientX;
       const rulerRect = hRuler.getBoundingClientRect();
-
       const onMouseMove = (moveEvent) => {
-        let newX = moveEvent.clientX;
-        let newPos = newX - rulerRect.left; // Position relative to the ruler
-
-        // Constrain position within the ruler bounds
-        newPos = Math.max(0, newPos);
-        newPos = Math.min(rulerRect.width, newPos);
-
+        let newPos = moveEvent.clientX - rulerRect.left;
+        newPos = Math.max(0, Math.min(newPos, rulerRect.width));
         onDragUpdate(newPos);
       };
-
       const onMouseUp = () => {
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       };
-
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     });
   }
 
-  // Assign drag handlers to each marker
+  // Assign drag handlers
   createDragHandler(leftIndentMarker, (newPos) => {
+    const INDENT_WIDTH_PX = IndentMeasurer.getWidth(); // Get width
     const newIndentLevel = Math.round(newPos / INDENT_WIDTH_PX);
     activeEditor.format("indent", newIndentLevel);
     updateRulerMarkers(activeEditor);
   });
 
   createDragHandler(firstLineMarker, (newPos) => {
+    const INDENT_WIDTH_PX = IndentMeasurer.getWidth(); // Get width
     const currentIndentPx =
       (activeEditor.getFormat().indent || 0) * INDENT_WIDTH_PX;
     const newTextIndent = newPos - currentIndentPx;

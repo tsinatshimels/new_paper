@@ -112,11 +112,11 @@
   cursor: ew-resize;
   z-index: 10;
   border-style: solid;
-  pointer-events: auto; /* *** THIS IS THE CRITICAL FIX *** */
+  pointer-events: auto;
 }
 
 #left-indent-marker {
-  left: 0;
+  left: 15px;
   border-width: 0 8px 8px 8px;
   border-color: transparent transparent #4a90e2 transparent;
 }
