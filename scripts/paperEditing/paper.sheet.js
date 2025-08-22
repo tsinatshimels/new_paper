@@ -218,7 +218,40 @@ function updateFormulaBarForCell($cell) {
   });
   cellContentInput.value = displayText;
 }
+function handleCellSpillover(cell) {
+  const $cell = $(cell);
+  if (!$cell.length) return;
 
+  // First, reset the width to its natural size within the grid
+  $cell.css("width", "");
+
+  // Check if the text content is actually wider than the cell's container
+  if (cell.scrollWidth > cell.clientWidth) {
+    let newWidth = cell.offsetWidth; // Start with the cell's own width
+    let currentCol = $cell.data("col");
+    let currentRow = $cell.data("row");
+    let nextCol = currentCol + 1;
+
+    // Look at the next cell to the right
+    let $nextCell = $(`div.cell[data-col=${nextCol}][data-row=${currentRow}]`);
+
+    // Keep expanding the calculated width as long as the next cell is empty
+    // AND the text still needs more space.
+    while (
+      newWidth < cell.scrollWidth &&
+      $nextCell.length > 0 &&
+      $nextCell.text().trim() === ""
+    ) {
+      newWidth += $nextCell[0].offsetWidth; // Add the width of the empty cell
+      nextCol++;
+      $nextCell = $(`div.cell[data-col=${nextCol}][data-row=${currentRow}]`);
+    }
+
+    // Apply the newly calculated width to the focused cell
+    // This will stretch the cell (and its border) over the empty cells
+    $cell.css("width", `${newWidth}px`);
+  }
+}
 $sheet.css("--col-count", cols);
 $sheet.css("--row-count", rows);
 
@@ -277,6 +310,8 @@ $(document).on("focusin", ".cell", function () {
   if (!activeMathSheetField) {
     updateFormulaBarForCell($cell);
   }
+  // Call the new overflow handler when a cell gets focus
+  handleCellSpillover(this);
 });
 
 // --- FIX #1: Use CLICK event to reliably set the cursor for insertion ---
@@ -293,8 +328,12 @@ $sheet.on("click", ".cell", function () {
 });
 
 $(document).on("input", "div.cell", function () {
-  if ($(this).is(":focus") && !activeMathSheetField) {
-    updateFormulaBarForCell($(this));
+  if ($(this).is(":focus")) {
+    if (!activeMathSheetField) {
+      updateFormulaBarForCell($(this));
+    }
+    // Also call the handler on input
+    handleCellSpillover(this);
   }
 });
 
@@ -494,6 +533,7 @@ $(document).on("focus", "div.cell", function () {
 $(document).on("blur", "div.cell", function () {
   const $cell = $(this);
   $cell.removeClass("is-focused");
+  $cell.css("width", "");
   const content = $cell.text();
   if (content.startsWith("=")) {
     $cell.data("formula", content);

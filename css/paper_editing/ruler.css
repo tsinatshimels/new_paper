@@ -49,7 +49,7 @@
   border-right: 1px solid #d1d5db;
   box-sizing: border-box;
   z-index: 0;
-  height: 450px;
+  /* height: 450px; */
   overflow: hidden; /* Hide overflow to prevent scrollbars */
 }
 

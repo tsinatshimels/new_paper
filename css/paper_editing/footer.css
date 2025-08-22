@@ -9,6 +9,8 @@
   color: #6b7280;
   font-size: 0.8rem;
   border-top: 1px solid #9197a32f;
+  position: relative;
+  z-index: 5;
 }
 
 .paper_footer #zoom_level {
