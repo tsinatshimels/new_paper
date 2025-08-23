@@ -1,12 +1,12 @@
 #ruler-system-wrapper {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 240px;
   right: 0;
   /* Adjust width and centering to match your paper editor */
-  width: 637px; /* 600px paper width + some padding */
-  margin: 0 auto;
-  height: 900px; /* Match paper height */
+  /* width: 637px;
+
+  height: 900px;  */
   z-index: 5;
   pointer-events: none; /* Allows clicks to go through to the editor below */
 }
@@ -33,7 +33,7 @@
   height: 30px;
   background: #f8f9fa;
   border-bottom: 1px solid #d1d5db;
-  width: 600px; /* Adjust width to fit the paper */
+  /* width: 600px;  */
   box-sizing: border-box;
   pointer-events: auto; /* Re-enable pointer events for the ruler itself */
 }
