@@ -1,13 +1,14 @@
 #ruler-system-wrapper {
   position: absolute;
   top: 0;
-  left: 240px;
-  right: 0;
+  /* left: 240px;
+  right: 0; */
   /* Adjust width and centering to match your paper editor */
   /* width: 637px;
 
   height: 900px;  */
   z-index: 5;
+  margin-right: 90px;
   pointer-events: none; /* Allows clicks to go through to the editor below */
 }
 
