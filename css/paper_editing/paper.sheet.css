@@ -158,6 +158,9 @@
   margin-top: 1px;
   white-space: nowrap;
   /* overflow: hidden; */
+  overflow-y: hidden;
+  overflow-x: visible;
+  scrollbar-width: none;
 }
 
 #spreadsheet .cell:nth-child(21n) {

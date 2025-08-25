@@ -249,7 +249,8 @@ strong {
   gap: 7px;
 }
 
-.quick_action_container button {
+.quick_action_container button,
+.quick_action_container .help--btn {
   background: var(--light-gray-color);
   border-radius: 20px;
 
@@ -268,6 +269,14 @@ strong {
 
 .quick_action_container button.edit_filename--btn:hover {
   background: var(--color-blue);
+}
+.docs_help {
+  display: flex;
+  gap: 5px;
+}
+.quick_action_container .help--btn:hover {
+  background: #8837e9;
+  color: white;
 }
 
 .quick_action_container button.favourite--btn:hover {
@@ -308,7 +317,7 @@ strong {
   font-weight: 500;
   font-size: 80%;
   display: flex;
-  gap: .5rem;
+  gap: 0.5rem;
   box-shadow: 0 0 0 0.7px rgba(0, 0, 0, 0.25);
   display: flex;
   justify-content: center;
