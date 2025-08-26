@@ -1657,3 +1657,23 @@ MathLiveBlot.tagName = "span";
 MathLiveBlot.className = "mathlive-blot-wrapper";
 
 Quill.register(MathLiveBlot);
+
+// Comment Feature
+class CommentBlot extends Inline {
+  static create(value) {
+    const node = super.create();
+    // 'value' will be the unique comment ID
+    node.setAttribute("data-comment-id", value);
+    node.classList.add("comment-highlight");
+    return node;
+  }
+
+  static formats(domNode) {
+    // Return the comment ID from the node
+    return domNode.getAttribute("data-comment-id");
+  }
+}
+
+CommentBlot.blotName = "comment";
+CommentBlot.tagName = "span"; // Using a span to wrap the text
+Quill.register(CommentBlot);

@@ -69,6 +69,13 @@ function createNewEditor() {
 
   paperEditors.push(editor);
   setupEditorListener(editor);
+  if (window.setupCommentEmojiListeners) {
+    window.setupCommentEmojiListeners(editor);
+  } else {
+    console.error(
+      "Comment/Emoji listener setup function not found. Check script loading order."
+    );
+  }
 
   // Immediately focus new editor when created
   editor?.focus();
