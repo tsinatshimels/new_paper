@@ -22,7 +22,8 @@ function updatePaperContainer() {
 
   // Adjust paper container position to keep it centered
   const left = (editorContainerRect.width - paperOriginalWidth * scale) / 2;
-  editorPaper.style.left = `${Math.max(0, left)}px`;
+  // editorPaper.style.left = `${Math.max(0, left)}px`;
+  editorPaper.style.left = "0px";
   editorPaper.style.top = "0px";
 
   // Adjust editor container height to fit the scaled paper

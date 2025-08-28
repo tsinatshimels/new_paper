@@ -76,6 +76,13 @@ function createNewEditor() {
       "Comment/Emoji listener setup function not found. Check script loading order."
     );
   }
+  if (window.setupHistory) {
+    window.setupHistory(editor);
+  } else {
+    console.error(
+      "History setup function not found. Check script loading order."
+    );
+  }
 
   // Immediately focus new editor when created
   editor?.focus();

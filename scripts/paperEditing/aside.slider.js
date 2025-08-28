@@ -10,7 +10,16 @@ async function renderAsideLists() {
   asideLists.innerHTML = "";
 
   data.forEach((d, i) => {
-    const { username, userPhoto, taskTitle, likes, seen, hasVideo, taskVideoThumbnail, taskImages } = d;
+    const {
+      username,
+      userPhoto,
+      taskTitle,
+      likes,
+      seen,
+      hasVideo,
+      taskVideoThumbnail,
+      taskImages,
+    } = d;
 
     // <img src="${hasVideo ? taskVideoThumbnail : userPhoto}" alt="" />
     const markup = `
@@ -136,11 +145,22 @@ asideLists.addEventListener("click", (e) => {
 /////////////////////////////////////////////////////////////
 const showRightSidebarBtn = document.getElementById("show_right--slider");
 const rightSidebarContainer = document.getElementById("aside_container");
-const mainContainerBodyLarge = document.getElementById("main_container_body--large");
-
+const mainContainerBodyLarge = document.getElementById(
+  "main_container_body--large"
+);
+const commentSidePanel = document.getElementById("comment_side_panel");
+const historySidePanel = document.getElementById("history_side_panel");
+let wasOriginalAsideOpen = false;
+// Button references
+const allCommentsBtn = document.getElementById("all-comments-btn");
+const historyBtn = document.getElementById("history-btn");
+const closeCommentPanelBtn = document.getElementById("close-comment-panel-btn");
+const closeHistoryPanelBtn = document.getElementById("close-history-panel-btn");
 showRightSidebarBtn.addEventListener("click", () => {
   const sidebarStatus = JSON.parse(rightSidebarContainer.ariaExpanded);
-  const toolsNavbarTarget = document.querySelector(".tools_navbar  #tools_navbar_target");
+  const toolsNavbarTarget = document.querySelector(
+    ".tools_navbar  #tools_navbar_target"
+  );
 
   if (sidebarStatus) {
     rightSidebarContainer.classList.add("collapsed");
@@ -166,6 +186,49 @@ showRightSidebarBtn.addEventListener("click", () => {
   }
 });
 
+function openSidePanel(panelElement) {
+  // 1. Check if the original aside is currently open
+  const isAsideExpanded =
+    rightSidebarContainer.getAttribute("aria-expanded") === "true";
+  if (isAsideExpanded) {
+    wasOriginalAsideOpen = true;
+    // showRightSidebarBtn.click(); // Programmatically close the original aside
+  } else {
+    wasOriginalAsideOpen = false;
+  }
+  // 2. Open the requested panel
+  panelElement.classList.toggle("is-open");
+}
+
+function closeSidePanel(panelElement) {
+  // 1. Close the current panel
+  panelElement.classList.remove("is-open");
+  // 2. If the original aside was open before, restore it
+  if (wasOriginalAsideOpen) {
+    showRightSidebarBtn.click(); // Programmatically re-open the original aside
+    wasOriginalAsideOpen = false; // Reset state
+  }
+}
+
+// --- Event Listeners ---
+
+allCommentsBtn.addEventListener("click", () => {
+  renderResolvedComments(); // Populate the panel
+  openSidePanel(commentSidePanel); // Open it
+});
+
+historyBtn.addEventListener("click", () => {
+  renderHistory(); // Populate the panel
+  openSidePanel(historySidePanel); // Open it
+});
+
+closeCommentPanelBtn.addEventListener("click", () => {
+  closeSidePanel(commentSidePanel);
+});
+
+closeHistoryPanelBtn.addEventListener("click", () => {
+  closeSidePanel(historySidePanel);
+});
 //////////////////////////////
 //////////////////////////////
 //////////////////////////////
@@ -174,7 +237,8 @@ function renderTemplatesSkeleton(container) {
   const ske = Array.from({ length: 20 }, (_, i) => i + 1);
 
   ske.forEach((s) => {
-    const markup = '<div style="height: 150px; border-radius:8px; margin-bottom: 15px" class="skeleton_loading recent_skeleton"></div>';
+    const markup =
+      '<div style="height: 150px; border-radius:8px; margin-bottom: 15px" class="skeleton_loading recent_skeleton"></div>';
     container.insertAdjacentHTML("afterbegin", markup);
   });
 }
@@ -182,7 +246,8 @@ function renderTemplatesSkeleton(container) {
 window.addEventListener("resize", () => {
   if (innerWidth <= 1024) {
     setTimeout(() => {
-      document.getElementById("tools_navbar--header--input").style.display = "none";
+      document.getElementById("tools_navbar--header--input").style.display =
+        "none";
     }, 200);
   }
 });

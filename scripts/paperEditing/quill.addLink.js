@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const paperAddLink = document.getElementById("paper_add_link");
   const paperAddLinkUrl = document.querySelector(".paper_add_link--url");
   const linkDocumentElement = document.querySelector(".link_document_element");
-  const mobileHideLinkModalBtn = document.getElementById("mobileHideLinkModalBtn");
+  const mobileHideLinkModalBtn = document.getElementById(
+    "mobileHideLinkModalBtn"
+  );
 
   [linkDocumentElement, openAddLink].forEach((button) => {
     button.addEventListener("click", () => {
@@ -52,19 +54,21 @@ document.addEventListener("DOMContentLoaded", () => {
     focusedEditor.focus();
   }
 
-  document.querySelector(".ql-editor").addEventListener("mousemove", function (e) {
-    const allLinks = this.querySelectorAll("a");
+  document
+    .querySelector(".ql-editor")
+    .addEventListener("mousemove", function (e) {
+      const allLinks = this.querySelectorAll("a");
 
-    allLinks.forEach((link) => {
-      link.addEventListener("mouseenter", () => {
-        this.setAttribute("contenteditable", "false");
-      });
+      allLinks.forEach((link) => {
+        link.addEventListener("mouseenter", () => {
+          this.setAttribute("contenteditable", "false");
+        });
 
-      link.addEventListener("mouseleave", () => {
-        this.setAttribute("contenteditable", "true");
+        link.addEventListener("mouseleave", () => {
+          this.setAttribute("contenteditable", "true");
+        });
       });
     });
-  });
 });
 
 function openAddLinkModal() {

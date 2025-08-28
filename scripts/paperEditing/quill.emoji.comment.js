@@ -1,12 +1,10 @@
-// Your new quill.emoji.comment.js file
+// Your corrected quill.emoji.comment.js file
 
 // --- Element References ---
 const selectionToolbar = document.getElementById("selection-toolbar");
 const addCommentBtn = document.getElementById("add-comment-btn");
 const addEmojiBtn = document.getElementById("add-emoji-btn");
-
 const emojiPicker = document.getElementById("emoji-picker");
-
 const commentSidebar = document.getElementById("comment-sidebar");
 const commentList = document.getElementById("comment-list");
 const commentInputContainer = document.getElementById(
@@ -17,63 +15,47 @@ const saveCommentBtn = document.getElementById("save-comment-btn");
 const cancelCommentBtn = document.getElementById("cancel-comment-btn");
 
 // --- State Management ---
-let comments = {}; // Store all comments { id: { text: '...', range: ... } }
-let activeCommentId = null; // The ID of the comment being created
-let activeRange = null; // The selection range for the new comment
+let comments = {};
+let activeCommentId = null;
+let activeRange = null;
+const mockUsers = ["Alex Doe", "Jane Smith", "Sam Wilson"];
 
 // --- Main Logic ---
-
-/**
- * Shows a toolbar (either selection or emoji) positioned relative to the selected text.
- * @param {Quill} editor The currently focused Quill instance
- * @param {Element} toolbarEl The toolbar element to show
- */
 function showToolbar(editor, toolbarEl) {
   const range = editor.getSelection();
   if (!range || range.length === 0) return;
-
-  const editorContainer = document.getElementById("editor-container");
+  const editorPaperWrapper = document.getElementById("editor_paper--wrapper");
+  if (!editorPaperWrapper) {
+    console.error("#editor_paper--wrapper not found!");
+    return;
+  }
   const bounds = editor.getBounds(range.index, range.length);
-
-  // Adjust position relative to the main container
   const editorRect = editor.container.getBoundingClientRect();
-  const containerRect = editorContainer.getBoundingClientRect();
-
-  toolbarEl.style.top = `${
-    editorRect.top - containerRect.top + bounds.top - toolbarEl.offsetHeight - 5
-  }px`;
-  toolbarEl.style.left = `${
-    270 +
+  const wrapperRect = editorPaperWrapper.getBoundingClientRect();
+  const topPosition =
+    editorRect.top - wrapperRect.top + bounds.top - toolbarEl.offsetHeight - 5;
+  const leftPosition =
     editorRect.left -
-    containerRect.left +
+    wrapperRect.left +
     bounds.left +
     bounds.width / 2 -
-    toolbarEl.offsetWidth / 2
-  }px`;
-
+    toolbarEl.offsetWidth / 2;
+  toolbarEl.style.top = `${topPosition}px`;
+  toolbarEl.style.right = `${leftPosition}px`; // Corrected from .right
   toolbarEl.classList.remove("hidden");
 }
 
-/**
- * Hides all pop-up toolbars.
- */
 function hideAllToolbars() {
   selectionToolbar.classList.add("hidden");
   emojiPicker.classList.add("hidden");
 }
 
-/**
- * Attaches selection-related event listeners to a Quill editor instance.
- * This is designed to be called for each editor you create.
- * @param {Quill} editor
- */
 window.setupCommentEmojiListeners = function (editor) {
   editor.on("selection-change", function (range, oldRange, source) {
     if (source === "user" && range && range.length > 0) {
       showToolbar(editor, selectionToolbar);
-      emojiPicker.classList.add("hidden"); // Hide emoji picker if selecting new text
+      emojiPicker.classList.add("hidden");
     } else {
-      // Don't hide if the focus is moving to one of our toolbars
       setTimeout(() => {
         if (
           !selectionToolbar.contains(document.activeElement) &&
@@ -88,15 +70,11 @@ window.setupCommentEmojiListeners = function (editor) {
 };
 
 // --- Event Handlers ---
-
 addCommentBtn.addEventListener("click", () => {
   if (!window.focusedEditor) return;
-
   activeRange = window.focusedEditor.getSelection();
   if (!activeRange) return;
-
   hideAllToolbars();
-
   activeCommentId = `comment-${Date.now()}`;
   window.focusedEditor.formatText(
     activeRange.index,
@@ -104,7 +82,6 @@ addCommentBtn.addEventListener("click", () => {
     "comment",
     activeCommentId
   );
-
   commentSidebar.classList.remove("hidden");
   commentInputContainer.classList.remove("hidden");
   commentInput.focus();
@@ -119,18 +96,14 @@ addEmojiBtn.addEventListener("click", () => {
 emojiPicker.addEventListener("click", (event) => {
   if (event.target.classList.contains("emoji-option")) {
     if (!window.focusedEditor) return;
-
     const emoji = event.target.textContent;
     const range = window.focusedEditor.getSelection();
-
     if (range) {
-      // Insert emoji after the selected text
       window.focusedEditor.insertText(
         range.index + range.length,
         emoji,
         "user"
       );
-      // Move cursor after the inserted emoji
       window.focusedEditor.setSelection(
         range.index + range.length + emoji.length
       );
@@ -142,10 +115,15 @@ emojiPicker.addEventListener("click", (event) => {
 saveCommentBtn.addEventListener("click", () => {
   const commentText = commentInput.value.trim();
   if (commentText && activeCommentId) {
-    comments[activeCommentId] = { text: commentText, range: activeRange };
+    const randomAuthor =
+      mockUsers[Math.floor(Math.random() * mockUsers.length)];
+    comments[activeCommentId] = {
+      text: commentText,
+      range: activeRange,
+      author: randomAuthor,
+      resolved: false,
+    };
     renderComments();
-
-    // Reset state
     commentInput.value = "";
     commentInputContainer.classList.add("hidden");
     activeCommentId = null;
@@ -155,7 +133,6 @@ saveCommentBtn.addEventListener("click", () => {
 
 cancelCommentBtn.addEventListener("click", () => {
   if (activeCommentId && activeRange) {
-    // Remove the highlight from the text
     window.focusedEditor.formatText(
       activeRange.index,
       activeRange.length,
@@ -163,28 +140,89 @@ cancelCommentBtn.addEventListener("click", () => {
       false
     );
   }
-
-  // Reset state
   commentInput.value = "";
   commentInputContainer.classList.add("hidden");
   activeCommentId = null;
   activeRange = null;
 });
 
+commentList.addEventListener("click", (event) => {
+  const resolveBtn = event.target.closest(".resolve-comment-btn");
+  if (resolveBtn) {
+    const commentItem = resolveBtn.closest(".comment-item");
+    const commentId = commentItem.getAttribute("data-comment-id");
+    resolveComment(commentId);
+  }
+});
+
+function resolveComment(id) {
+  if (!comments[id]) return;
+  const commentItem = commentList.querySelector(`[data-comment-id="${id}"]`);
+  if (commentItem) {
+    commentItem.classList.add("resolving");
+    setTimeout(() => {
+      comments[id].resolved = true;
+      renderComments();
+      renderResolvedComments(); // <<< THE FIX IS HERE
+    }, 300);
+  }
+}
+
 // --- Rendering ---
 function renderComments() {
   commentList.innerHTML = "";
-  for (const id in comments) {
-    const comment = comments[id];
+  const activeComments = Object.entries(comments).filter(
+    ([id, comment]) => !comment.resolved
+  );
+
+  activeComments.forEach(([id, comment]) => {
     const commentItem = document.createElement("div");
     commentItem.className = "comment-item";
     commentItem.setAttribute("data-comment-id", id);
-    commentItem.textContent = comment.text;
+    commentItem.innerHTML = `
+      <div class="comment-header">
+          <div class="comment-profile-icon">${comment.author.charAt(0)}</div>
+          <div class="comment-author">${comment.author}</div>
+      </div>
+      <div class="comment-text">${comment.text}</div>
+      <div class="comment-actions">
+          <button class="comment-action-btn resolve-comment-btn" title="Resolve comment">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="green" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/></svg>
+          </button>
+      </div>
+    `;
     commentList.appendChild(commentItem);
+  });
+
+  if (activeComments.length === 0) {
+    commentSidebar.classList.add("hidden");
+  } else {
+    commentSidebar.classList.remove("hidden");
+  }
+}
+
+function renderResolvedComments() {
+  const resolvedList = document.getElementById("resolved-comment-list");
+  if (!resolvedList) return;
+
+  resolvedList.innerHTML = "";
+  const resolved = Object.values(comments).filter((c) => c.resolved);
+
+  if (resolved.length === 0) {
+    resolvedList.innerHTML = "<p>No resolved comments.</p>";
+    return;
   }
 
-  // If no comments left, hide the whole sidebar
-  if (Object.keys(comments).length === 0) {
-    commentSidebar.classList.add("hidden");
-  }
+  resolved.forEach((comment) => {
+    const commentItem = document.createElement("div");
+    commentItem.className = "comment-item";
+    commentItem.innerHTML = `
+      <div class="comment-header">
+        <div class="comment-profile-icon">${comment.author.charAt(0)}</div>
+        <div class="comment-author">${comment.author}</div>
+      </div>
+      <div class="comment-text">${comment.text}</div>
+    `;
+    resolvedList.appendChild(commentItem);
+  });
 }

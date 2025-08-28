@@ -434,7 +434,7 @@
 }
 
 .column.alignment_last_column {
-  justify-content: flex-start;
+  /* justify-content: flex-start; */
 }
 
 .toolbar_headers--holder ul#dropdown {

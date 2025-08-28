@@ -1748,6 +1748,17 @@
                           <!-- prettier-ignore -->
                           <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M13.9993 6.66667H5.33268M13.9993 4H2.66602M13.9993 9.33333H2.66602M13.9993 12H5.33268" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
+                        <button
+                          id="all-comments-btn"
+                          data-tippy-content="All Comments"
+                        >
+                          <!-- prettier-ignore -->
+                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M14 2.66699H2C1.46957 2.66699 0.960859 2.8777 0.585786 3.25277C0.210714 3.62784 0 4.13655 0 4.66699V11.3337C0 11.8641 0.210714 12.3728 0.585786 12.7479C0.960859 13.1229 1.46957 13.3337 2 13.3337H12L16 16V4.66699C16 4.13655 15.7893 3.62784 15.4142 3.25277C15.0391 2.8777 14.5304 2.66699 14 2.66699ZM4 6.66699H12M4 9.33366H8" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <button id="history-btn" data-tippy-content="History">
+                          <!-- prettier-ignore -->
+                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M8 1.33301C4.318 1.33301 1.33398 4.31703 1.33398 8.00033C1.33398 11.6837 4.318 14.6663 8 14.6663C11.6827 14.6663 14.6667 11.6837 14.6667 8.00033C14.6667 4.31703 11.6827 1.33301 8 1.33301ZM8 13.3337C5.05467 13.3337 2.66665 10.9457 2.66665 8.00033C2.66665 5.05499 5.05467 2.66699 8 2.66699C10.9453 2.66699 13.3333 5.05499 13.3333 8.00033C13.3333 10.9457 10.9453 13.3337 8 13.3337ZM8.00065 4.00033V8.00033L11.3333 9.86699" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -3501,6 +3512,32 @@
             <!-- List Item -->
           </div>
         </aside>
+
+        <!-- New Side Panel for Resolved Comments -->
+        <div id="comment_side_panel" class="side-panel">
+          <div class="side-panel-header">
+            <h2>Resolved Comments</h2>
+            <button id="close-comment-panel-btn" class="side-panel-close-btn">
+              &times;
+            </button>
+          </div>
+          <div id="resolved-comment-list" class="side-panel-content">
+            <!-- Resolved comments will be dynamically added here -->
+          </div>
+        </div>
+
+        <!-- New Side Panel for Version History -->
+        <div id="history_side_panel" class="side-panel">
+          <div class="side-panel-header">
+            <h2>Version History</h2>
+            <button id="close-history-panel-btn" class="side-panel-close-btn">
+              &times;
+            </button>
+          </div>
+          <div id="history-list" class="side-panel-content">
+            <!-- History versions will be dynamically added here -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -7270,7 +7307,12 @@
     <!-- Editor functionality with quill.js -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathquill/build/mathquill.min.js"></script>
+    <!-- <script src="/scripts/paperEditing/global.state.js" defer></script> -->
     <script src="/scripts/paperEditing/quill.emoji.comment.js"></script>
+    <script src="/scripts/paperEditing/quill.history.js"></script>
+    <!-- Your aside.slider.js file should come next -->
+    <!-- <script src="/scripts/paperEditing/aside.slider.js" defer></script> -->
+    <!-- Quill init MUST come last as it depends on all the others -->
     <script src="/scripts/paperEditing/quill.init.js"></script>
     <script src="/scripts/paperEditing/quill.ruler.js"></script>
     <script src="/scripts/paperEditing/quill.blots.js"></script>

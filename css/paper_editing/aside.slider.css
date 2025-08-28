@@ -146,3 +146,81 @@
     display: none;
   }
 }
+/* Style for aside comment and history */
+/* --- Generic Side Panel Styling --- */
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px; /* Wider than the default 15rem aside */
+  height: 100vh; /* Full viewport height */
+  background-color: #f9f9fa;
+  border-left: 1px solid #e0e0e0;
+  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.08);
+  z-index: 1500; /* High z-index to be on top */
+
+  /* Hide by default */
+  transform: translateX(100%);
+  transition: transform 0.35s ease-in-out;
+
+  /* Flexbox layout for header and scrollable content */
+  display: flex;
+  flex-direction: column;
+}
+
+/* The class that makes the panel visible */
+.side-panel.is-open {
+  transform: translateX(0);
+}
+
+.side-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid #d1d5db;
+  flex-shrink: 0; /* Header should not shrink */
+}
+
+.side-panel-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.side-panel-close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: #555;
+  padding: 0 5px;
+}
+
+.side-panel-content {
+  padding: 15px 20px;
+  flex-grow: 1; /* Content area takes remaining space */
+  overflow-y: auto; /* Allow scrolling */
+  scrollbar-width: thin;
+}
+
+/* --- Item-specific styles (re-using from before) --- */
+.side-panel .comment-item,
+.side-panel .history-item {
+  /* These styles remain the same as the previous response */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.side-panel .history-item {
+  cursor: pointer;
+}
+
+.side-panel .history-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* ... include other necessary styles for comment-header, comment-author, history-timestamp etc. ... */
