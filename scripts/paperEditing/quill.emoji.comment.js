@@ -181,7 +181,7 @@ function renderComments() {
     commentItem.setAttribute("data-comment-id", id);
     commentItem.innerHTML = `
       <div class="comment-header">
-          <div class="comment-profile-icon">${comment.author.charAt(0)}</div>
+          <div class="comment-profile-icon"><img src="https://randomuser.me/api/portraits/med/men/94.jpg" alt="Louis Davies"></div>
           <div class="comment-author">${comment.author}</div>
       </div>
       <div class="comment-text">${comment.text}</div>
@@ -218,7 +218,7 @@ function renderResolvedComments() {
     commentItem.className = "comment-item";
     commentItem.innerHTML = `
       <div class="comment-header">
-        <div class="comment-profile-icon">${comment.author.charAt(0)}</div>
+        <div class="comment-profile-icon"><img src="https://randomuser.me/api/portraits/med/men/94.jpg" alt="Louis Davies"></div>
         <div class="comment-author">${comment.author}</div>
       </div>
       <div class="comment-text">${comment.text}</div>
