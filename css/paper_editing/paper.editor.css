@@ -189,6 +189,13 @@
   transition: opacity 0.1s ease-in-out;
   flex-direction: column;
 }
+#emoji-picker {
+  display: grid;
+  grid-template-columns: repeat(8, auto);
+  gap: 8px;
+  z-index: 1001; /* Should be above the editor paper */
+  transition: opacity 0.1s ease-in-out;
+}
 
 #selection-toolbar button,
 .emoji-option {
@@ -210,9 +217,9 @@
 
 /* Comment Sidebar (on the left) */
 #comment-sidebar {
-  position: fixed; /* Fixed to the viewport */
+  position: absolute; /* Fixed to the viewport */
   left: 20px;
-  top: 260px; /* Adjust as needed */
+  top: 50px; /* Adjust as needed */
   width: 280px;
   background-color: #f9f9fa;
   border: 1px solid #e0e0e0;
@@ -220,9 +227,10 @@
   padding: 15px;
 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-height: 80vh;
+  height: auto;
   display: flex;
   flex-direction: column;
+  overflow: visible;
 }
 
 /* --- Existing #comment-sidebar styles --- */
@@ -346,7 +354,6 @@
 }
 
 #comment-list {
-  overflow-y: auto;
   flex-grow: 1;
 }
 
@@ -416,6 +423,47 @@
   color: white;
 }
 
+/* --- Comment Options Dropdown --- */
+
+.comment-options-dropdown {
+  position: absolute;
+  right: 10px; /* Position near the options button */
+  top: 35px;
+  background-color: white;
+
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  width: 120px;
+}
+
+.comment-options-dropdown .dropdown-btn {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.comment-options-dropdown .delete-btn {
+  color: #f20f0f;
+}
+.comment-options-dropdown .dropdown-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* --- Emoji Reaction Styling --- */
+.emoji-reaction {
+  font-size: 20px;
+  margin-left: 8px;
+}
+
 /* History Style */
 
 /* Use the same modal base styles as #resolved-comments-modal */
@@ -459,4 +507,110 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 5px;
+}
+/* newwwwwwwwwwwww */
+
+/* --- Add to your existing CSS file --- */
+
+/* --- Comment/Reply Structure --- */
+.comment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.comment-reply-btn {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px;
+}
+
+.comment-reply-btn:hover {
+  color: #8837e9;
+}
+
+.comment-text.emoji-reaction {
+  font-size: 28px;
+  margin: 5px 0;
+}
+
+/* --- Reply Input Container --- */
+.reply-container {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.reply-input {
+  width: 100%;
+  height: 60px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  resize: vertical;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.reply-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.reply-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.save-reply-btn {
+  background-color: #8837e9;
+  color: white;
+}
+
+.cancel-reply-btn {
+  background-color: #f1f3f4;
+  color: #3c4043;
+}
+
+/* --- Rendered Replies --- */
+.comment-replies-container {
+  margin-left: 20px;
+  margin-top: 10px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 10px;
+}
+
+.comment-reply-item {
+  margin-top: 10px;
+}
+
+.comment-reply-item .comment-text {
+  font-size: 13px; /* Replies can have slightly smaller text */
+}
+
+.reply-icon img {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.resolved-timestamp {
+  font-size: 11px;
+  color: #999;
+  margin-top: 8px;
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+  text-align: right;
+}
+.comment-timestamp {
+  font-size: 11px;
+  color: #999;
 }

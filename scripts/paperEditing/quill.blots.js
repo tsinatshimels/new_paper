@@ -230,8 +230,9 @@ Quill.register(DividerBlot);
 class ShapeBlot extends BlockEmbed {
   static #rotation = 0;
   static shapeContainerWrapper;
-  static editingContainer =
-    focusedEditor?.container?.querySelector(".ql-editor");
+  static get editingContainer() {
+    return focusedEditor?.container?.querySelector(".ql-editor");
+  }
   static bgColorButtonId;
 
   static create(value) {
@@ -717,8 +718,9 @@ Quill.register(ShapeBlot);
 //////////////////////////////////////////
 // TABLE BLOT
 class TableBlot extends BlockEmbed {
-  static editingContainer =
-    focusedEditor?.container?.querySelector(".ql-editor");
+  static get editingContainer() {
+    return focusedEditor?.container?.querySelector(".ql-editor");
+  }
 
   static create(value) {
     // Create main wrapper
@@ -1677,3 +1679,18 @@ class CommentBlot extends Inline {
 CommentBlot.blotName = "comment";
 CommentBlot.tagName = "span"; // Using a span to wrap the text
 Quill.register(CommentBlot);
+
+// class CommentHighlight extends Inline {
+//   static create(value) {
+//     let node = super.create();
+//     node.setAttribute("data-comment-id", value);
+//     node.classList.add("comment-highlight");
+//     return node;
+//   }
+//   static formats(node) {
+//     return node.getAttribute("data-comment-id");
+//   }
+// }
+// CommentHighlight.blotName = "comment";
+// CommentHighlight.tagName = "span";
+// Quill.register(CommentHighlight);
