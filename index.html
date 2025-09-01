@@ -153,6 +153,7 @@
     <link rel="stylesheet" href="./css/modal.collaboration.css" />
     <link rel="stylesheet" href="./css/aside.suggestions.css" />
     <link rel="stylesheet" href="./css/paper_editing/ruler.css" />
+    <link rel="stylesheet" href="./css/paper_editing/dict.translate.css" />
 
     <!-- share modal style -->
     <link rel="stylesheet" href="./css/share.modal.css" />
@@ -1102,14 +1103,22 @@
 
                       <!-- translate -->
 
-                      <li role="button" class="translate_document_element">
+                      <li
+                        role="button"
+                        id="translate-btn"
+                        class="translate_document_element"
+                      >
                         <!-- prettier-ignore -->
                         <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M2.66602 13.3333H5.33268L8.00002 2.66667L10.6673 13.3333H13.334C13.7073 13.3333 13.894 13.3333 14.034 13.2667C14.1615 13.2019 14.2644 13.0967 14.3273 12.9677C14.4006 12.8277 14.4006 12.6401 14.4006 12.2667V11.3333C14.4006 10.96 14.4006 10.7733 14.3273 10.6333C14.2615 10.5058 14.1563 10.4029 14.0273 10.34C13.8873 10.2667 13.6997 10.2667 13.3264 10.2667H12.3997M5.33268 13.3333H8.00002M5.33268 13.3333L6.66602 9.33333M8.00002 2.66667L9.33335 6.66667M10.6673 13.3333H8.00002M10.6673 13.3333L9.33335 9.33333M2.66602 13.3333L4.00035 9.33333M4.00035 9.33333H11.9993M11.9993 4C11.9993 4 12.7993 2 14.3993 2C15.9993 2 16.7993 4 16.7993 4M11.9993 4C11.9993 4 11.1993 2 9.59935 2C7.99935 2 7.19935 4 7.19935 4M11.9993 4C11.999         3 4 10.9993 2 9.59935 2C8.19935 2 7.19935 4 7.19935 4" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         <span>Translate</span>
                       </li>
 
                       <!-- Dictionary -->
-                      <li role="button" class="dictionary_document_element">
+                      <li
+                        role="button"
+                        id="dictionary-btn"
+                        class="dictionary_document_element"
+                      >
                         <!-- prettier-ignore -->
                         <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M4.66602 2H11.3337C12.4537 2 13.0137 2 13.4404 2.22C13.8153 2.40994 14.1209 2.71319 14.3137 3.08667C14.5337 3.52 14.5337 4.08 14.5337 5.2V10.8C14.5337 11.92 14.5337 12.48 14.3137 12.9067C14.1238 13.2816 13.8205 13.5872 13.4471 13.78C13.0137 14 12.4537 14 11.3337 14H4.66602C3.54602 14 2.98602 14 2.55935 13.78C2.1844 13.5901 1.87883 13.2868 1.68602 12.9133C1.46602 12.48 1.46602 11.92 1.46602 10.8V5.2C1.46602 4.08 1.46602 3.52 1.68602 3.09333C1.87597 2.71839 2.17921 2.41281 2.55269 2.22C2.98602 2 3.54602 2 4.66602 2Z" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.6663 5H5.33398M10.6663 8H5.33398M7.00065 11H5.33398" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         <span>Dictionary</span>
@@ -7277,6 +7286,52 @@
       </div>
     </div>
 
+    <!-- Translation Modal (initially hidden) -->
+    <div
+      id="translate-modal"
+      class="modal-overlay-translate"
+      style="display: none"
+    >
+      <div class="modal-content">
+        <h2>Translate Document</h2>
+        <p>Select a language to translate your document into.</p>
+        <select id="language-select">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+          <!-- Add more languages as needed -->
+        </select>
+        <div class="modal-actions">
+          <button id="cancel-translate">Cancel</button>
+          <button id="confirm-translate">Translate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dictionary Sidebar (initially hidden) -->
+    <div
+      id="dictionary-sidebar"
+      class="sidebar-dictionary"
+      style="right: -350px"
+    >
+      <div class="sidebar-header">
+        <h3>Dictionary</h3>
+        <button id="close-dictionary" class="close-btn">&times;</button>
+      </div>
+      <div class="sidebar-content">
+        <input
+          type="text"
+          id="dictionary-search"
+          placeholder="Search for a word..."
+        />
+        <div id="dictionary-results">
+          <p class="initial-message">Start typing to search for a word.</p>
+        </div>
+      </div>
+    </div>
     <!-- Drop down for equation -->
 
     <template id="dropdown-template">
@@ -7434,6 +7489,8 @@
     <!-- <script src="/scripts/paperEditing/aside.slider.js" defer></script> -->
     <!-- Quill init MUST come last as it depends on all the others -->
     <script src="/scripts/paperEditing/quill.redo.undo.js"></script>
+    <script src="/scripts/paperEditing/quill.translate.js"></script>
+    <script src="/scripts/paperEditing/quill.dictionary.js"></script>
     <script src="/scripts/paperEditing/quill.paste.js"></script>
     <script src="/scripts/paperEditing/quill.requestFullScreen.js"></script>
     <script src="/scripts/paperEditing/quill.cut.js"></script>
