@@ -614,3 +614,90 @@
   font-size: 11px;
   color: #999;
 }
+/* --- Add to your existing CSS file --- */
+
+/* Ensure reply item is positioned to contain the actions menu */
+.comment-reply-item {
+  position: relative;
+}
+
+/* Position the actions menu inside the reply header */
+.comment-reply-item .comment-header {
+  position: relative;
+  /* justify-content: space-between; */
+}
+
+/* Hide reply actions by default, show on reply item hover */
+.comment-reply-item .comment-actions {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.comment-reply-item:hover .comment-actions {
+  display: flex;
+}
+
+/* Styling for the new reaction picker */
+.reaction-picker {
+  display: flex;
+  flex-direction: row; /* Horizontal layout */
+  width: auto;
+  padding: 4px;
+}
+
+.reaction-picker .dropdown-btn {
+  font-size: 18px;
+  padding: 4px 6px;
+}
+
+/* Ensure resolved items can show hover actions */
+.resolved-item .comment-header {
+  position: relative;
+}
+
+/* --- Add/Replace in your existing CSS file --- */
+
+/*
+ * This is the key change. By making the container for the buttons
+ * the 'relative' anchor, the dropdown inside it can be positioned
+ * absolutely *relative to this container*. It's much more reliable.
+ */
+
+/* Show the actions menu on hover of the parent item */
+.comment-item:hover .comment-actions,
+.comment-reply-item:hover .comment-actions {
+  display: flex;
+}
+
+/*
+ * This rule is updated to position the dropdown below its new anchor.
+ * The 'top: 100%' trick places it just below the parent container.
+ */
+.comment-options-dropdown {
+  /* Align with the right edge of the actions container */
+
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  z-index: 1002; /* Increased to ensure it's on top */
+  display: flex;
+  flex-direction: column;
+  width: 145px; /* A bit wider for the "Add Reaction" text */
+}
+
+/* This new rule styles the picker itself for a horizontal emoji layout */
+.reaction-picker {
+  position: absolute;
+  right: 0;
+  top: 0; /* Position below the actions button */
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  z-index: 1002;
+  flex-direction: column;
+  width: auto; /* Let it size to fit the emojis */
+  padding: 4px;
+  gap: 4px;
+}

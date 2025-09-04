@@ -162,69 +162,169 @@ cancelCommentBtn.addEventListener("click", () => {
 // START OF DEBUGGING AREA
 // =================================================================
 
+// =================================================================
+// START OF MODIFIED AREA
+// =================================================================
+
 commentList.addEventListener("click", (event) => {
   const commentItem = event.target.closest(".comment-item");
-  if (!commentItem) return;
+  const replyItem = event.target.closest(".comment-reply-item");
 
-  const commentId = commentItem.getAttribute("data-comment-id");
+  if (!commentItem && !replyItem) return;
 
-  // --- Dropdown Logic (Now with Toggle and smarter closing) ---
+  // Prioritize reply actions if a reply was clicked
+  const targetElement = replyItem || commentItem;
+  const parentCommentId = commentItem.getAttribute("data-comment-id");
+  const replyId = replyItem ? replyItem.getAttribute("data-reply-id") : null;
+  const commentId = replyId ? null : parentCommentId; // This is a main comment ONLY if it's not a reply action
+
+  // --- Universal Dropdown Logic (for both comments and replies) ---
   const optionBtn = event.target.closest(".comment-option-btn");
   if (optionBtn) {
-    // Check if a dropdown for THIS comment was already open
-    const wasAlreadyOpen = commentItem.querySelector(
+    const wasAlreadyOpen = targetElement.querySelector(
       ".comment-options-dropdown"
     );
-
-    // First, for a clean slate, remove ALL open dropdowns
+    // Clean slate: remove ALL open dropdowns first
     document
       .querySelectorAll(".comment-options-dropdown")
       .forEach((d) => d.remove());
 
-    // If the one we clicked wasn't already open, then it's time to create it.
-    // If it was open, the line above already closed it, creating the toggle effect.
     if (!wasAlreadyOpen) {
       const dropdown = document.createElement("div");
       dropdown.className = "comment-options-dropdown";
+      // Add data attributes to know what we're editing/deleting
+      if (replyId) {
+        dropdown.setAttribute("data-parent-id", parentCommentId);
+        dropdown.setAttribute("data-reply-id", replyId);
+      } else {
+        dropdown.setAttribute("data-comment-id", commentId);
+      }
+
       dropdown.innerHTML = `
-                <button class="dropdown-btn reply-btn-dropdown"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M19 19v-4q0-1.25-.875-2.125T16 12H6.825l3.6 3.6L9 17l-6-6l6-6l1.425 1.4l-3.6 3.6H16q2.075 0 3.538 1.463T21 15v4z"/></svg> Reply</button>
                 <button class="dropdown-btn edit-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19.09 14.441v4.44a2.37 2.37 0 0 1-2.369 2.369H5.12a2.37 2.37 0 0 1-2.369-2.383V7.279a2.356 2.356 0 0 1 2.37-2.37H9.56"/><path d="M6.835 15.803v-2.165c.002-.357.144-.7.395-.953l9.532-9.532a1.36 1.36 0 0 1 1.934 0l2.151 2.151a1.36 1.36 0 0 1 0 1.934l-9.532 9.532a1.36 1.36 0 0 1-.953.395H8.197a1.36 1.36 0 0 1-1.362-1.362M19.09 8.995l-4.085-4.086"/></g></svg> Edit</button>
+                <button class="dropdown-btn add-reaction-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m0 18a8 8 0 1 1 8-8a8 8 0 0 1-8 8m-2.5-6.25a1.5 1.5 0 1 1 1.5 1.5a1.5 1.5 0 0 1-1.5-1.5M12 12a1.5 1.5 0 0 0-1.5 1.5v.25a.25.25 0 0 0 .25.25h2.5a.25.25 0 0 0 .25-.25v-.25A1.5 1.5 0 0 0 12 12m2.5-1.5a1.5 1.5 0 1 1 1.5 1.5a1.5 1.5 0 0 1-1.5-1.5"/></svg> Add Reaction</button>
                 <button class="dropdown-btn delete-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" stroke="#f20f0f" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="24" stroke-dashoffset="24" d="M12 20h5c0.5 0 1 -0.5 1 -1v-14M12 20h-5c-0.5 0 -1 -0.5 -1 -1v-14"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"/></path><path stroke-dasharray="20" stroke-dashoffset="20" d="M4 5h16"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.4s" dur="0.2s" values="20;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M10 4h4M10 9v7M14 9v7"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0"/></path></g></svg> Delete</button>
             `;
-      commentItem.appendChild(dropdown);
-      dropdown
-        .querySelector(".delete-btn")
-        .addEventListener("click", () => deleteComment(commentId));
-      dropdown
-        .querySelector(".reply-btn-dropdown")
-        .addEventListener("click", () => {
-          // First, show the reply input
+      // For main comments, add the Reply and Resolve options
+      if (!replyId) {
+        const replyBtn = document.createElement("button");
+        replyBtn.className = "dropdown-btn reply-btn-dropdown";
+        replyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M19 19v-4q0-1.25-.875-2.125T16 12H6.825l3.6 3.6L9 17l-6-6l6-6l1.425 1.4l-3.6 3.6H16q2.075 0 3.538 1.463T21 15v4z"/></svg> Reply`;
+        dropdown.prepend(replyBtn); // Add to the top
+        replyBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          document.querySelector(".comment-options-dropdown").remove(); // This closes the dropdown
           showReplyInput(commentId, commentItem);
-          // Then, immediately remove the dropdown menu
-          dropdown.classList.add("hidden");
         });
+      }
+
+      targetElement.appendChild(dropdown);
     }
-    return; // Stop other click events from firing
+    return; // Stop other events
   }
 
-  // --- Reply Logic ---
-  const replyBtn = event.target.closest(".comment-reply-btn");
-  if (replyBtn) {
-    showReplyInput(commentId, commentItem);
-    // close the dropdown if open
-    const dropdown = commentItem.querySelector(".comment-options-dropdown");
-    if (dropdown) dropdown.remove();
+  // --- Delegated Action Handlers ---
+
+  // Handle Add Reaction
+  const addReactionBtn = event.target.closest(".add-reaction-btn");
+  if (addReactionBtn) {
+    const dropdown = addReactionBtn.closest(".comment-options-dropdown");
+    if (dropdown) {
+      // The container for the button is the .comment-actions div
+      const actionsContainer = dropdown.parentElement;
+      showReactionPicker(actionsContainer, parentCommentId, replyId);
+      dropdown.remove(); // Close the original dropdown
+      console.log("[LOG] Add Reaction button clicked.");
+    }
+    return; // Stop processing
   }
 
-  // --- Resolve Logic ---
+  // Handle Delete
+  const deleteBtn = event.target.closest(".delete-btn");
+  if (deleteBtn) {
+    if (replyId) {
+      deleteReply(parentCommentId, replyId);
+    } else {
+      deleteComment(parentCommentId);
+    }
+    deleteBtn.parentElement.remove(); // Close dropdown
+  }
+
+  // Handle Edit (Placeholder for now)
+  const editBtn = event.target.closest(".edit-btn");
+  if (editBtn) {
+    console.log(
+      "[LOG] Edit button clicked. Edit functionality not implemented yet."
+    );
+
+    editBtn.parentElement.remove();
+  }
+
   const resolveBtn = event.target.closest(".resolve-comment-btn");
   if (resolveBtn) {
-    resolveComment(commentId);
+    resolveComment(parentCommentId);
   }
 
-  // Highlight on click
-  highlightCommentText(commentId);
+  // Highlight on click (only for main comments)
+  if (commentId) {
+    highlightCommentText(commentId);
+  }
 });
+
+// New function to show a small emoji picker for reactions
+function showReactionPicker(container, parentId, replyId) {
+  // container is now the element with the .comment-actions div
+  // document.querySelectorAll(".reaction-picker").forEach((p) => p.remove());
+
+  const picker = document.createElement("div");
+  picker.className = " reaction-picker";
+  const reactions = ["👍", "❤️", "😂", "😮", "😢", "🔥", "🎉"];
+  reactions.forEach((emoji) => {
+    const btn = document.createElement("button");
+    btn.className = "dropdown-btn";
+    btn.textContent = emoji;
+    btn.onclick = () => {
+      addReaction(parentId, replyId, emoji);
+      // picker.remove();
+    };
+    picker.appendChild(btn);
+  });
+
+  // Append the picker inside the .comment-actions div.
+  // This makes the new CSS positioning work perfectly.
+  container.appendChild(picker);
+}
+
+// New function to add a reaction to a comment or reply
+function addReaction(parentId, replyId, emoji) {
+  if (replyId) {
+    // It's a reply
+    const parentComment = comments[parentId];
+    const reply = parentComment?.replies.find((r) => r.id === replyId);
+    if (reply) {
+      reply.text += ` ${emoji}`;
+    }
+  } else {
+    // It's a main comment
+    const comment = comments[parentId];
+    if (comment) {
+      comment.text += ` ${emoji}`;
+    }
+  }
+  renderComments();
+}
+
+// New function to delete a reply
+function deleteReply(parentId, replyId) {
+  const parentComment = comments[parentId];
+  if (parentComment && parentComment.replies) {
+    parentComment.replies = parentComment.replies.filter(
+      (r) => r.id !== replyId
+    );
+    renderComments();
+  }
+}
 
 document.addEventListener("click", function (event) {
   if (!event.target.closest(".comment-item")) {
@@ -409,19 +509,22 @@ function renderComments() {
 
     let repliesHTML = "";
     if (comment.replies && comment.replies.length > 0) {
-      console.log(
-        `[LOG] Rendering ${comment.replies.length} replies for comment ${id}`
-      );
       repliesHTML = '<div class="comment-replies-container">';
       comment.replies.forEach((reply) => {
         const replyTimestamp = formatTimestamp(reply.createdAt);
+        // MODIFICATION: Added data-reply-id and the options button for each reply
         repliesHTML += `
-                <div class="comment-reply-item">
+                <div class="comment-reply-item" data-reply-id="${reply.id}">
                     <div class="comment-header">
                         <div class="comment-profile-icon reply-icon"><img src="https://randomuser.me/api/portraits/med/men/94.jpg" alt="User"></div>
                         <div style="display: flex; flex-direction: column;">
-                        <div class="comment-author">${reply.author}</div>
-                        <div class="comment-timestamp">${replyTimestamp}</div>
+                            <div class="comment-author">${reply.author}</div>
+                            <div class="comment-timestamp">${replyTimestamp}</div>
+                        </div>
+                         <div class="comment-actions">
+                            <button class="comment-option-btn" title="Options">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#8837e9" d="M7 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/></svg>
+                            </button>
                         </div>
                     </div>
                     <div class="comment-text">${reply.text}</div>
@@ -431,30 +534,25 @@ function renderComments() {
       repliesHTML += "</div>";
     }
 
-    commentItem.innerHTML =
-      `
+    commentItem.innerHTML = `
             <div class="comment-header">
                 <div class="comment-profile-icon"><img src="https://randomuser.me/api/portraits/med/men/94.jpg" alt="Louis Davies"></div>
                 <div style="display: flex; flex-direction: column;">
                 <div class="comment-author">${comment.author}</div>
                 <div class="comment-timestamp">${timestamp}</div>
                 </div>
-            </div>
-            ${commentContentHTML}
-            ${repliesHTML}
-            <div class="comment-footer">
-                
-                <div class="comment-actions">
-                    <button class="comment-action-btn resolve-comment-btn" title="Resolve">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24" ` +
-      `24"><path fill="green" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/></svg>
+                 <div class="comment-actions">
+                     <button class="comment-action-btn resolve-comment-btn" title="Resolve">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="green" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/></svg>
                     </button>
                     <button class="comment-option-btn" title="Options">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 ` +
-      `24"><rect width="24" height="24" fill="none"/><path fill="#8837e9" d="M7 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#8837e9" d="M7 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/></svg>
                     </button>
                 </div>
             </div>
+            ${commentContentHTML}
+            ${repliesHTML}
+         
         `;
     commentList.appendChild(commentItem);
 
@@ -463,13 +561,6 @@ function renderComments() {
       document.querySelectorAll(".comment-highlight-active").forEach((el) => {
         el.classList.remove("comment-highlight-active");
       });
-    });
-
-    commentItem.addEventListener("mouseleave", () => {
-      const dropdown = commentItem.querySelector(".comment-options-dropdown");
-      if (dropdown) {
-        dropdown.remove();
-      }
     });
   });
 
@@ -484,20 +575,27 @@ function renderResolvedComments() {
   const resolvedList = document.getElementById("resolved-comment-list");
   if (!resolvedList) return;
   resolvedList.innerHTML = "";
-  const resolved = Object.values(comments).filter((c) => c.resolved);
+  const resolved = Object.entries(comments).filter(([id, c]) => c.resolved);
   if (resolved.length === 0) {
     resolvedList.innerHTML = "<p>No resolved comments.</p>";
     return;
   }
-  resolved.forEach((comment) => {
+  resolved.forEach(([id, comment]) => {
     const commentItem = document.createElement("div");
-    commentItem.className = "comment-item resolved-item";
+    commentItem.className = "comment-item resolved-item"; // Keep .comment-item class for hover styles
+    commentItem.setAttribute("data-comment-id", id);
     const createdAt = formatTimestamp(comment.createdAt);
     const resolvedAt = formatTimestamp(comment.resolvedAt);
     commentItem.innerHTML = `
           <div class="comment-header">
             <div class="comment-profile-icon"><img src="https://randomuser.me/api/portraits/med/men/94.jpg" alt="User"></div>
             <div class="comment-author">${comment.author}</div>
+            <!-- MODIFICATION: Added actions menu for resolved comments -->
+            <div class="comment-actions">
+                <button class="comment-option-btn delete-resolved-btn" title="Delete Permanently">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" stroke="#f20f0f" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 5h16M7 5v-2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2M10 9v7M14 9v7M5 5l1 15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1l1-15"/></g></svg>
+                </button>
+            </div>
           </div>
           <div class="comment-text">${
             comment.type === "emoji" ? `Reacted: ${comment.text}` : comment.text
@@ -509,3 +607,24 @@ function renderResolvedComments() {
     resolvedList.appendChild(commentItem);
   });
 }
+
+// Add a separate listener for the resolved comments modal for deletion
+document.addEventListener("DOMContentLoaded", () => {
+  const resolvedList = document.getElementById("resolved-comment-list");
+  if (resolvedList) {
+    resolvedList.addEventListener("click", (event) => {
+      const deleteBtn = event.target.closest(".delete-resolved-btn");
+      if (deleteBtn) {
+        const commentItem = event.target.closest(".comment-item");
+        const commentId = commentItem.getAttribute("data-comment-id");
+        if (
+          commentId &&
+          confirm("Are you sure you want to permanently delete this comment?")
+        ) {
+          delete comments[commentId]; // Delete from master list
+          renderResolvedComments(); // Re-render the modal
+        }
+      }
+    });
+  }
+});

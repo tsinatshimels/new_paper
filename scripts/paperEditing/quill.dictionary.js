@@ -70,34 +70,67 @@ function displayDefinition(data) {
   resultsContainer.innerHTML = ""; // Clear previous results
   const wordEntry = data[0];
 
-  // Display word and phonetic
+  // --- 1. Header with Word, Phonetic, and Audio Button ---
   const header = document.createElement("div");
-  header.innerHTML = `<h3>${wordEntry.word}</h3>
-                        <p>${
-                          wordEntry.phonetics.find((p) => p.text)?.text || ""
-                        }</p>`;
+  header.className = "dictionary-header";
+
+  // Find the first phonetic that has an audio link
+  const phoneticAudio = wordEntry.phonetics.find((p) => p.audio);
+  const phoneticText = wordEntry.phonetics.find((p) => p.text)?.text || "";
+
+  header.innerHTML = `
+    <div class="word-title">
+      <h3>${wordEntry.word}</h3>
+      ${
+        phoneticAudio
+          ? `<button id="play-audio-btn" class="audio-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77c0-4.28-2.99-7.86-7-8.77"/></svg></button>`
+          : ""
+      }
+    </div>
+    <p class="phonetic-text">${phoneticText}</p>
+  `;
   resultsContainer.appendChild(header);
 
-  // Display meanings
+  // Add event listener for the new audio button
+  if (phoneticAudio) {
+    const audioBtn = document.getElementById("play-audio-btn");
+    const audio = new Audio(phoneticAudio.audio);
+    audioBtn.addEventListener("click", () => {
+      audio.play();
+    });
+  }
+
+  // --- 2. Loop Through Meanings (Noun, Verb, etc.) ---
   wordEntry.meanings.forEach((meaning) => {
     const meaningDiv = document.createElement("div");
     meaningDiv.className = "word-section";
-    meaningDiv.innerHTML = `<h4>${meaning.partOfSpeech}</h4>`;
 
-    const definitionsList = document.createElement("ul");
+    // Part of speech as a styled badge
+    meaningDiv.innerHTML = `<h4 class="part-of-speech">${meaning.partOfSpeech}</h4>`;
+
+    const definitionsList = document.createElement("ol"); // Use an ordered list for numbering
+    definitionsList.className = "definitions-list";
+
     meaning.definitions.forEach((def) => {
       const item = document.createElement("li");
-      item.textContent = def.definition;
+      // Include the definition and an example sentence if it exists
+      item.innerHTML = `
+        <p class="definition">${def.definition}</p>
+        ${def.example ? `<p class="example">“${def.example}”</p>` : ""}
+      `;
       definitionsList.appendChild(item);
     });
     meaningDiv.appendChild(definitionsList);
 
+    // --- 3. Synonyms as Clickable Tags ---
     if (meaning.synonyms && meaning.synonyms.length > 0) {
-      const synonyms = document.createElement("p");
-      synonyms.innerHTML = `<strong>Synonyms:</strong> ${meaning.synonyms.join(
-        ", "
-      )}`;
-      meaningDiv.appendChild(synonyms);
+      const synonymsDiv = document.createElement("div");
+      synonymsDiv.className = "synonyms-container";
+      let synonymTags = meaning.synonyms
+        .map((s) => `<span class="synonym-tag">${s}</span>`)
+        .join("");
+      synonymsDiv.innerHTML = `<strong>Synonyms:</strong> ${synonymTags}`;
+      meaningDiv.appendChild(synonymsDiv);
     }
 
     resultsContainer.appendChild(meaningDiv);

@@ -190,3 +190,119 @@
     opacity: 1;
   }
 }
+/* --- Add this to your existing CSS file --- */
+
+/* --- Dictionary Results Styling --- */
+
+#dictionary-results .initial-message {
+  color: #888;
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* Header for the word, phonetic, and audio */
+.dictionary-header {
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.word-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.word-title h3 {
+  font-size: 28px;
+  color: #8837e9; /* A nice purple to make the word pop */
+  margin: 0;
+}
+
+.phonetic-text {
+  font-size: 16px;
+  color: #777;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+.audio-btn {
+  background: #e9dffc;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #8837e9;
+  transition: background-color 0.2s ease;
+}
+
+.audio-btn:hover {
+  background-color: #d1bcf2;
+}
+
+/* Sections for each part of speech */
+.word-section {
+  margin-bottom: 20px;
+}
+
+.part-of-speech {
+  display: inline-block;
+  background-color: #333;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* List of definitions */
+.definitions-list {
+  list-style: decimal inside; /* Use numbered list */
+  padding-left: 5px;
+}
+
+.definitions-list li {
+  margin-bottom: 12px;
+}
+
+p.definition {
+  display: inline;
+  color: #444;
+  line-height: 1.5;
+}
+
+p.example {
+  color: #888;
+  font-style: italic;
+  border-left: 3px solid #e0e0e0;
+  padding-left: 10px;
+  margin: 8px 0 0 5px;
+}
+
+/* Synonyms container and tags */
+.synonyms-container {
+  margin-top: 15px;
+  color: #555;
+}
+
+.synonym-tag {
+  display: inline-block;
+  background-color: #f0f0f0;
+  color: #555;
+  padding: 4px 10px;
+  border-radius: 5px;
+  margin: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.synonym-tag:hover {
+  background-color: #8837e9;
+  color: white;
+}
