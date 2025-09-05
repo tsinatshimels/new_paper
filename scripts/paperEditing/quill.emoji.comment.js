@@ -617,10 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (deleteBtn) {
         const commentItem = event.target.closest(".comment-item");
         const commentId = commentItem.getAttribute("data-comment-id");
-        if (
-          commentId &&
-          confirm("Are you sure you want to permanently delete this comment?")
-        ) {
+        if (commentId) {
           delete comments[commentId]; // Delete from master list
           renderResolvedComments(); // Re-render the modal
         }

@@ -26,6 +26,7 @@ function createNewEditor() {
       },
     },
     formats: [
+      "comment",
       "math-live",
       "font",
       "size",
