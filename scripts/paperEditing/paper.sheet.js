@@ -58,6 +58,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const rulerSystem = document.getElementById("ruler-system-wrapper");
   const wordDropdown = document.getElementById("exportWord--dropdown");
   const sheetDropdown = document.getElementById("exportSheet--dropdown");
+  // Sheet exports
+  document
+    .getElementById("export-csv")
+    .addEventListener("click", () => exportSheetData("csv"));
+  document
+    .getElementById("export-xls")
+    .addEventListener("click", () => exportSheetData("xls"));
+  document
+    .getElementById("export-xlsx")
+    .addEventListener("click", () => exportSheetData("xlsx"));
+
+  // Word exports
+  document.getElementById("export-txt").addEventListener("click", exportAsTXT);
+  document.getElementById("export-doc").addEventListener("click", exportAsDOC);
+  document
+    .getElementById("export-docx")
+    .addEventListener("click", exportAsDOCX);
+
+  // Common exports that work in both modes
+  document
+    .getElementById("export-pdf-sheet")
+    .addEventListener("click", exportAsPDF);
+  document
+    .getElementById("export-pdf-word")
+    .addEventListener("click", exportAsPDF);
+  document
+    .getElementById("export-xml-sheet")
+    .addEventListener("click", exportAsXML);
+  document
+    .getElementById("export-xml-word")
+    .addEventListener("click", exportAsXML);
 
   function updateModeSwitcherAppearance(mode) {
     if (mode === "true") {

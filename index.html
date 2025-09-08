@@ -442,7 +442,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-csv"
               >
                 <svg
                   width="24"
@@ -491,7 +491,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-xls"
               >
                 <svg
                   width="24"
@@ -540,7 +540,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-xlsx"
               >
                 <svg
                   width="24"
@@ -590,7 +590,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-pdf-sheet"
               >
                 <svg
                   width="24"
@@ -640,7 +640,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-xml-sheet"
               >
                 <svg
                   width="24"
@@ -695,7 +695,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-doc"
               >
                 <img src="./icons/export-doc.svg" />
                 <span>Export as DOC</span>
@@ -710,7 +710,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-docx"
               >
                 <img src="./icons/export-docx.svg" />
                 <span>Export as DOCX</span>
@@ -725,7 +725,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-pdf-word"
               >
                 <img src="./icons/export-pdf.svg" />
                 <span>Export as PDF</span>
@@ -741,7 +741,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-txt"
               >
                 <img src="./icons/export-txt.svg" />
                 <span>Export as TXT</span>
@@ -757,7 +757,7 @@
                   gap: 0.3rem;
                   align-items: center;
                 "
-                id=""
+                id="export-xml-word"
               >
                 <img src="./icons/export-xml.svg" />
                 <span>Export as XML</span>
@@ -7477,6 +7477,19 @@
     <script>
       const HIDDEN = "paper-editing";
     </script>
+
+    <!-- 1. SheetJS (for CSV, XLS, XLSX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- 2. jsPDF (for PDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- 3. docx (for DOCX) and FileSaver.js (to help save the file) -->
+    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <!-- Now, include your new export functions file and your main script -->
+    <script src="./scripts/export-functions.js"></script>
     <script src="./scripts/global.share.modal.js"></script>
     <script src="/scripts/following_followers.js"></script>
     <!-- <script src="/scripts/global.report.modal.js"></script> -->
