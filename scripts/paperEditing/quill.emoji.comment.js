@@ -556,7 +556,7 @@ function renderComments() {
         `;
     commentList.appendChild(commentItem);
 
-    commentItem.addEventListener("mouseover", () => highlightCommentText(id));
+    commentItem.addEventListener("click", () => highlightCommentText(id));
     commentItem.addEventListener("mouseout", () => {
       document.querySelectorAll(".comment-highlight-active").forEach((el) => {
         el.classList.remove("comment-highlight-active");

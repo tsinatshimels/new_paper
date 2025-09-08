@@ -412,7 +412,8 @@
 }
 /* The default highlight style for text with a comment */
 .comment-highlight {
-  background-color: #e3d4f5; /* Light Purple */
+  /* background-color: #e3d4f5; */
+  background-color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
