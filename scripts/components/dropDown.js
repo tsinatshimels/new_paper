@@ -13,8 +13,22 @@ class Dropdown {
       item.addEventListener("click", () => this.selectOption(item));
     });
   }
+  findActiveMenu() {
+    this.menu = this.dropdown.querySelector(
+      ".dropdown-menu:not(.paper--hidden)"
+    );
+    if (this.menu) {
+      this.items = this.menu.querySelectorAll(".dropdown-item");
+      this.items.forEach((item) => {
+        // A clean way to handle event listeners without duplication
+        item.onclick = () => this.selectOption(item);
+      });
+    }
+  }
 
   toggle() {
+    this.findActiveMenu();
+    if (!this.menu) return;
     const isOpen = this.menu.classList.contains("show");
 
     // Close all other dropdowns
