@@ -164,12 +164,13 @@ const expressions = {
     { latex: "e^{-\\placeholder{}}", display: "e⁻ˣ" },
   ],
   fraction: [
-    { latex: "\\frac{\\placeholder{}}{\\placeholder{}}", display: "□/□" },
-    { latex: "\\frac{dy}{dx}", display: "dy/dx" },
-    { latex: "\\frac{\\Delta y}{\\Delta x}", display: "Δy/Δx" },
-    { latex: "\\frac{\\partial y}{\\partial x}", display: "∂y/∂x" },
-    { latex: "\\frac{\\delta y}{\\delta x}", display: "δy/δx" },
+    { latex: "\\placeholder{}/\\placeholder{}", display: "□/□" },
+    { latex: "dy/dx", display: "dy/dx" },
+    { latex: "\\Delta y/\\Delta x", display: "Δy/Δx" },
+    { latex: "\\partial y/\\partial x", display: "∂y/∂x" },
+    { latex: "\\delta y/\\delta x", display: "δy/δx" },
   ],
+
   radicals: [
     { latex: "\\sqrt{\\placeholder{}}", display: "√□" },
     { latex: "\\sqrt[n]{\\placeholder{}}", display: "□√□" },
