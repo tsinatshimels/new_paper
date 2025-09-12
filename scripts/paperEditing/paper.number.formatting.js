@@ -144,3 +144,28 @@ function applyFormatToCell($cell, formatter) {
   $cell.attr("data-raw-value", originalValue);
   $cell.attr("data-format", $cell.closest(".dropdown-item").data("format"));
 }
+
+const percentageBtn = document.getElementById("sizemug_percentage--btn");
+if (percentageBtn) {
+  percentageBtn.addEventListener("click", () => {
+    const selectedRange = getSelectedRange();
+    if (!selectedRange) {
+      if (lastFocusedCell) {
+        applyFormatToCell(lastFocusedCell, formatters["Percentage"]);
+      } else {
+        alert("Please select a cell or a range of cells to format.");
+      }
+      return;
+    }
+
+    // Apply the Percentage format to all cells in the selected range
+    for (let r = selectedRange.minRow; r <= selectedRange.maxRow; r++) {
+      for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
+        const cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
+        if (cell.length > 0) {
+          applyFormatToCell(cell, formatters["Percentage"]);
+        }
+      }
+    }
+  });
+}
