@@ -169,3 +169,71 @@ if (percentageBtn) {
     }
   });
 }
+
+function decreaseDecimalPlaces(value) {
+  const num = parseFloat(value);
+  if (isNaN(num)) {
+    return value; // Return original value if it's not a number
+  }
+
+  // Determine the current number of decimal places
+  const decimalPart = value.toString().split(".")[1] || "";
+  const currentDecimalPlaces = decimalPart.length;
+
+  // Decrease decimal places, ensuring it doesn't go below zero
+  const newDecimalPlaces = Math.max(0, currentDecimalPlaces - 1);
+
+  return num.toFixed(newDecimalPlaces);
+}
+
+// Event listener for the decrease decimal places button
+const decreaseDecimalBtn = document.getElementById(
+  "decreaseDecimalPlaces--btn"
+);
+if (decreaseDecimalBtn) {
+  decreaseDecimalBtn.addEventListener("click", () => {
+    const selectedRange = getSelectedRange();
+    if (!selectedRange) {
+      if (lastFocusedCell) {
+        applyFormatToCell(lastFocusedCell, decreaseDecimalPlaces);
+      } else {
+        alert("Please select a cell or a range of cells to format.");
+      }
+      return;
+    }
+
+    // Apply the decrease decimal format to all cells in the selected range
+    for (let r = selectedRange.minRow; r <= selectedRange.maxRow; r++) {
+      for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
+        const cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
+        if (cell.length > 0) {
+          applyFormatToCell(cell, decreaseDecimalPlaces);
+        }
+      }
+    }
+  });
+}
+const addCurrencyBtn = document.getElementById("addCurrency--btn");
+if (addCurrencyBtn) {
+  addCurrencyBtn.addEventListener("click", () => {
+    const selectedRange = getSelectedRange();
+    if (!selectedRange) {
+      if (lastFocusedCell) {
+        applyFormatToCell(lastFocusedCell, formatters["Currency"]);
+      } else {
+        alert("Please select a cell or a range of cells to format.");
+      }
+      return;
+    }
+
+    // Apply the Currency format to all cells in the selected range
+    for (let r = selectedRange.minRow; r <= selectedRange.maxRow; r++) {
+      for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
+        const cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
+        if (cell.length > 0) {
+          applyFormatToCell(cell, formatters["Currency"]);
+        }
+      }
+    }
+  });
+}
