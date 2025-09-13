@@ -1,3 +1,42 @@
+function parseTimeValue(value) {
+  const strValue = String(value).trim();
+  let date = new Date(); // Use today as a base, we only care about the time.
+  let hours = 0;
+  let minutes = 0;
+
+  // Case 1: Input contains a colon, e.g., "15:30"
+  if (strValue.includes(":")) {
+    const parts = strValue.split(":");
+    hours = parseInt(parts[0], 10);
+    minutes = parseInt(parts[1], 10) || 0;
+  }
+  // Case 2: Input is a valid number, e.g., "15" or "9.5"
+  else if (!isNaN(parseFloat(strValue)) && isFinite(strValue)) {
+    const num = parseFloat(strValue);
+    hours = Math.floor(num); // The integer part is the hour
+    minutes = Math.round((num - hours) * 60); // The decimal part represents the fraction of an hour
+  }
+  // Case 3: The input is not a recognized time format
+  else {
+    return null;
+  }
+
+  // Final validation to ensure we have a real time
+  if (
+    isNaN(hours) ||
+    hours < 0 ||
+    hours > 23 ||
+    isNaN(minutes) ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    return null;
+  }
+
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
 const numberDropdown = document.querySelector(
   "#numberFunctionalitiesDropdown .dropdown-menu"
 );
@@ -20,6 +59,16 @@ const formatters = {
       ? num.toLocaleString("en-US", {
           style: "currency",
           currency: "USD",
+          minimumFractionDigits: 2,
+        })
+      : value;
+  },
+  Euro: (value) => {
+    const num = parseFloat(value);
+    return !isNaN(num)
+      ? num.toLocaleString("en-IE", {
+          style: "currency",
+          currency: "EUR",
           minimumFractionDigits: 2,
         })
       : value;
@@ -66,8 +115,8 @@ const formatters = {
       : value;
   },
   Time24: (value) => {
-    const date = new Date(`1970-01-01T${value}`); // Assume value is a time string
-    return !isNaN(date.getTime())
+    const date = parseTimeValue(value); // Use the new helper function
+    return date
       ? date.toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
@@ -76,8 +125,8 @@ const formatters = {
       : value;
   },
   Time12: (value) => {
-    const date = new Date(`1970-01-01T${value}`); // Assume value is a time string
-    return !isNaN(date.getTime())
+    const date = parseTimeValue(value); // Use the new helper function
+    return date
       ? date.toLocaleTimeString("en-US", {
           hour: "numeric",
           minute: "2-digit",
@@ -213,13 +262,56 @@ if (decreaseDecimalBtn) {
     }
   });
 }
+function increaseDecimalPlaces(value) {
+  const num = parseFloat(value);
+  if (isNaN(num)) {
+    return value; // Return original value if it's not a number
+  }
+
+  // Determine the current number of decimal places
+  const decimalPart = value.toString().split(".")[1] || "";
+  const currentDecimalPlaces = decimalPart.length;
+
+  // Increase decimal places by one
+  const newDecimalPlaces = currentDecimalPlaces + 1;
+
+  return num.toFixed(newDecimalPlaces);
+}
+
+// Event listener for the increase decimal places button
+const increaseDecimalBtn = document.getElementById(
+  "increaseDecimalPlaces--btn"
+);
+if (increaseDecimalBtn) {
+  increaseDecimalBtn.addEventListener("click", () => {
+    const selectedRange = getSelectedRange();
+    if (!selectedRange) {
+      if (lastFocusedCell) {
+        applyFormatToCell(lastFocusedCell, increaseDecimalPlaces);
+      } else {
+        alert("Please select a cell or a range of cells to format.");
+      }
+      return;
+    }
+
+    // Apply the increase decimal format to all cells in the selected range
+    for (let r = selectedRange.minRow; r <= selectedRange.maxRow; r++) {
+      for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
+        const cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
+        if (cell.length > 0) {
+          applyFormatToCell(cell, increaseDecimalPlaces);
+        }
+      }
+    }
+  });
+}
 const addCurrencyBtn = document.getElementById("addCurrency--btn");
 if (addCurrencyBtn) {
   addCurrencyBtn.addEventListener("click", () => {
     const selectedRange = getSelectedRange();
     if (!selectedRange) {
       if (lastFocusedCell) {
-        applyFormatToCell(lastFocusedCell, formatters["Currency"]);
+        applyFormatToCell(lastFocusedCell, formatters["Euro"]);
       } else {
         alert("Please select a cell or a range of cells to format.");
       }
@@ -231,7 +323,7 @@ if (addCurrencyBtn) {
       for (let c = selectedRange.minCol; c <= selectedRange.maxCol; c++) {
         const cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
         if (cell.length > 0) {
-          applyFormatToCell(cell, formatters["Currency"]);
+          applyFormatToCell(cell, formatters["Euro"]);
         }
       }
     }

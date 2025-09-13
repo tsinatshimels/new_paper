@@ -78,12 +78,26 @@
   position: sticky;
   background-color: #fff;
   color: #9ca3af;
+  /* height: 2rem; */
+}
+
+#spreadsheet .ruler_rows > span {
+  /* ... your existing styles (like background, border, etc.) ... */
+
+  /* ADD THESE to ensure vertical centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Set an initial height that matches the grid's default row height */
+  height: 2rem; /* Matches your grid-template-rows */
+  box-sizing: border-box; /* Good practice for borders/padding */
 }
 
 #spreadsheet .ruler_rows span,
 #spreadsheet .ruler_cols span {
   border-right: 1px solid #d1d5db;
-  border-bottom: 1px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
 }
 
 #spreadsheet .ruler_cols span:last-child {

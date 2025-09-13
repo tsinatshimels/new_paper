@@ -569,47 +569,225 @@ $(document).on("blur", "div.cell", function () {
   const content = $cell.text();
   if (content.startsWith("=")) {
     $cell.data("formula", content);
-    const result = evaluateFormula(content);
+    const result = evaluateFormula(content, $cell);
     $cell.html(result);
   }
 });
 
-function evaluateFormula(formula) {
-  const match = formula.match(/=\s*([A-Z]+)\s*\(([^)]+)\)/i);
-  if (!match) return formula;
-  const funcName = match[1].toUpperCase();
-  const rangeStr = match[2];
-  const rangeParts = rangeStr.split(":").map(fromA1);
-  const start = rangeParts[0];
-  const end = rangeParts.length > 1 ? rangeParts[1] : start;
-  if (!start || !end) return "#ERROR!";
-  const values = [];
-  for (let c = start.col; c <= end.col; c++) {
-    for (let r = start.row; r <= end.row; r++) {
-      const cellValue = $(`div.cell[data-col=${c}][data-row=${r}]`).text();
-      if (
-        $(`div.cell[data-col=${c}][data-row=${r}]`).data("formula") !== formula
-      ) {
-        const numValue = parseFloat(cellValue);
-        if (!isNaN(numValue)) values.push(numValue);
+function resolveArgument(argStr, contextCell) {
+  argStr = argStr.trim();
+
+  // It's a string literal
+  if (argStr.startsWith('"') && argStr.endsWith('"')) {
+    return argStr.substring(1, argStr.length - 1);
+  }
+
+  // It's a number
+  if (!isNaN(argStr) && isFinite(argStr)) {
+    return parseFloat(argStr);
+  }
+
+  // It's a range or a single cell
+  if (/^[A-Z]+\d+(:[A-Z]+\d+)?$/i.test(argStr)) {
+    const rangeParts = argStr.split(":").map(fromA1);
+    const start = rangeParts[0];
+    const end = rangeParts.length > 1 ? rangeParts[1] : start;
+    if (!start || !end) return [];
+
+    const values = [];
+    for (let c = start.col; c <= end.col; c++) {
+      for (let r = start.row; r <= end.row; r++) {
+        const $cell = $(`div.cell[data-col=${c}][data-row=${r}]`);
+        // Prevent circular references to the formula cell itself
+        if ($cell[0] !== contextCell[0]) {
+          values.push($cell.text());
+        }
       }
     }
+    // If it was a single cell reference, return the single value, not an array
+    return argStr.includes(":") ? values : values[0];
   }
+
+  // Could be a boolean or other literal
+  if (argStr.toUpperCase() === "TRUE") return true;
+  if (argStr.toUpperCase() === "FALSE") return false;
+
+  // If we can't figure it out, return the string itself
+  return argStr;
+}
+
+/**
+ * Parses a formula string to extract the function name and arguments.
+ * @param {string} formula The formula string (e.g., "=SUM(A1:B5)").
+ * @returns {object|null} An object with `funcName` and `args` array, or null if invalid.
+ */
+function parseFormula(formula) {
+  const match = formula.match(/=\s*([A-Z\.]+)\s*\((.*)\)/i);
+  if (!match) return null;
+
+  const funcName = match[1].toUpperCase();
+  const argsStr = match[2];
+
+  // Handle no-argument functions like TODAY()
+  if (argsStr.trim() === "") {
+    return { funcName, args: [] };
+  }
+
+  // Basic split on comma. This is a simplification and won't handle commas inside strings.
+  const args = argsStr.split(",").map((arg) => arg.trim());
+
+  return { funcName, args };
+}
+
+/**
+ * Evaluates a formula from a cell.
+ * @param {string} formula The formula string.
+ * @param {jQuery} $cell The jQuery object for the cell containing the formula.
+ * @returns {any} The result of the formula evaluation.
+ */
+function evaluateFormula(formula, $cell) {
+  const parsed = parseFormula(formula);
+  if (!parsed) return formula; // Return original text if not a valid formula format
+
+  const { funcName, args } = parsed;
+  const resolvedArgs = args.map((arg) => resolveArgument(arg, $cell));
+
+  // Helper to extract numeric values from resolved args that might be ranges
+  const getNumericValues = (argsArray) => {
+    let values = [];
+    argsArray.forEach((arg) => {
+      if (Array.isArray(arg)) {
+        values = values.concat(arg);
+      } else {
+        values.push(arg);
+      }
+    });
+    return values.map(parseFloat).filter((n) => !isNaN(n));
+  };
+  // Helper to extract all non-empty values
+  const getAllValues = (argsArray) => {
+    let values = [];
+    argsArray.forEach((arg) => {
+      if (Array.isArray(arg)) {
+        values = values.concat(arg);
+      } else {
+        values.push(arg);
+      }
+    });
+    return values.filter(
+      (v) => v !== null && v !== undefined && String(v).trim() !== ""
+    );
+  };
+
   switch (funcName) {
+    // --- Mathematical Functions ---
     case "SUM":
-      return values.reduce((acc, val) => acc + val, 0);
+      return getNumericValues(resolvedArgs).reduce((acc, val) => acc + val, 0);
     case "AVERAGE":
-      return values.length
-        ? values.reduce((acc, val) => acc + val, 0) / values.length
+      const avgNums = getNumericValues(resolvedArgs);
+      return avgNums.length
+        ? avgNums.reduce((acc, val) => acc + val, 0) / avgNums.length
         : 0;
+    case "ROUND":
+      return parseFloat(resolvedArgs[0]).toFixed(resolvedArgs[1] || 0);
+    case "ABS":
+      return Math.abs(parseFloat(resolvedArgs[0]));
+    case "INT":
+      return Math.floor(parseFloat(resolvedArgs[0]));
+    case "MOD":
+      return parseFloat(resolvedArgs[0]) % parseFloat(resolvedArgs[1]);
+    case "POWER":
+      return Math.pow(parseFloat(resolvedArgs[0]), parseFloat(resolvedArgs[1]));
+
+    // --- Statistical Functions ---
     case "COUNT":
-      return values.length;
+      return getNumericValues(resolvedArgs).length;
+    case "COUNTA":
+      return getAllValues(resolvedArgs).length;
     case "MAX":
-      return Math.max(...values);
+      return Math.max(...getNumericValues(resolvedArgs));
     case "MIN":
-      return Math.min(...values);
+      return Math.min(...getNumericValues(resolvedArgs));
+    case "MEDIAN":
+      const medianNums = getNumericValues(resolvedArgs).sort((a, b) => a - b);
+      const mid = Math.floor(medianNums.length / 2);
+      return medianNums.length % 2 !== 0
+        ? medianNums[mid]
+        : (medianNums[mid - 1] + medianNums[mid]) / 2;
+
+    // --- Text Functions ---
+    case "CONCAT":
+      return resolvedArgs.join("");
+    case "LEFT":
+      return String(resolvedArgs[0]).substring(0, resolvedArgs[1]);
+    case "RIGHT":
+      return String(resolvedArgs[0]).substring(
+        String(resolvedArgs[0]).length - resolvedArgs[1]
+      );
+    case "LEN":
+      return String(resolvedArgs[0]).length;
+    case "UPPER":
+      return String(resolvedArgs[0]).toUpperCase();
+    case "LOWER":
+      return String(resolvedArgs[0]).toLowerCase();
+    case "TRIM":
+      return String(resolvedArgs[0]).trim();
+
+    // --- Date/Time Functions ---
+    case "TODAY":
+      const today = new Date();
+      return today.toLocaleDateString(); // Format as MM/DD/YYYY or similar
+    case "NOW":
+      return new Date().toLocaleString(); // Format as MM/DD/YYYY, hh:mm:ss AM/PM
+    case "DATE":
+      // Note: JS month is 0-indexed, so we subtract 1
+      return new Date(
+        resolvedArgs[0],
+        resolvedArgs[1] - 1,
+        resolvedArgs[2]
+      ).toLocaleDateString();
+
+    // --- Logical Functions (Simplified) ---
+    // Note: A full implementation would require a proper expression evaluator.
+    // This is a simplified version.
+    case "IF":
+      // Super simple evaluator for "A1>5" or "A1="Hello"" style conditions
+      let condition = false;
+      const conditionStr = String(args[0]); // Use the unresolved argument string
+      const parts = conditionStr.match(
+        /([A-Z]+\d+)\s*(>|<|=|>=|<=|<>)\s*(.*)/i
+      );
+      if (parts) {
+        const cellVal = resolveArgument(parts[1], $cell);
+        const operator = parts[2];
+        const compareVal = resolveArgument(parts[3], $cell);
+        switch (operator) {
+          case ">":
+            condition = cellVal > compareVal;
+            break;
+          case "<":
+            condition = cellVal < compareVal;
+            break;
+          case "=":
+            condition = cellVal == compareVal;
+            break;
+          case ">=":
+            condition = cellVal >= compareVal;
+            break;
+          case "<=":
+            condition = cellVal <= compareVal;
+            break;
+          case "<>":
+            condition = cellVal != compareVal;
+            break;
+        }
+      } else {
+        condition = !!resolvedArgs[0]; // Evaluate truthiness
+      }
+      return condition ? resolvedArgs[1] : resolvedArgs[2];
+
     default:
-      return "#NAME?";
+      return "#NAME?"; // Function not recognized
   }
 }
 
@@ -800,4 +978,116 @@ $("#filter-save-btn").on("click", function () {
     }
   }
   $("#filter-pane").removeClass("open");
+});
+
+// --- Row Height Adjustment Functionality (v3 - Fully Synchronized) ---
+
+const DEFAULT_ROW_HEIGHT = 32; // 2rem is often 32px. Adjust if needed.
+const ROW_HEIGHT_STEP = 20; // How much to increase/decrease by
+
+/**
+ * Updates the height for a specific row by modifying the grid definitions
+ * for both the ruler and the main spreadsheet wrapper.
+ * @param {number} row The 1-based index of the row to resize.
+ * @param {number} newHeight The target height in pixels.
+ */
+function updateRowHeight(row, newHeight) {
+  const $rulerRows = $(".ruler_rows");
+  const $cellsWrapper = $("#cells_wrapper");
+
+  // --- 1. Update the Row Ruler's Grid Definition ---
+  const rulerGridRows = $rulerRows.css("grid-template-rows").split(" ");
+  if (row - 1 < rulerGridRows.length) {
+    rulerGridRows[row - 1] = `${newHeight}px`;
+    $rulerRows.css("grid-template-rows", rulerGridRows.join(" "));
+  }
+
+  // --- 2. Update the Cells Wrapper's Grid Definition ---
+  const wrapperGridRows = $cellsWrapper.css("grid-template-rows").split(" ");
+  if (row - 1 < wrapperGridRows.length) {
+    wrapperGridRows[row - 1] = `${newHeight}px`;
+    $cellsWrapper.css("grid-template-rows", wrapperGridRows.join(" "));
+  }
+}
+
+// Event listener for the increase height button
+$("#addingHeight").on("click", function () {
+  if (!lastFocusedCell) {
+    alert("Please select a cell first.");
+    return;
+  }
+  const row = lastFocusedCell.data("row");
+  // Get current height from one of the grid definitions (they should be the same)
+  const currentHeight = parseFloat(
+    $(".ruler_rows").css("grid-template-rows").split(" ")[row - 1]
+  );
+  const newHeight = currentHeight + ROW_HEIGHT_STEP;
+
+  updateRowHeight(row, newHeight);
+});
+
+// --- REPLACE your old keydown listener with this one ---
+$sheet.on("keydown", ".cell", function (e) {
+  // We only care about the Backspace key for this functionality.
+  if (e.key !== "Backspace") {
+    return;
+  }
+
+  // A reference to the cell being edited.
+  const $cell = $(this);
+
+  // --- Part 1: Handle synchronous deletion of special elements ---
+  // This part for deleting math-fields must run immediately.
+  const selection = window.getSelection();
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    if (range.collapsed) {
+      let nodeToDelete = null;
+      if (
+        range.startOffset === 0 &&
+        range.startContainer.nodeType === Node.TEXT_NODE
+      ) {
+        nodeToDelete = range.startContainer.previousSibling;
+      } else if (
+        range.startContainer.nodeType === Node.ELEMENT_NODE &&
+        range.startContainer.classList.contains("cell")
+      ) {
+        nodeToDelete = range.startContainer.childNodes[range.startOffset - 1];
+      }
+      if (nodeToDelete && nodeToDelete.tagName === "MATH-FIELD") {
+        e.preventDefault();
+        nodeToDelete.remove();
+        updateFormulaBarForCell($cell);
+      }
+    }
+  }
+
+  // --- Part 2: Schedule the smart height decrease ---
+  // We use a `setTimeout` of 0. This is a standard JavaScript trick to wait
+  // for the browser to finish its current task (deleting the character)
+  // before our code runs.
+  setTimeout(() => {
+    // Make sure the cell wasn't deleted from the page entirely.
+    if (!$cell.closest(document.documentElement).length) return;
+
+    // --- Measure the content's new height (same logic as before) ---
+    $cell.css("white-space", "normal");
+    const contentHeight = $cell[0].scrollHeight + 4; // Add 4px for padding
+    $cell.css("white-space", "nowrap"); // IMPORTANT: Restore for text spillover
+
+    const row = $cell.data("row");
+    const currentRowHeight = parseFloat(
+      $(".ruler_rows").css("grid-template-rows").split(" ")[row - 1]
+    );
+
+    // Calculate the height the content now requires (cannot be smaller than default).
+    const newRequiredHeight = Math.max(DEFAULT_ROW_HEIGHT, contentHeight);
+
+    // --- THE CRITICAL LOGIC ---
+    // We only update the row height if the content now fits in a SMALLER space
+    // than the current row height. This prevents this code from ever increasing the height.
+    if (newRequiredHeight < currentRowHeight) {
+      updateRowHeight(row, newRequiredHeight);
+    }
+  }, 0);
 });

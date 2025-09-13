@@ -729,6 +729,6 @@
 .mode_options .mode_option:hover {
   background-color: #f3f3f3b2;
 }
-.mode_document_element:hover .mode_options {
+/* .mode_document_element:hover .mode_options {
   display: flex;
-}
+} */
