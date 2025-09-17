@@ -1,12 +1,21 @@
 const menuDropdownBar = document.querySelectorAll(".toolbar_direct--btn > ul");
 const toolsNavbar = document.getElementById("tools_navbar");
-const mobileToolbarOption = document.querySelector("#mobile_toolbar_option--btn~ul");
+const mobileToolbarOption = document.querySelector(
+  "#mobile_toolbar_option--btn~ul"
+);
 
 document.addEventListener("DOMContentLoaded", function () {
-  const allToolbarDirectBtn = document.querySelectorAll(".tools_navbar--header .toolbar_direct--btn");
+  const allToolbarDirectBtn = document.querySelectorAll(
+    ".tools_navbar--header .toolbar_direct--btn"
+  );
 
   // Tooltip setup
   tippy(".navbar_header_tools .column_holder button", {
+    placement: "bottom",
+    zIndex: 999999999,
+  });
+
+  tippy(".spreadsheet-tools button", {
     placement: "bottom",
     zIndex: 999999999,
   });
@@ -35,7 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.addEventListener("click", function (e) {
-    if (!e.target.closest(".toolbar_direct--btn") && !e.target.closest("#sizemug_add_date--btn")) {
+    if (
+      !e.target.closest(".toolbar_direct--btn") &&
+      !e.target.closest("#sizemug_add_date--btn")
+    ) {
       closeDropdownBar();
     }
   });

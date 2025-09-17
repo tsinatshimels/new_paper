@@ -154,6 +154,7 @@
     <link rel="stylesheet" href="./css/aside.suggestions.css" />
     <link rel="stylesheet" href="./css/paper_editing/ruler.css" />
     <link rel="stylesheet" href="./css/paper_editing/dict.translate.css" />
+    <link rel="stylesheet" href="./css/paper_editing/sheet.border.css" />
 
     <!-- share modal style -->
     <link rel="stylesheet" href="./css/share.modal.css" />
@@ -2293,12 +2294,12 @@
               <div id="sheet_tools">
                 <div class="tools">
                   <div class="sheet_label">Spreadsheet</div>
-                  <div class="column">
+                  <div class="column spreadsheet-tools">
                     <div class="dropdown">
                       <div class="dropdown-select">
                         <button
                           id="matematicalEquation"
-                          data-tippy-content="Bold"
+                          data-tippy-content="Functions"
                         >
                           <!-- prettier-ignore -->
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2535,6 +2536,7 @@
                             align-items: center;
                             width: 40px;
                           "
+                          data-tippy-content="Order Letters"
                         >
                           <!-- prettier-ignore -->
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2621,6 +2623,7 @@
                             align-items: center;
                             width: 40px;
                           "
+                          data-tippy-content="Order Numbers"
                         >
                           <!-- prettier-ignore -->
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2708,7 +2711,10 @@
                       </div>
                     </div>
 
-                    <button id="addingHeight" data-tippy-content="Height">
+                    <button
+                      id="addingHeight"
+                      data-tippy-content="Adding Height"
+                    >
                       <!-- prettier-ignore -->
                       <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M1 1H10.3333M1 4.33333H8.33333C9 4.33333 10.3333 4.66667 10.3333 6C10.3333 7.33333 9.2222 7.66667 8.66667 7.66667H5.66667M5.66667 7.66667L7 6.33333M5.66667 7.66667L7 9M1 7.66667H3.66667" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2763,6 +2769,7 @@
                             align-items: center;
                             width: 40px;
                           "
+                          data-tippy-content="Number formatting"
                         >
                           <!-- prettier-ignore -->
                           <svg width="18" height="9" viewBox="0 0 18 9" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -3186,6 +3193,382 @@
                         </button>
                       </div>
                     </div>
+                    <!-- Text Color Button -->
+                    <button
+                      id="textColorBtn"
+                      data-tippy-content="Text Color"
+                      style="position: relative"
+                    >
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" fill-rule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="#33363F" d="M7.952 17.306a1 1 0 0 1-1.904-.612L10.395 3.17a1.686 1.686 0 0 1 3.21 0l4.347 13.524a1 1 0 1 1-1.904.612L14.664 13H9.336zM9.979 11h4.042L12 4.712zM4 21a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1"/></g></svg>
+                      <input
+                        type="color"
+                        id="textColorPicker"
+                        style="
+                          position: absolute;
+                          top: 5px;
+                          left: -15px;
+                          opacity: 0;
+                        "
+                      />
+                    </button>
+
+                    <!-- Fill Color Button -->
+                    <button
+                      id="fillColorBtn"
+                      data-tippy-content="Fill Color"
+                      style="position: relative"
+                    >
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="m6.598 2.573l.694-.727l9.289 9.289l-6.196 6.254l-6.196-6.273l5.502-5.45zm3.806 3.806L5.59 11.154h9.588zm8.173 11.313q-.633 0-1.066-.433q-.434-.434-.434-1.067q0-.448.236-.884t.495-.827q.186-.262.378-.51q.193-.248.391-.51q.198.262.39.51q.193.248.38.51q.259.39.494.827q.236.436.236.884q0 .633-.434 1.067q-.433.433-1.066.433M2 24v-2h20v2z"/></svg>
+                      <input
+                        type="color"
+                        id="fillColorPicker"
+                        style="
+                          position: absolute;
+                          top: 5px;
+                          left: -15px;
+                          opacity: 0;
+                        "
+                      />
+                    </button>
+
+                    <!-- Borders Dropdown -->
+
+                    <div class="dropdown" id="bordersDropdown">
+                      <div class="dropdown-select">
+                        <button data-tippy-content="Borders">
+                          <!-- prettier-ignore -->
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2V14H14V2H2Z" stroke="currentColor" stroke-width="1.5" /><path d="M9 2V14" stroke="currentColor" stroke-width="1.5" /><path d="M2 9H14" stroke="currentColor" stroke-width="1.5" /></svg>
+                        </button>
+                      </div>
+                      <div class="dropdown-menu" id="borders-menu">
+                        <div class="border-options-grid">
+                          <!-- Row 1 -->
+                          <button
+                            class="dropdown-item"
+                            id="borderAll"
+                            data-tippy-content="All borders"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M3 4h17v17H3zm1 1v7h7V5zm15 7V5h-7v7zM4 20h7v-7H4zm15 0v-7h-7v7z"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderInner"
+                            data-tippy-content="Inner borders"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512"><rect width="512" height="512" fill="none"/><path fill="#33363F" d="M240 272v200h32V272h200v-32H272V40h-32v200H40v32zm200 168h32v32h-32zm-133.818 0h33.455v32h-33.455zm-133.818 0h33.455v32h-33.455zm200.727 0h33.455v32h-33.455zm-267.636 0h33.455v32h-33.455zM40 440h32v32H40zm0-133.817h32v33.454H40zm0 66.909h32v33.454H40zm0-200.728h32v33.454H40zm0-66.909h32v33.454H40zM40 40h32v32H40zm266.182 0h33.455v32h-33.455zm-133.818 0h33.455v32h-33.455zm200.727 0h33.455v32h-33.455zm-267.636 0h33.455v32h-33.455zM440 40h32v32h-32zm0 333.091h32v33.454h-32zm0-66.909h32v33.454h-32zm0-200.728h32v33.454h-32zm0 66.909h32v33.454h-32z"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderInnerHorizontal"
+                            data-tippy-content="Horizontal borders"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 15 15"><rect width="15" height="15" fill="none"/><path fill="none" stroke="#33363F" d="M1 1.5h1m5 0h1m2 0h1m2 0h1m-1 3h1m-7 0h1m5 6h1m-7 0h1m5 3h1m-4 0h1m-4 0h1m-4 0h1m-4 0h1m-1-3h1m-1-6h1m2-3h1m-4 6h13" stroke-width="1"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderInnerVertical"
+                            data-tippy-content="Vertical borders"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 15 15"><rect width="15" height="15" fill="none"/><path fill="none" stroke="#33363F" d="M1 1.5h1m8 0h1m2 0h1m-1 3h1m-1 3h1m-4 0h1m2 3h1m-1 3h1m-4 0h1m-7 0h1m-4 0h1m-1-3h1m-1-3h1m2 0h1m-4-3h1m2-3h1M7.5 1v13" stroke-width="1"/></svg>
+                          </button>
+
+                          <!-- Row 2 -->
+                          <button
+                            class="dropdown-item"
+                            id="borderOuter"
+                            data-tippy-content="Outer borders"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512"><rect width="512" height="512" fill="none"/><path fill="#33363F" d="M56 40a16 16 0 0 0-16 16v400a16 16 0 0 0 16 16h400a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm384 400H72V72h368Z"/><path fill="#33363F" d="M239.272 239.272h33.455v33.455h-33.455zm0 66.91h33.455v33.454h-33.455zm0-133.819h33.455v33.454h-33.455zm0-66.909h33.455v33.454h-33.455zm0 267.637h33.455v33.454h-33.455zm66.91-133.819h33.455v33.455h-33.455zm66.909 0h33.455v33.455h-33.455zm-200.727 0h33.455v33.455h-33.455zm-66.909 0h33.455v33.455h-33.455z"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderLeft"
+                            data-tippy-content="Left border"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M3 21V3h2v18zm4 0v-2h2v2zm0-8v-2h2v2zm0-8V3h2v2zm4 16v-2h2v2zm0-4v-2h2v2zm0-4v-2h2v2zm0-4V7h2v2zm0-4V3h2v2zm4 16v-2h2v2zm0-8v-2h2v2zm0-8V3h2v2zm4 16v-2h2v2zm0-4v-2h2v2zm0-4v-2h2v2zm0-4V7h2v2zm0-4V3h2v2z"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderTop"
+                            data-tippy-content="Top border"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M12 9q-.425 0-.712-.288T11 8t.288-.712T12 7t.713.288T13 8t-.288.713T12 9m-4 4q-.425 0-.712-.288T7 12t.288-.712T8 11t.713.288T9 12t-.288.713T8 13m4 0q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m4 0q-.425 0-.712-.288T15 12t.288-.712T16 11t.713.288T17 12t-.288.713T16 13m-4 4q-.425 0-.712-.288T11 16t.288-.712T12 15t.713.288T13 16t-.288.713T12 17M4 9q-.425 0-.712-.288T3 8t.288-.712T4 7t.713.288T5 8t-.288.713T4 9m16 0q-.425 0-.712-.288T19 8t.288-.712T20 7t.713.288T21 8t-.288.713T20 9M4 13q-.425 0-.712-.288T3 12t.288-.712T4 11t.713.288T5 12t-.288.713T4 13m16 0q-.425 0-.712-.288T19 12t.288-.712T20 11t.713.288T21 12t-.288.713T20 13M4 17q-.425 0-.712-.288T3 16t.288-.712T4 15t.713.288T5 16t-.288.713T4 17m16 0q-.425 0-.712-.288T19 16t.288-.712T20 15t.713.288T21 16t-.288.713T20 17M4 21q-.425 0-.712-.288T3 20t.288-.712T4 19t.713.288T5 20t-.288.713T4 21m4 0q-.425 0-.712-.288T7 20t.288-.712T8 19t.713.288T9 20t-.288.713T8 21m4 0q-.425 0-.712-.288T11 20t.288-.712T12 19t.713.288T13 20t-.288.713T12 21m4 0q-.425 0-.712-.288T15 20t.288-.712T16 19t.713.288T17 20t-.288.713T16 21m4 0q-.425 0-.712-.288T19 20t.288-.712T20 19t.713.288T21 20t-.288.713T20 21M4 5q-.425 0-.712-.288T3 4t.288-.712T4 3h16q.425 0 .713.288T21 4t-.288.713T20 5z"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderRight"
+                            data-tippy-content="Right border"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M12 9q-.425 0-.712-.288T11 8t.288-.712T12 7t.713.288T13 8t-.288.713T12 9m-4 4q-.425 0-.712-.288T7 12t.288-.712T8 11t.713.288T9 12t-.288.713T8 13m4 0q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m4 0q-.425 0-.712-.288T15 12t.288-.712T16 11t.713.288T17 12t-.288.713T16 13m-4 4q-.425 0-.712-.288T11 16t.288-.712T12 15t.713.288T13 16t-.288.713T12 17M4 5q-.425 0-.712-.288T3 4t.288-.712T4 3t.713.288T5 4t-.288.713T4 5m4 0q-.425 0-.712-.288T7 4t.288-.712T8 3t.713.288T9 4t-.288.713T8 5m4 0q-.425 0-.712-.288T11 4t.288-.712T12 3t.713.288T13 4t-.288.713T12 5m4 0q-.425 0-.712-.288T15 4t.288-.712T16 3t.713.288T17 4t-.288.713T16 5M4 9q-.425 0-.712-.288T3 8t.288-.712T4 7t.713.288T5 8t-.288.713T4 9m0 4q-.425 0-.712-.288T3 12t.288-.712T4 11t.713.288T5 12t-.288.713T4 13m0 4q-.425 0-.712-.288T3 16t.288-.712T4 15t.713.288T5 16t-.288.713T4 17m0 4q-.425 0-.712-.288T3 20t.288-.712T4 19t.713.288T5 20t-.288.713T4 21m4 0q-.425 0-.712-.288T7 20t.288-.712T8 19t.713.288T9 20t-.288.713T8 21m4 0q-.425 0-.712-.288T11 20t.288-.712T12 19t.713.288T13 20t-.288.713T12 21m4 0q-.425 0-.712-.288T15 20t.288-.712T16 19t.713.288T17 20t-.288.713T16 21m3-1V4q0-.425.288-.712T20 3t.713.288T21 4v16q0 .425-.288.713T20 21t-.712-.288T19 20"/></svg>
+                          </button>
+
+                          <!-- Row 3 -->
+                          <button
+                            class="dropdown-item"
+                            id="borderBottom"
+                            data-tippy-content="Bottom border"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M12 9q-.425 0-.712-.288T11 8t.288-.712T12 7t.713.288T13 8t-.288.713T12 9m-4 4q-.425 0-.712-.288T7 12t.288-.712T8 11t.713.288T9 12t-.288.713T8 13m4 0q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m4 0q-.425 0-.712-.288T15 12t.288-.712T16 11t.713.288T17 12t-.288.713T16 13m-4 4q-.425 0-.712-.288T11 16t.288-.712T12 15t.713.288T13 16t-.288.713T12 17M4 5q-.425 0-.712-.288T3 4t.288-.712T4 3t.713.288T5 4t-.288.713T4 5m4 0q-.425 0-.712-.288T7 4t.288-.712T8 3t.713.288T9 4t-.288.713T8 5m4 0q-.425 0-.712-.288T11 4t.288-.712T12 3t.713.288T13 4t-.288.713T12 5m4 0q-.425 0-.712-.288T15 4t.288-.712T16 3t.713.288T17 4t-.288.713T16 5m4 0q-.425 0-.712-.288T19 4t.288-.712T20 3t.713.288T21 4t-.288.713T20 5M4 9q-.425 0-.712-.288T3 8t.288-.712T4 7t.713.288T5 8t-.288.713T4 9m16 0q-.425 0-.712-.288T19 8t.288-.712T20 7t.713.288T21 8t-.288.713T20 9M4 13q-.425 0-.712-.288T3 12t.288-.712T4 11t.713.288T5 12t-.288.713T4 13m16 0q-.425 0-.712-.288T19 12t.288-.712T20 11t.713.288T21 12t-.288.713T20 13M4 17q-.425 0-.712-.288T3 16t.288-.712T4 15t.713.288T5 16t-.288.713T4 17m16 0q-.425 0-.712-.288T19 16t.288-.712T20 15t.713.288T21 16t-.288.713T20 17M4 21q-.425 0-.712-.288T3 20t.288-.712T4 19h16q.425 0 .713.288T21 20t-.288.713T20 21z"/></svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="borderClear"
+                            data-tippy-content="Clear borders"
+                          >
+                            <!-- prettier-ignore -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M12 9q-.425 0-.712-.288T11 8t.288-.712T12 7t.713.288T13 8t-.288.713T12 9m-4 4q-.425 0-.712-.288T7 12t.288-.712T8 11t.713.288T9 12t-.288.713T8 13m4 0q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m4 0q-.425 0-.712-.288T15 12t.288-.712T16 11t.713.288T17 12t-.288.713T16 13m-4 4q-.425 0-.712-.288T11 16t.288-.712T12 15t.713.288T13 16t-.288.713T12 17M4 5q-.425 0-.712-.288T3 4t.288-.712T4 3t.713.288T5 4t-.288.713T4 5m4 0q-.425 0-.712-.288T7 4t.288-.712T8 3t.713.288T9 4t-.288.713T8 5m4 0q-.425 0-.712-.288T11 4t.288-.712T12 3t.713.288T13 4t-.288.713T12 5m4 0q-.425 0-.712-.288T15 4t.288-.712T16 3t.713.288T17 4t-.288.713T16 5m4 0q-.425 0-.712-.288T19 4t.288-.712T20 3t.713.288T21 4t-.288.713T20 5M4 9q-.425 0-.712-.288T3 8t.288-.712T4 7t.713.288T5 8t-.288.713T4 9m16 0q-.425 0-.712-.288T19 8t.288-.712T20 7t.713.288T21 8t-.288.713T20 9M4 13q-.425 0-.712-.288T3 12t.288-.712T4 11t.713.288T5 12t-.288.713T4 13m16 0q-.425 0-.712-.288T19 12t.288-.712T20 11t.713.288T21 12t-.288.713T20 13M4 17q-.425 0-.712-.288T3 16t.288-.712T4 15t.713.288T5 16t-.288.713T4 17m16 0q-.425 0-.712-.288T19 16t.288-.712T20 15t.713.288T21 16t-.288.713T20 17M4 21q-.425 0-.712-.288T3 20t.288-.712T4 19t.713.288T5 20t-.288.713T4 21m4 0q-.425 0-.712-.288T7 20t.288-.712T8 19t.713.288T9 20t-.288.713T8 21m4 0q-.425 0-.712-.288T11 20t.288-.712T12 19t.713.288T13 20t-.288.713T12 21m4 0q-.425 0-.712-.288T15 20t.288-.712T16 19t.713.288T17 20t-.288.713T16 21m4 0q-.425 0-.712-.288T19 20t.288-.712T20 19t.713.288T21 20t-.288.713T20 21"/></svg>
+                          </button>
+                        </div>
+                        <hr />
+                        <div class="border-style-controls">
+                          <div class="border-color-wrapper">
+                            <button
+                              id="borderColorBtn"
+                              data-tippy-content="Border Color"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 16 16">
+                                <path
+                                  d="M13.1,3.1c-0.4-0.4-1-0.4-1.4,0L4,10.8V13h2.2L13.1,5.4C13.5,5,13.5,4.4,13.1,4L13.1,3.1z M3,14h10v1H3V14z"
+                                  fill="currentColor"
+                                />
+                              </svg>
+                              <span
+                                class="color-preview"
+                                id="borderColorPreview"
+                              ></span>
+                            </button>
+                            <input
+                              type="color"
+                              id="borderColorPicker"
+                              value="#000000"
+                            />
+                          </div>
+                          <div class="border-style-wrapper">
+                            <select
+                              id="borderStyleSelect"
+                              class="border-style-select"
+                              data-tippy-content="Border Style"
+                            >
+                              <option value="1px solid">Solid (1px)</option>
+                              <option value="2px solid">Solid (2px)</option>
+                              <option value="1px dashed">Dashed</option>
+                              <option value="1px dotted">Dotted</option>
+                              <option value="2px double">Double</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Text Wrapping Button -->
+                    <button id="textWrapBtn" data-tippy-content="Text Wrapping">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M7 21H5V3h2zM19 3h-2v18h2zm-6 5H9v2h3.97c.17 0 1.03.16 1.03 2s-.86 2-1 2h-2v-2l-3 3l3 3v-2h2c1.04 0 3-.84 3-4s-1.96-4-3-4"/></svg>
+                    </button>
+
+                    <!-- Text Rotation Dropdown -->
+                    <div class="dropdown" id="textRotationDropdown">
+                      <div class="dropdown-select">
+                        <button data-tippy-content="Text Rotation">
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="none" stroke="#33363F" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 15l-5-5C2.633 8.633 2.633 6.367 4 5s3.633-1.367 5 0l5 5m-8.5 1.5l5-5M21 12l-9 9m9-9v4m0-4h-4"/></svg>
+                        </button>
+                      </div>
+                      <div class="dropdown-menu" id="text-rotation-menu">
+                        <div class="rotation-options-grid">
+                          <button
+                            class="dropdown-item"
+                            id="rotate-none"
+                            data-tippy-content="None"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <text
+                                x="12"
+                                y="16"
+                                font-size="12"
+                                text-anchor="middle"
+                              >
+                                ABC
+                              </text>
+                            </svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="rotate-tilt-up"
+                            data-tippy-content="Tilt up"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <text
+                                x="12"
+                                y="16"
+                                font-size="12"
+                                text-anchor="middle"
+                                transform="rotate(-45 12 12)"
+                              >
+                                ABC
+                              </text>
+                            </svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="rotate-tilt-down"
+                            data-tippy-content="Tilt down"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <text
+                                x="12"
+                                y="16"
+                                font-size="12"
+                                text-anchor="middle"
+                                transform="rotate(45 12 12)"
+                              >
+                                ABC
+                              </text>
+                            </svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="rotate-stack-vertical"
+                            data-tippy-content="Stack vertically"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <text
+                                x="12"
+                                y="8"
+                                font-size="8"
+                                text-anchor="middle"
+                              >
+                                A
+                              </text>
+                              <text
+                                x="12"
+                                y="15"
+                                font-size="8"
+                                text-anchor="middle"
+                              >
+                                B
+                              </text>
+                              <text
+                                x="12"
+                                y="22"
+                                font-size="8"
+                                text-anchor="middle"
+                              >
+                                C
+                              </text>
+                            </svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="rotate-up"
+                            data-tippy-content="Rotate up"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <text
+                                x="12"
+                                y="16"
+                                font-size="12"
+                                text-anchor="middle"
+                                transform="rotate(-90 12 12)"
+                              >
+                                ABC
+                              </text>
+                            </svg>
+                          </button>
+                          <button
+                            class="dropdown-item"
+                            id="rotate-down"
+                            data-tippy-content="Rotate down"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <text
+                                x="12"
+                                y="16"
+                                font-size="12"
+                                text-anchor="middle"
+                                transform="rotate(90 12 12)"
+                              >
+                                ABC
+                              </text>
+                            </svg>
+                          </button>
+                        </div>
+                        <hr />
+                        <div class="custom-angle-wrapper">
+                          <select id="customAngleSelect">
+                            <option value="" disabled selected>
+                              Custom Angle...
+                            </option>
+                            <option value="90">90°</option>
+                            <option value="75">75°</option>
+                            <option value="60">60°</option>
+                            <option value="45">45°</option>
+                            <option value="30">30°</option>
+                            <option value="15">15°</option>
+                            <option value="0">0°</option>
+                            <option value="-15">-15°</option>
+                            <option value="-30">-30°</option>
+                            <option value="-45">-45°</option>
+                            <option value="-60">-60°</option>
+                            <option value="-75">-75°</option>
+                            <option value="-90">-90°</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Vertical Align Dropdown -->
+                    <div class="dropdown" id="verticalAlignDropdown">
+                      <div class="dropdown-select">
+                        <button data-tippy-content="Vertical Align">
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M5 5q-.425 0-.712-.288T4 4t.288-.712T5 3h14q.425 0 .713.288T20 4t-.288.713T19 5zm7 16q-.425 0-.712-.288T11 20v-9.2l-1.9 1.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l3.6-3.6q.15-.15.325-.212T12 7.425t.375.063t.325.212l3.6 3.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275L13 10.8V20q0 .425-.287.713T12 21"/></svg>
+                        </button>
+                      </div>
+                      <div class="dropdown-menu" style="width: 50px">
+                        <button
+                          class="dropdown-item"
+                          id="alignTop"
+                          data-tippy-content="Align Top"
+                        >
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M5 5q-.425 0-.712-.288T4 4t.288-.712T5 3h14q.425 0 .713.288T20 4t-.288.713T19 5zm7 16q-.425 0-.712-.288T11 20v-9.2l-1.9 1.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l3.6-3.6q.15-.15.325-.212T12 7.425t.375.063t.325.212l3.6 3.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275L13 10.8V20q0 .425-.287.713T12 21"/></svg>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          id="alignMiddle"
+                          data-tippy-content="Align Middle"
+                        >
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M8 19h3v4h2v-4h3l-4-4zm8-14h-3V1h-2v4H8l4 4zM4 11v2h16v-2z"/></svg>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          id="alignBottom"
+                          data-tippy-content="Align Bottom"
+                        >
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M16 13h-3V3h-2v10H8l4 4zM4 19v2h16v-2z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Merge Cell Button -->
+                    <button id="mergeCellBtn" data-tippy-content="Merge Cells">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#33363F" d="M4 9q-.425 0-.712-.288T3 8V5q0-.825.588-1.412T5 3h3q.425 0 .713.288T9 4t-.288.713T8 5H5v3q0 .425-.288.713T4 9m16 0q-.425 0-.712-.288T19 8V5h-3q-.425 0-.712-.288T15 4t.288-.712T16 3h3q.825 0 1.413.588T21 5v3q0 .425-.288.713T20 9m-3.875 6.125L13.7 12.7q-.3-.3-.3-.7t.3-.7l2.425-2.425q.3-.3.713-.3t.712.3t.3.713t-.3.712l-.725.7H21q.425 0 .712.288T22 12t-.288.713T21 13h-4.175l.725.7q.3.3.3.713t-.3.712t-.712.3t-.713-.3m-9.65 0q-.3-.3-.312-.712t.287-.713l.725-.7H3q-.425 0-.712-.288T2 12t.288-.712T3 11h4.175l-.725-.7q-.3-.3-.288-.712t.313-.713t.7-.3t.7.3L10.3 11.3q.3.3.3.7t-.3.7l-2.425 2.425q-.3.3-.7.3t-.7-.3M5 21q-.825 0-1.412-.587T3 19v-3q0-.425.288-.712T4 15t.713.288T5 16v3h3q.425 0 .713.288T9 20t-.288.713T8 21zm11 0q-.425 0-.712-.288T15 20t.288-.712T16 19h3v-3q0-.425.288-.712T20 15t.713.288T21 16v3q0 .825-.587 1.413T19 21z"/></svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -7703,6 +8086,14 @@
     <script src="/scripts/paperEditing/paper.remove.js"></script>
     <script src="/scripts/paperEditing/paper.sheet.js"></script>
     <script src="/scripts/paperEditing/paper.number.formatting.js"></script>
+    <script src="/scripts/paperEditing/sheet.borders.js"></script>
+    <script src="/scripts/paperEditing/sheet.fill.color.js"></script>
+    <script src="/scripts/paperEditing/sheet.merge.js"></script>
+    <script src="/scripts/paperEditing/sheet.text.color.js"></script>
+    <script src="/scripts/paperEditing/sheet.text.oriantation.js"></script>
+    <script src="/scripts/paperEditing/sheet.text.wrapping.js"></script>
+    <script src="/scripts/paperEditing/sheet.vertical.align.js"></script>
+
     <script src="/scripts/paperEditing/paper.download.js"></script>
     <script src="/scripts/paperEditing/paper.open.js"></script>
     <script src="/scripts/paperEditing/quill.citation.js"></script>

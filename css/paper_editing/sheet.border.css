@@ -1,0 +1,142 @@
+/* Styling for the new border dropdown menu */
+#borders-menu {
+  width: 200px; /* Adjust width as needed */
+  padding: 8px;
+}
+
+.border-options-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.border-options-grid .dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+}
+
+.border-options-grid .dropdown-item:hover {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.border-options-grid .dropdown-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+#borders-menu hr {
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+.border-style-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Border Color Picker Styles */
+.border-color-wrapper {
+  position: relative;
+}
+
+#borderColorBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  gap: 2px;
+}
+
+.color-preview {
+  width: 16px;
+  height: 4px;
+  background-color: #000000;
+  border: 1px solid #ccc;
+}
+
+#borderColorPicker {
+  /* Hide the default color input but keep it functional */
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Border Style Dropdown */
+.border-style-wrapper {
+  flex-grow: 1;
+}
+
+.border-style-select {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+/* style for text rotation */
+/* Styling for the text rotation dropdown menu */
+#text-rotation-menu {
+  width: 150px;
+  padding: 8px;
+}
+
+.rotation-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.rotation-options-grid .dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid transparent;
+  fill: #333; /* Color for the text inside SVGs */
+}
+
+.rotation-options-grid .dropdown-item:hover {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.rotation-options-grid .dropdown-item svg {
+  width: 100%;
+  height: 100%;
+}
+
+#text-rotation-menu hr {
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Style for the custom angle select dropdown */
+.custom-angle-wrapper {
+  margin-top: 4px;
+}
+
+#customAngleSelect {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+}
