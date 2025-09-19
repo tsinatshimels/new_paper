@@ -1,12 +1,38 @@
-// Font family configuration
+// --- Expanded Font Family Configuration ---
 const fontFamilies = [
-  { label: "Arima", value: "Arima" },
-  { label: "Geologica", value: "Geologica" },
-  { label: "Finlandica", value: "Finlandica" },
-  { label: "Inter", value: "Inter" },
+  // Serif Fonts
+  { label: "Lora", value: "Lora" },
+  { label: "Merriweather", value: "Merriweather" },
+  { label: "Playfair Display", value: "Playfair Display" },
+  { label: "PT Serif", value: "PT Serif" },
+  { label: "Roboto Slab", value: "Roboto Slab" },
+
+  // Sans-Serif Fonts
+  { label: "Lato", value: "Lato" },
   { label: "Montserrat", value: "Montserrat" },
-  { label: "Playwrite", value: "Playwrite" },
+  { label: "Open Sans", value: "Open Sans" },
+  { label: "Oswald", value: "Oswald" },
+  { label: "Poppins", value: "Poppins" },
+  { label: "Raleway", value: "Raleway" },
   { label: "Roboto", value: "Roboto" },
+  { label: "Work Sans", value: "Work Sans" },
+
+  // Display Fonts
+  { label: "Anton", value: "Anton" },
+  { label: "Lobster", value: "Lobster" },
+  { label: "Pacifico", value: "Pacifico" },
+  { label: "Righteous", value: "Righteous" },
+
+  // Handwriting Fonts
+  { label: "Caveat", value: "Caveat" },
+  { label: "Dancing Script", value: "Dancing Script" },
+  { label: "Indie Flower", value: "Indie Flower" },
+  { label: "Patrick Hand", value: "Patrick Hand" },
+
+  // Monospace Fonts
+  { label: "Inconsolata", value: "Inconsolata" },
+  { label: "Roboto Mono", value: "Roboto Mono" },
+  { label: "Source Code Pro", value: "Source Code Pro" },
 ];
 
 const fontSizes = [
@@ -26,12 +52,20 @@ const fontSizes = [
   { label: "36px", value: "36px" },
 ];
 
-// Register fonts with Quill
+// --- Dynamically Load Google Fonts ---
+const googleFonts = fontFamilies.map((font) => font.value);
+WebFont.load({
+  google: {
+    families: googleFonts,
+  },
+});
+
+// --- Register Fonts with Quill ---
 const Font = Quill.import("formats/font");
 Font.whitelist = fontFamilies.map((family) => family.value);
 Quill.register(Font, true);
 
-// Register custom font sizes
+// Register Custom Font Sizes
 const Size = Quill.import("attributors/style/size");
 Size.whitelist = fontSizes.map((size) => size.value);
 Quill.register(Size, true);
@@ -44,14 +78,18 @@ document.addEventListener("DOMContentLoaded", () => {
     "div#sizemug_font_size--btn"
   );
 
-  // Populate dropdowns
+  // --- Populate Dropdowns with Font Samples ---
   fontFamilies.forEach((family) => {
-    const markup = `<button  class="dropdown-item"  value="${family.value}">${family.label}</button>`;
+    const markup = `
+      <button class="dropdown-item" value="${family.value}">
+        <span>${family.label}</span>
+        <span class="font-sample" style="font-family: '${family.value}', sans-serif;">Aa</span>
+      </button>`;
     sizemugFontFamilyBtn.insertAdjacentHTML("beforeend", markup);
   });
 
   fontSizes.forEach((size) => {
-    const markup = `<button   class="dropdown-item" value="${size.value}">${size.label}</button>`;
+    const markup = `<button class="dropdown-item" value="${size.value}">${size.label}</button>`;
     sizemugFontSizeBtn.insertAdjacentHTML("beforeend", markup);
   });
 
@@ -101,11 +139,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Change Font Family
-  sizemugFontFamilyBtn.addEventListener("change", (e) => {
+  // --- Change Font Family ---
+  sizemugFontFamilyBtn.addEventListener("click", (e) => {
     if (!focusedEditor) return;
 
-    const family = e.target.value;
+    // Find the button that was clicked
+    const button = e.target.closest(".dropdown-item");
+    if (!button) return;
+
+    const family = button.value;
     const range = focusedEditor.getSelection();
 
     if (range) {
@@ -119,10 +161,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Change Font Size
-  sizemugFontSizeBtn.addEventListener("change", (e) => {
+  sizemugFontSizeBtn.addEventListener("click", (e) => {
     if (!focusedEditor) return;
 
-    const size = e.target.value;
+    const button = e.target.closest(".dropdown-item");
+    if (!button) return;
+
+    const size = button.value;
     const range = focusedEditor.getSelection();
 
     if (range) {
