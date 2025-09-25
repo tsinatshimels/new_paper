@@ -7,7 +7,7 @@
 
 .share_modal {
   gap: 15px;
-  width: 520px;
+  width: 608px;
 }
 
 .share_modal > div {
@@ -92,7 +92,7 @@
 .share_modal .bottom .copy_link {
   background: #f4f4f4;
   border-radius: 7px;
-  padding: 0.8rem;
+  padding: 0.6rem;
   border-radius: 32px;
   display: flex;
   justify-content: space-between;
