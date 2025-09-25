@@ -62,20 +62,20 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const fontSizes = [
-    { label: "10px", value: "10px" },
-    { label: "12px", value: "12px" },
-    { label: "14px", value: "14px" },
-    { label: "16px", value: "16px" },
-    { label: "18px", value: "18px" },
-    { label: "20px", value: "20px" },
-    { label: "22px", value: "22px" },
-    { label: "24px", value: "24px" },
-    { label: "26px", value: "26px" },
-    { label: "28px", value: "28px" },
-    { label: "30px", value: "30px" },
-    { label: "32px", value: "32px" },
-    { label: "34px", value: "34px" },
-    { label: "36px", value: "36px" },
+    { label: "10", value: "10px" },
+    { label: "12", value: "12px" },
+    { label: "14", value: "14px" },
+    { label: "16", value: "16px" },
+    { label: "18", value: "18px" },
+    { label: "20", value: "20px" },
+    { label: "22", value: "22px" },
+    { label: "24", value: "24px" },
+    { label: "26", value: "26px" },
+    { label: "28", value: "28px" },
+    { label: "30", value: "30px" },
+    { label: "32", value: "32px" },
+    { label: "34", value: "34px" },
+    { label: "36", value: "36px" },
   ];
 
   // --- Dynamically Load Google Fonts ---
@@ -105,19 +105,46 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const fontFamilySelect = document.getElementById("fontFamilySelect");
   const sizemugFontSizeBtn = document.getElementById("sizemug_font_size--btn");
+  const fontSizeSelect = document.getElementById("fontSizeSelect");
 
   let focusedEditor = null;
+  let selectionRange = null;
+
+  // --- STATE VARIABLES TO REMEMBER LAST SELECTION ---
+  let currentFontFamily = "Inter"; // Default font family
+  let currentFontSize = "12px";
 
   const updateToolbarState = () => {
     if (!focusedEditor) return;
     const format = focusedEditor.getFormat() || {};
-    const currentFont = fontFamilies.find((f) => f.value === format.font);
+
+    if (format.font) {
+      currentFontFamily = format.font;
+    }
+    const currentFont = fontFamilies.find((f) => f.value === currentFontFamily);
     if (currentFont) {
       fontFamilySelect.textContent = currentFont.label;
       fontFamilySelect.style.fontFamily = `'${currentFont.value}', sans-serif`;
     } else {
+      // Fallback just in case
       fontFamilySelect.textContent = "Inter";
       fontFamilySelect.style.fontFamily = "'Inter', sans-serif";
+    }
+  };
+
+  const updateFontSizeToolbar = () => {
+    if (!focusedEditor) return;
+    const format = focusedEditor.getFormat() || {};
+
+    if (format.size) {
+      currentFontSize = format.size;
+    }
+    const currentSize = fontSizes.find((s) => s.value === currentFontSize);
+    if (currentSize) {
+      fontSizeSelect.textContent = currentSize.label;
+    } else {
+      // Add a fallback to ensure the label resets
+      fontSizeSelect.textContent = "12";
     }
   };
 
@@ -131,11 +158,27 @@ document.addEventListener("DOMContentLoaded", () => {
       sizemugFontFamilyDropdown.insertAdjacentHTML("beforeend", markup);
     });
 
-    sizemugFontFamilyDropdown.addEventListener("click", (e) => {
+    // sizemugFontFamilyDropdown.addEventListener("click", (e) => {
+    //   if (!focusedEditor) return;
+    //   const button = e.target.closest(".dropdown-item");
+    //   if (!button) return;
+    //   focusedEditor.format("font", button.value);
+    //   updateToolbarState();
+    // });
+    sizemugFontFamilyDropdown.addEventListener("mousedown", (e) => {
+      e.preventDefault(); // Prevent the editor from losing focus
       if (!focusedEditor) return;
+
       const button = e.target.closest(".dropdown-item");
       if (!button) return;
-      focusedEditor.format("font", button.value);
+
+      // Restore selection before formatting
+      if (selectionRange) {
+        focusedEditor.setSelection(selectionRange);
+      }
+      const newFont = button.value;
+      focusedEditor.format("font", newFont);
+      currentFontFamily = newFont; // <<< UPDATE THE STATE VARIABLE
       updateToolbarState();
     });
   }
@@ -147,21 +190,43 @@ document.addEventListener("DOMContentLoaded", () => {
       sizemugFontSizeBtn.insertAdjacentHTML("beforeend", markup);
     });
 
-    sizemugFontSizeBtn.addEventListener("click", (e) => {
+    sizemugFontSizeBtn.addEventListener("mousedown", (e) => {
+      e.preventDefault(); // Prevent the editor from losing focus
       if (!focusedEditor) return;
+
       const button = e.target.closest(".dropdown-item");
       if (!button) return;
-      focusedEditor.format("size", button.value);
+
+      // Restore selection before formatting
+      if (selectionRange) {
+        focusedEditor.setSelection(selectionRange);
+      }
+
+      const newSize = button.value;
+      focusedEditor.format("size", newSize);
+      currentFontSize = newSize; // <<< UPDATE THE STATE VARIABLE
+      updateFontSizeToolbar();
     });
   }
 
   // --- Editor Focus and Selection Tracking ---
   if (typeof paperEditors !== "undefined" && paperEditors.length > 0) {
     paperEditors.forEach((editor) => {
-      editor.on("editor-change", (eventName) => {
-        if (eventName === "selection-change" && editor.hasFocus()) {
-          focusedEditor = editor;
-          updateToolbarState();
+      editor.on("editor-change", (eventName, ...args) => {
+        if (eventName === "selection-change") {
+          const [range] = args;
+          if (range) {
+            selectionRange = range;
+          }
+          if (editor.hasFocus()) {
+            focusedEditor = editor;
+            updateToolbarState();
+            updateFontSizeToolbar();
+            if (editor.getLength() === 1) {
+              editor.format("font", currentFontFamily);
+              editor.format("size", currentFontSize);
+            }
+          }
         }
       });
     });
