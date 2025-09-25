@@ -204,3 +204,14 @@
   text-overflow: ellipsis;
   width: 100%;
 }
+.copy_link_btn {
+  background: #8837e9;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 14px;
+  justify-content: center;
+}
