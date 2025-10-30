@@ -155,6 +155,7 @@
     <link rel="stylesheet" href="./css/paper_editing/ruler.css" />
     <link rel="stylesheet" href="./css/paper_editing/dict.translate.css" />
     <link rel="stylesheet" href="./css/paper_editing/sheet.border.css" />
+    <link rel="stylesheet" href="./css/paper_editing/first.time.message.css" />
 
     <!-- share modal style -->
     <link rel="stylesheet" href="./css/share.modal.css" />
@@ -7897,6 +7898,23 @@
       </div>
     </template>
 
+    <!-- First time message  -->
+    <div id="firstTimeMessage" class="first-time-message first-time--hidden">
+      <h3>Posts Related to Your Paper</h3>
+      <p>
+        These posts are suggested based on the tags you added to your paper.
+        They help you discover ideas, discussions, and updates connected to what
+        you’re working on.
+      </p>
+      <div class="message-actions">
+        <button id="learnMoreButton" class="btn btn-secondary">
+          Learn More
+        </button>
+        <button id="gotItButton" class="btn btn-primary">Got It</button>
+      </div>
+      <div class="bubble-arrow"></div>
+    </div>
+
     <!-- External Scripts -->
     <!-- External Scripts -->
     <!-- External Scripts -->
@@ -8095,7 +8113,7 @@
     <script src="/scripts/paperEditing/toolbar.js"></script>
     <script src="/scripts/paperEditing/template.overlay.js"></script>
     <script src="/scripts/paperEditing/participant.dropdown.js"></script>
-
+    <script src="/scripts/paperEditing/first.time.message.js"></script>
     <!-- share Modal -->
     <script src="/scripts/shareModal.js"></script>
 
