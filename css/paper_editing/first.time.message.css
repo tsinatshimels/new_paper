@@ -39,9 +39,9 @@
 .message-actions .btn {
   padding: 8px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9em;
+  font-size: 1rem;
 }
 
 .message-actions .btn-primary {
