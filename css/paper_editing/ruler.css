@@ -1,58 +1,38 @@
 /* ruler.css */
 
+/* MODIFIED: Ruler is hidden by default */
 #ruler-system-wrapper {
-  position: absolute; /* Keep absolute for positioning relative to editor-container */
-  top: 0;
-  left: 0; /* Align to the very left of the editor-container */
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* In your CSS file (e.g., ruler.css or main.css) */
-
-#main_white_paper_board {
-  position: relative; /* Essential for absolute positioning of its children */
-  /* Define its width and height, e.g.: */
-  /* width: 100%; */
-  /* min-height: 800px; */
-  /* margin: 0 auto; */
-  /* background-color: #f0f0f0; */
-}
-
-/* ruler-system-wrapper's existing CSS is good for its new parent #main_white_paper_board */
-#ruler-system-wrapper {
+  display: none; /* Hidden by default */
   position: absolute;
   top: 0;
   left: 0;
   z-index: 5;
-  pointer-events: none; /* Crucial, ensures only markers (with pointer-events: auto) receive events */
+  pointer-events: none;
 }
 
-.horizonatal-ruler-wrapper {
-  background: red;
+#main_white_paper_board {
+  position: relative;
 }
 
 #h-ruler-marks {
   position: absolute;
-  left: 300px;
-}
-/* Ensure markers are interactive */
-.indent-marker {
-  pointer-events: auto; /* Overrides parent's pointer-events: none; */
 }
 
-/* Add this for smooth dragging feedback */
+.indent-marker {
+  pointer-events: auto;
+}
+
 body.dragging-ew-resize {
   cursor: ew-resize !important;
-  user-select: none !important; /* Prevents unwanted text selection during drag */
+  user-select: none !important;
 }
 
 #ruler-corner {
   position: absolute;
   top: 0;
-  left: 0; /* Align to the very left corner */
-  width: 30px; /* Fixed width */
-  height: 30px; /* Fixed height */
+  left: 0;
+  width: 30px;
+  height: 30px;
   background: #f8f9fa;
   border-right: 1px solid #d1d5db;
   border-bottom: 1px solid #d1d5db;
@@ -62,28 +42,26 @@ body.dragging-ew-resize {
 #horizontal-ruler {
   position: absolute;
   top: 0;
-  left: 30px; /* Starts after the corner piece */
-  height: 30px; /* Fixed height */
+  left: 30px;
+  height: 30px;
   background: #f8f9fa;
   border-bottom: 1px solid #d1d5db;
-  overflow: hidden; /* Hide overflow to prevent scrollbars */
+  overflow: hidden;
   box-sizing: border-box;
-  /* width: 100% !important; */
 }
 
 #vertical-ruler {
   position: absolute;
-  top: 30px; /* Starts after the horizontal ruler */
-  left: 0; /* Aligns with the corner piece */
-  width: 30px; /* Fixed width */
+  top: 30px;
+  left: 0;
+  width: 30px;
   background: #f8f9fa;
   border-right: 1px solid #d1d5db;
   box-sizing: border-box;
   z-index: 0;
-  overflow: hidden; /* Hide overflow to prevent scrollbars */
+  overflow: hidden;
 }
 
-/* Ruler Marks (Ticks and Numbers) - no major changes here */
 .ruler-mark {
   position: absolute;
   background-color: #adb5bd;
@@ -95,7 +73,6 @@ body.dragging-ew-resize {
   user-select: none;
 }
 
-/* Horizontal Marks */
 #h-ruler-marks .ruler-mark {
   top: 15px;
   width: 1px;
@@ -114,7 +91,6 @@ body.dragging-ew-resize {
   transform: translateX(-50%);
 }
 
-/* Vertical Marks */
 #v-ruler-marks .ruler-mark {
   left: 15px;
   height: 1px;
@@ -133,78 +109,69 @@ body.dragging-ew-resize {
   transform: translateY(-50%);
 }
 
-/* Indent Markers Styling */
-/* Your current indent markers are small triangles. The image shows a more blocky, draggable style. */
-/* Let's update these for better visual and drag experience */
 .indent-marker {
   position: absolute;
-  /* Top position will be calculated dynamically to place them correctly */
-  height: 20px; /* Make them taller for easier grab */
-  width: 16px; /* A bit wider */
+  height: 20px;
+  width: 16px;
   cursor: ew-resize;
   z-index: 10;
   pointer-events: auto;
-  background-color: #6c757d; /* A gray color */
-  border: 1px solid #333;
-  box-sizing: border-box;
-  transform: translateX(-50%); /* Center the marker on its `left` position */
-  display: flex; /* For potential internal elements */
+  transform: translateX(-50%);
+  display: flex;
   justify-content: center;
   align-items: center;
-  user-select: none; /* Prevent text selection during drag */
+  user-select: none;
 }
-
+.indent-marker svg {
+  width: 100%;
+  height: 100%;
+}
 #left-indent-marker {
-  top: 10px; /* Adjust top to align with ruler */
-  border-radius: 2px 0 0 2px; /* Slight round on left edge */
+  top: 10px;
 }
-
 #first-line-marker {
   position: absolute;
-  top: -10px; /* Position above the left indent marker */
-  left: 0; /* Keep it centered on the parent marker due to parent's transform */
-  height: 10px; /* Smaller height */
+  top: -10px;
+  left: 0;
+  height: 10px;
   width: 16px;
   cursor: ew-resize;
-  background-color: #4a90e2; /* Different color to distinguish */
-  border: 1px solid #333;
-  box-sizing: border-box;
-  border-radius: 2px 2px 0 0;
 }
-
 #right-indent-marker {
-  top: 10px; /* Adjust top to align with ruler */
-  border-radius: 0 2px 2px 0; /* Slight round on right edge */
-  /* Remove `right: 0` as `left` will be calculated */
+  top: 10px;
 }
 
-/* New style for the caret position indicator line */
+/* MODIFIED: CSS for the ruler line, now relative to the wrapper */
 #caret-ruler-line {
   position: absolute;
-  top: 30px; /* Below the horizontal ruler */
+  top: 30px; /* Start below the horizontal ruler */
+  left: 0; /* JS will set this */
   width: 1px;
-  background-color: #6a0dad; /* Purple color */
-  z-index: 8; /* Above paper, below ruler markers */
-  pointer-events: none; /* Do not block clicks */
-  display: none; /* Hidden by default */
+  background-color: #8837e9;
+  z-index: 9; /* Above paper, below markers */
+  pointer-events: none;
+  display: none; /* Hidden by default, shown by JS on drag */
 }
 
-/* Tooltip for the caret ruler line */
 #caret-ruler-tooltip {
   position: absolute;
-  top: 1px; /* Inside the horizontal ruler */
+  bottom: 100%; /* Position it directly above the line's start */
   left: 50%;
   transform: translateX(-50%);
-  background-color: #6a0dad; /* Purple */
+  margin-bottom: 5px; /* Small space from the ruler */
+  background-color: #8837e9;
   color: white;
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 10px;
+  font-family: sans-serif;
   white-space: nowrap;
+  /* Starts hidden */
   opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-  pointer-events: none;
+  transition: opacity 0.2s;
 }
+
+/* Show tooltip when the line is active */
 #caret-ruler-line.active #caret-ruler-tooltip {
   opacity: 1;
 }
