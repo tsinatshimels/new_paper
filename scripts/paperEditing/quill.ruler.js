@@ -1,4 +1,4 @@
-// quill.ruler.js (Corrected Drag Logic)
+// quill.ruler.js (Final Version with Separated Drawing and Real Scale)
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- 1. DOM Element References ---
@@ -10,14 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const hRulerMarks = document.getElementById("h-ruler-marks");
   const vRulerMarks = document.getElementById("v-ruler-marks");
   const leftIndentMarker = document.getElementById("left-indent-marker");
-  const firstLineMarker = document.getElementById("first-line-marker");
   const rightIndentMarker = document.getElementById("right-indent-marker");
   const editorContainer = document.getElementById("editor-container");
-  const editorPaper = document.getElementById("editor_paper");
   const editorPaperWrapper = document.getElementById("editor_paper--wrapper");
   const caretRulerLine = document.getElementById("caret-ruler-line");
   const caretRulerTooltip = document.getElementById("caret-ruler-tooltip");
-
+  const matchingSlider = document.getElementById("matching_slider");
   if (!rulerSystem || !toggleRulerBtn) {
     console.error("Ruler system base elements not found.");
     return;
@@ -26,7 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 2. State and Constants ---
   const PIXELS_PER_INCH = 96;
   const INDENT_WIDTH_PX = 48;
-  let currentScale = 1;
+
+  // -- THIS IS THE FIX: SEPARATE THE SCALES --
+  // This scale is ONLY for drawing the ruler marks with the desired small gaps. It never changes.
+  const RULER_DRAWING_SCALE = 0.37;
+  // This will hold the real, live scale of the paper for accurate calculations.
+  let realCurrentScale = RULER_DRAWING_SCALE;
+
   let isRulerVisible = false;
 
   // --- 3. Quill Integration ---
@@ -47,6 +51,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!qlEditor) return { left: 0, right: 0, width: 0, rect: null };
     const rect = qlEditor.getBoundingClientRect();
     const computedStyle = window.getComputedStyle(qlEditor);
+
+    const transform = window.getComputedStyle(
+      qlEditor.closest(".editor_paper")
+    ).transform;
+
+    // This function now only updates the REAL scale for calculations.
+    if (transform && transform !== "none") {
+      const matrix = transform.match(/matrix\(([^)]+)\)/);
+      realCurrentScale = matrix ? parseFloat(matrix[1].split(", ")[0]) : 1;
+    } else {
+      // If no transform is found, assume it might be 1 for calculations
+      realCurrentScale = 1;
+    }
+
     return {
       left: parseFloat(computedStyle.paddingLeft),
       right: parseFloat(computedStyle.paddingRight),
@@ -58,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 4. Ruler Update Logic ---
   function fullRulerUpdate() {
     if (!isRulerVisible) return;
+    getQlEditorMetrics(); // Update the real scale first
     const mainBoardWidth = mainWhitePaperBoard.clientWidth;
     hRuler.style.width = `${mainBoardWidth - 30}px`;
     vRuler.style.height = `${editorContainer.clientHeight}px`;
@@ -66,40 +85,51 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function generateRulerMarks() {
-    hRulerMarks.innerHTML = "";
+    hRulerMarks
+      .querySelectorAll(".ruler-mark, .ruler-number")
+      .forEach((el) => el.remove());
     vRulerMarks.innerHTML = "";
-    const hRulerWidth = mainWhitePaperBoard.clientWidth;
 
-    for (let i = 0; i < 610; i += PIXELS_PER_INCH / 16) {
+    const SUBDIVISIONS_PER_INCH = 4;
+    const increment = PIXELS_PER_INCH / SUBDIVISIONS_PER_INCH;
+    const maxRulerWidthInPixels = 16 * PIXELS_PER_INCH;
+
+    for (let i = 0; i <= maxRulerWidthInPixels; i += increment) {
       const mark = document.createElement("div");
       mark.className = "ruler-mark";
-      mark.style.left = `${i * currentScale}px`;
-      hRulerMarks.appendChild(mark);
+      // This now CONSISTENTLY uses the drawing scale for visual appearance.
+      mark.style.left = `${i * RULER_DRAWING_SCALE}px`;
       if (i % PIXELS_PER_INCH === 0) {
         mark.classList.add("major");
         const num = document.createElement("span");
         num.className = "ruler-number";
         num.textContent = i / PIXELS_PER_INCH;
-        num.style.left = `${i * currentScale}px`;
+        num.style.left = `${i * RULER_DRAWING_SCALE}px`;
         hRulerMarks.appendChild(num);
+      } else if (i % (PIXELS_PER_INCH / 2) === 0) {
+        mark.classList.add("half-inch");
       }
+      hRulerMarks.appendChild(mark);
     }
-    for (let i = 0; i <= 500; i += (PIXELS_PER_INCH / 16) * currentScale) {
+
+    // Vertical Ruler Marks
+    for (let i = 0; i <= 1600; i += increment) {
       const mark = document.createElement("div");
       mark.className = "ruler-mark";
-      mark.style.top = `${i}px`;
-      vRulerMarks.appendChild(mark);
-      const inchValue = i / (PIXELS_PER_INCH * currentScale);
-      if (Math.abs(inchValue % 1) < 0.01) {
+      mark.style.top = `${i * RULER_DRAWING_SCALE}px`;
+
+      if (i % PIXELS_PER_INCH === 0) {
         mark.classList.add("major");
         const num = document.createElement("span");
         num.className = "ruler-number";
-        num.textContent = Math.round(inchValue);
-        num.style.top = `${i}px`;
+        num.textContent = Math.round(i / PIXELS_PER_INCH);
+        num.style.top = `${i * RULER_DRAWING_SCALE}px`;
         vRulerMarks.appendChild(num);
-      } else if (Math.abs(inchValue % 0.5) < 0.01) {
-        mark.classList.add("minor");
+      } else if (i % (PIXELS_PER_INCH / 2) === 0) {
+        mark.classList.add("half-inch");
       }
+
+      vRulerMarks.appendChild(mark);
     }
   }
 
@@ -119,62 +149,61 @@ document.addEventListener("DOMContentLoaded", () => {
     const indentPx = (formats.indent || 0) * INDENT_WIDTH_PX;
     const textIndentPx = parseFloat(formats["text-indent"] || "0px");
     const rightIndentPx = parseFloat(formats["right-indent"] || "0px");
+
+    // Marker positioning must use the REAL, live scale.
     leftIndentMarker.style.left = `${
-      (paddingLeft + indentPx) * currentScale
+      (paddingLeft + indentPx) * realCurrentScale
     }px`;
-    firstLineMarker.style.left = `${textIndentPx * currentScale}px`;
     rightIndentMarker.style.left = `${
-      scaledWidth - (paddingRight + rightIndentPx) * currentScale
+      scaledWidth - (paddingRight + rightIndentPx) * realCurrentScale
     }px`;
   }
 
-  // --- 5. DRAGGING LOGIC (REFACTORED) ---
+  // --- 5. DRAGGING LOGIC ---
   function createDragHandler(markerElement, type) {
     markerElement.addEventListener("mousedown", (e) => {
       if (!window.focusedEditor) return;
       e.preventDefault();
       e.stopPropagation();
-
       const dragStartX = e.pageX;
       const initialMarkerLeft = parseFloat(markerElement.style.left || "0");
-
       caretRulerLine.style.height = `${editorContainer.clientHeight}px`;
       caretRulerLine.classList.add("active");
       document.body.classList.add("dragging-ew-resize");
 
-      // Define move and up handlers *inside* mousedown
       const onMouseMove = (moveEvent) => {
         requestAnimationFrame(() => {
           const deltaX = moveEvent.pageX - dragStartX;
           const newMarkerLeft = initialMarkerLeft + deltaX;
           markerElement.style.left = `${newMarkerLeft}px`;
-
-          const linePosition = hRulerMarks.offsetLeft + newMarkerLeft;
-          caretRulerLine.style.left = `${linePosition}px`;
+          const markerRect = markerElement.getBoundingClientRect();
+          const rulerSystemRect = rulerSystem.getBoundingClientRect();
+          caretRulerLine.style.left = `${
+            markerRect.left - rulerSystemRect.left + markerRect.width / 2
+          }px`;
           caretRulerLine.style.display = "block";
 
-          const inchValue = newMarkerLeft / currentScale / PIXELS_PER_INCH;
+          // Tooltip calculation must use the REAL, live scale.
+          const inchValue = newMarkerLeft / realCurrentScale / PIXELS_PER_INCH;
           caretRulerTooltip.textContent = `${inchValue.toFixed(2)}"`;
         });
       };
 
       const onMouseUp = () => {
-        // Cleanup listeners
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
-
-        // Reset UI
         document.body.classList.remove("dragging-ew-resize");
         caretRulerLine.style.display = "none";
         caretRulerLine.classList.remove("active");
 
-        // Apply formatting to Quill
+        // Final position calculation must use the REAL, live scale.
         const {
           left: paddingLeft,
           right: paddingRight,
           width: scaledWidth,
         } = getQlEditorMetrics();
-        const finalLeft = parseFloat(markerElement.style.left) / currentScale;
+        const finalLeft =
+          parseFloat(markerElement.style.left) / realCurrentScale;
 
         switch (type) {
           case "left-indent": {
@@ -183,20 +212,10 @@ document.addEventListener("DOMContentLoaded", () => {
             window.focusedEditor.format("indent", newIndentLevel, "user");
             break;
           }
-          case "first-line": {
-            window.focusedEditor.format(
-              "text-indent",
-              `${finalLeft}px`,
-              "user"
-            );
-            break;
-          }
           case "right-indent": {
-            const contentWidth = scaledWidth / currentScale - paddingLeft;
-            const newRightIndentPx = Math.max(
-              0,
-              contentWidth - finalLeft - paddingRight
-            );
+            const contentWidth =
+              scaledWidth / realCurrentScale - paddingLeft - paddingRight;
+            const newRightIndentPx = Math.max(0, contentWidth - finalLeft);
             window.focusedEditor.format(
               "right-indent",
               `${newRightIndentPx}px`,
@@ -205,18 +224,14 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
           }
         }
-
         setTimeout(updateRulerMarkers, 50);
       };
-
-      // Add the new listeners
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     });
   }
 
   createDragHandler(leftIndentMarker, "left-indent");
-  createDragHandler(firstLineMarker, "first-line");
   createDragHandler(rightIndentMarker, "right-indent");
 
   // --- 6. Event Listeners ---
@@ -228,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.focusedEditor) {
       window.focusedEditor.on("selection-change", editorUpdateHandler);
       window.focusedEditor.on("text-change", editorUpdateHandler);
-      fullRulerUpdate();
+      // Don't call fullRulerUpdate here automatically, wait for toggle.
     } else {
       setTimeout(attachQuillListeners, 500);
     }
@@ -239,6 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
     rulerSystem.style.display = isRulerVisible ? "block" : "none";
     if (isRulerVisible) {
       fullRulerUpdate();
+      matchingSlider.style.margin = "30px";
+    } else {
+      matchingSlider.style.margin = "0px";
     }
   });
 
