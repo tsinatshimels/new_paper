@@ -34,8 +34,6 @@ body.dragging-ew-resize {
   width: 30px;
   height: 30px;
   background: #f8f9fa;
-
-  border-bottom: 1px solid #d1d5db;
   box-sizing: border-box;
 }
 
@@ -59,7 +57,9 @@ body.dragging-ew-resize {
   border-right: 1px solid #d1d5db;
   box-sizing: border-box;
   z-index: 0;
-  /* overflow: hidden; */
+  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 #v-ruler-marks {
   padding-top: 5px;
@@ -108,7 +108,7 @@ body.dragging-ew-resize {
 }
 #v-ruler-marks .ruler-number {
   left: 8px;
-  transform: translateY(-50%);
+  /* transform: translateY(-50%); */
 }
 
 .indent-marker {

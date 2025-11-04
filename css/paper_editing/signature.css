@@ -1,0 +1,332 @@
+/* Signature Modal Container */
+.signature-modal {
+  position: absolute;
+  top: 0;
+  right: -4200px; /* Start off-screen */
+  width: 400px;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: -3px 0 15px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  transition: right 0.4s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+/* State when the modal is open */
+.signature-modal.open {
+  right: 0;
+}
+
+.signature-modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  flex-grow: 1;
+}
+.signature-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.signature-modal-header .sign-header-one {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signature-modal-header .sign-header-one span {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+.click-to-insert {
+  display: flex;
+  gap: 6px;
+  background: rgba(28, 100, 242, 0.1);
+  color: #1c64f2;
+  padding: 4px;
+  border-radius: 4px;
+}
+.signature-modal-header .tabs {
+  margin-bottom: 5px;
+}
+.signature-modal-header .tabs button {
+  width: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-size: 16px;
+  color: #555;
+  border-bottom: 3px solid transparent;
+}
+
+.signature-modal-header .tabs button.active {
+  color: #8837e9;
+  border-bottom: 3px solid #8837e9;
+}
+
+.signature-modal-header .close-button {
+  font-size: 28px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #000;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  padding-top: 20px;
+}
+
+#signature-canvas {
+  border: 1px dashed #ccc;
+  border-radius: 16px;
+  cursor: crosshair;
+  width: 100%;
+  height: 200px;
+  background: #f2f4f7;
+}
+
+.signature-controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 15px;
+  background: #f2f4f7;
+  border-radius: 16px;
+  padding: 5px 0px;
+}
+
+#add-signature-btn,
+#clear-canvas-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  border-radius: 32px;
+  font-size: 16px;
+}
+#add-signature-btn {
+  background-color: #1c64f2;
+  color: white;
+}
+#clear-canvas-btn {
+  background-color: #f1f1f1;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* Signature Gallery */
+.signature-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.signature-item {
+  border: 1px solid #ddd;
+  padding: 5px;
+  cursor: pointer;
+  position: relative;
+  background-color: #f9f9f9;
+  transition: box-shadow 0.2s;
+  height: 80px;
+}
+
+.signature-item img {
+  width: 100%;
+  height: 70px;
+  display: block;
+}
+
+.signature-item:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.signature-item.selected {
+  border-color: #007bff;
+}
+
+.signature-menu-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: none; /* Hidden by default */
+  align-items: center;
+  justify-content: center;
+}
+
+.signature-item.selected .signature-menu-btn {
+  display: flex; /* Show when item is selected */
+}
+
+/* Dropdown Menu */
+.signature-dropdown {
+  display: block;
+  position: absolute;
+  background-color: white;
+  border-radius: 16px;
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+  top: 28px;
+  right: -120px;
+  z-index: 1060;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 150px;
+}
+
+.signature-dropdown li {
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.signature-dropdown li:hover {
+  background-color: #f1f1f1;
+}
+
+/* ADD these styles to your signature.css file */
+
+/* Signature Container in Editor */
+.ql-signature-container {
+  display: inline-block;
+  position: absolute;
+  border: 2px solid transparent;
+  padding: 2px;
+  cursor: move;
+  transition: all 0.2s;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+}
+
+.ql-signature-container.selected {
+  border: 2px solid #7633f9;
+  box-shadow: 0 4px 12px rgba(118, 51, 249, 0.3);
+}
+
+.ql-signature-container.dragging {
+  opacity: 0.8;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ql-signature-container img {
+  display: block;
+  max-width: 200px;
+  max-height: 100px;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Resize Handles */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #7633f9;
+  border: 2px solid white;
+  border-radius: 2px;
+  z-index: 11;
+  display: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ql-signature-container.selected .resize-handle {
+  display: block;
+}
+
+.resize-handle-nw {
+  top: -6px;
+  left: -6px;
+  cursor: nw-resize;
+}
+
+.resize-handle-ne {
+  top: -6px;
+  right: -6px;
+  cursor: ne-resize;
+}
+
+.resize-handle-sw {
+  bottom: -6px;
+  left: -6px;
+  cursor: sw-resize;
+}
+
+.resize-handle-se {
+  bottom: -6px;
+  right: -6px;
+  cursor: se-resize;
+}
+
+/* Tooltip Styles */
+.image-action-tooltip {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  z-index: 20;
+  display: none;
+  align-items: center;
+}
+
+.ql-signature-container.selected .image-action-tooltip {
+  display: flex;
+}
+
+.image-action-tooltip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.image-action-tooltip button:hover {
+  background-color: #444;
+}
+
+.image-action-tooltip button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.image-action-tooltip button.img-delete svg path {
+  stroke: #f43f5e;
+}
+
+.image-action-tooltip button.img-rotate svg path {
+  stroke: #60a5fa;
+}
+
+/* Ensure the editor can handle multiple signature containers */
+.ql-editor {
+  position: relative;
+  min-height: 200px;
+  overflow: visible !important;
+}
+
+.ql-editor .ql-signature-container {
+  display: inline-flex;
+  vertical-align: middle;
+}

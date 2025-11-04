@@ -26,6 +26,7 @@ function createNewEditor() {
       },
     },
     formats: [
+      "signature",
       "comment",
       "math-live",
       "font",
@@ -64,8 +65,8 @@ function createNewEditor() {
   // Set a fixed height and width for the editor container
   container.style.maxHeight = "900px";
   container.style.minHeight = "900px";
-  container.style.maxWidth = "600px";
-  container.style.minWidth = "600px";
+  container.style.maxWidth = "700px";
+  container.style.minWidth = "700px";
   container.style.overflow = "hidden";
 
   paperEditors.push(editor);
@@ -108,10 +109,52 @@ function setupEditorListener(editor) {
   });
 }
 
+// function handleOverflow(editor) {
+//   const editorElement = editor?.container?.querySelector(".ql-editor");
+//   const currentIndex = paperEditors.indexOf(editor);
+//   let nextEditor;
+
+//   // Get the content that overflows
+//   const length = editor?.getLength();
+
+//   // Find the last paragraph break that fits
+//   let lastFittingIndex = findLastFittingParagraph(editor);
+
+//   // Only proceed if there's actually overflow content
+//   if (lastFittingIndex < length - 1) {
+//     const overflowLength = length - lastFittingIndex;
+//     const overflowContent = editor.getContents(
+//       lastFittingIndex,
+//       overflowLength
+//     );
+
+//     editor.deleteText(lastFittingIndex, overflowLength);
+//     nextEditor.setContents(overflowContent);
+
+//     const nextEditorElement = nextEditor.container.parentElement;
+//     nextEditorElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+//     nextEditor.focus();
+//     nextEditor.setSelection(0, 0);
+//   }
+// }
 function handleOverflow(editor) {
   const editorElement = editor?.container?.querySelector(".ql-editor");
   const currentIndex = paperEditors.indexOf(editor);
   let nextEditor;
+
+  // Check if there's already a next editor, if not create one
+  if (currentIndex + 1 < paperEditors.length) {
+    nextEditor = paperEditors[currentIndex + 1];
+  } else {
+    nextEditor = createNewEditor();
+  }
+
+  // Safety check - ensure nextEditor is properly initialized
+  if (!nextEditor || !nextEditor.setContents) {
+    console.error("Next editor not properly initialized");
+    return;
+  }
 
   // Get the content that overflows
   const length = editor?.getLength();
@@ -127,14 +170,21 @@ function handleOverflow(editor) {
       overflowLength
     );
 
+    // Remove overflow content from current editor
     editor.deleteText(lastFittingIndex, overflowLength);
-    nextEditor.setContents(overflowContent);
 
-    const nextEditorElement = nextEditor.container.parentElement;
-    nextEditorElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Set content in next editor
+    try {
+      nextEditor.setContents(overflowContent);
 
-    nextEditor.focus();
-    nextEditor.setSelection(0, 0);
+      const nextEditorElement = nextEditor.container.parentElement;
+      nextEditorElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      nextEditor.focus();
+      nextEditor.setSelection(0, 0);
+    } catch (error) {
+      console.error("Error setting contents in next editor:", error);
+    }
   }
 }
 

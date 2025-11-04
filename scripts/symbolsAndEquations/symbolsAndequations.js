@@ -272,8 +272,6 @@ function activateMathField(mathFieldToActivate) {
   activeMathField.focus();
 }
 
-// --- END: NEW LOGIC ---
-
 function insertIntoQuill(data) {
   const quill = window.focusedEditor;
   if (!quill) return;

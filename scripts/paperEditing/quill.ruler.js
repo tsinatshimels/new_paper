@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // -- THIS IS THE FIX: SEPARATE THE SCALES --
   // This scale is ONLY for drawing the ruler marks with the desired small gaps. It never changes.
-  const RULER_DRAWING_SCALE = 0.37;
+  const RULER_DRAWING_SCALE = 0.453;
   // This will hold the real, live scale of the paper for accurate calculations.
   let realCurrentScale = RULER_DRAWING_SCALE;
 
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i <= 1600; i += increment) {
       const mark = document.createElement("div");
       mark.className = "ruler-mark";
-      mark.style.top = `${i * RULER_DRAWING_SCALE}px`;
+      mark.style.top = `${i * RULER_DRAWING_SCALE + 5}px`;
 
       if (i % PIXELS_PER_INCH === 0) {
         mark.classList.add("major");
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
       rect: paperRect,
     } = getQlEditorMetrics();
     const rulerRect = hRuler.getBoundingClientRect();
-    hRulerMarks.style.left = `${paperRect.left - rulerRect.left}px`;
+    hRulerMarks.style.left = `${paperRect.left - rulerRect.left - 15}px`;
     const indentPx = (formats.indent || 0) * INDENT_WIDTH_PX;
     const textIndentPx = parseFloat(formats["text-indent"] || "0px");
     const rightIndentPx = parseFloat(formats["right-indent"] || "0px");

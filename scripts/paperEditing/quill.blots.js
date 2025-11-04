@@ -1,6 +1,7 @@
 const Inline = Quill.import("blots/inline");
 const Block = Quill.import("blots/block");
 const BlockEmbed = Quill.import("blots/block/embed");
+
 // const BlockQuote = Quill.import("formats/blockquote");
 
 //////////////////////////////////////////
@@ -1680,17 +1681,55 @@ CommentBlot.blotName = "comment";
 CommentBlot.tagName = "span"; // Using a span to wrap the text
 Quill.register(CommentBlot);
 
-// class CommentHighlight extends Inline {
-//   static create(value) {
-//     let node = super.create();
-//     node.setAttribute("data-comment-id", value);
-//     node.classList.add("comment-highlight");
-//     return node;
-//   }
-//   static formats(node) {
-//     return node.getAttribute("data-comment-id");
-//   }
-// }
-// CommentHighlight.blotName = "comment";
-// CommentHighlight.tagName = "span";
-// Quill.register(CommentHighlight);
+class SignatureBlot extends BlockEmbed {
+  static create(value) {
+    const node = super.create();
+    node.setAttribute("data-signature-id", value.id);
+    node.classList.add("ql-signature-container");
+
+    // Create image
+    const img = document.createElement("img");
+    img.src = value.url;
+    img.style.cssText = `
+        display: block;
+        max-width: 200px;
+        max-height: 100px;
+      `;
+    node.appendChild(img);
+
+    // Create resize handles
+    ["nw", "ne", "sw", "se"].forEach((handle) => {
+      const handleEl = document.createElement("div");
+      handleEl.className = `resize-handle resize-handle-${handle}`;
+      handleEl.setAttribute("data-direction", handle);
+      node.appendChild(handleEl);
+    });
+
+    // Create tooltip
+    const tooltip = document.createElement("div");
+    tooltip.className = "image-action-tooltip";
+
+    tooltip.innerHTML = `
+        <button class="img-rotate" title="Rotate">
+           <img src="./icons/rotate-sign.svg" />
+        </button>
+        <button class="img-delete" title="Delete">
+           <img src="./icons/delete-sign.svg" />
+        </button>
+      `;
+    node.appendChild(tooltip);
+
+    return node;
+  }
+
+  static value(node) {
+    return {
+      id: node.getAttribute("data-signature-id"),
+      url: node.querySelector("img").src,
+    };
+  }
+}
+
+SignatureBlot.blotName = "signature";
+SignatureBlot.tagName = "div";
+Quill.register(SignatureBlot);
