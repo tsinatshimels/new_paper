@@ -1,4 +1,4 @@
-// quill.ruler.js (Final Version with Separated Drawing and Real Scale)
+// quill.ruler.js (Final Version with Google Docs Vertical Ruler Functionality)
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- 1. DOM Element References ---
@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const vRuler = document.getElementById("vertical-ruler");
   const hRulerMarks = document.getElementById("h-ruler-marks");
   const vRulerMarks = document.getElementById("v-ruler-marks");
+  // const topMarginMarker = document.getElementById("top-margin-marker"); // REMOVED: No longer needed
   const leftIndentMarker = document.getElementById("left-indent-marker");
   const rightIndentMarker = document.getElementById("right-indent-marker");
   const editorContainer = document.getElementById("editor-container");
@@ -24,17 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 2. State and Constants ---
   const PIXELS_PER_INCH = 96;
   const INDENT_WIDTH_PX = 48;
+  const maxRulerHeightInPixels = 16 * PIXELS_PER_INCH;
 
   // -- THIS IS THE FIX: SEPARATE THE SCALES --
-  // This scale is ONLY for drawing the ruler marks with the desired small gaps. It never changes.
   const RULER_DRAWING_SCALE = 0.453;
-  // This will hold the real, live scale of the paper for accurate calculations.
   let realCurrentScale = RULER_DRAWING_SCALE;
 
   let isRulerVisible = false;
 
   // --- 3. Quill Integration ---
   const Parchment = Quill.import("parchment");
+
+  // Register existing horizontal Attributors (they are working)
   Quill.register(
     new Parchment.Attributor.Style("right-indent", "margin-right", {
       scope: Parchment.Scope.BLOCK,
@@ -45,6 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
       scope: Parchment.Scope.BLOCK,
     })
   );
+  Quill.register(
+    new Parchment.Attributor.Style("top-margin", "margin-top", {
+      scope: Parchment.Scope.BLOCK,
+    })
+  );
+  // REMOVED: All TopMargin Attributor/Blot logic
 
   const getQlEditorMetrics = () => {
     const qlEditor = editorPaperWrapper.querySelector(".ql-editor");
@@ -56,12 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
       qlEditor.closest(".editor_paper")
     ).transform;
 
-    // This function now only updates the REAL scale for calculations.
     if (transform && transform !== "none") {
       const matrix = transform.match(/matrix\(([^)]+)\)/);
       realCurrentScale = matrix ? parseFloat(matrix[1].split(", ")[0]) : 1;
     } else {
-      // If no transform is found, assume it might be 1 for calculations
       realCurrentScale = 1;
     }
 
@@ -76,28 +82,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 4. Ruler Update Logic ---
   function fullRulerUpdate() {
     if (!isRulerVisible) return;
-    getQlEditorMetrics(); // Update the real scale first
+    getQlEditorMetrics();
     const mainBoardWidth = mainWhitePaperBoard.clientWidth;
     hRuler.style.width = `${mainBoardWidth - 30}px`;
+
     vRuler.style.height = `${editorContainer.clientHeight}px`;
     generateRulerMarks();
     updateRulerMarkers();
+    // REMOVED: updateTopMarginMarker();
   }
 
   function generateRulerMarks() {
     hRulerMarks
       .querySelectorAll(".ruler-mark, .ruler-number")
       .forEach((el) => el.remove());
+
+    // Clean up all vertical marks/numbers (no marker to worry about preserving)
     vRulerMarks.innerHTML = "";
 
     const SUBDIVISIONS_PER_INCH = 4;
     const increment = PIXELS_PER_INCH / SUBDIVISIONS_PER_INCH;
     const maxRulerWidthInPixels = 16 * PIXELS_PER_INCH;
 
+    // Horizontal Ruler Marks
     for (let i = 0; i <= maxRulerWidthInPixels; i += increment) {
       const mark = document.createElement("div");
       mark.className = "ruler-mark";
-      // This now CONSISTENTLY uses the drawing scale for visual appearance.
       mark.style.left = `${i * RULER_DRAWING_SCALE}px`;
       if (i % PIXELS_PER_INCH === 0) {
         mark.classList.add("major");
@@ -113,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Vertical Ruler Marks
-    for (let i = 0; i <= 1600; i += increment) {
+    for (let i = 0; i <= maxRulerHeightInPixels; i += increment) {
       const mark = document.createElement("div");
       mark.className = "ruler-mark";
       mark.style.top = `${i * RULER_DRAWING_SCALE + 5}px`;
@@ -128,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (i % (PIXELS_PER_INCH / 2) === 0) {
         mark.classList.add("half-inch");
       }
-
       vRulerMarks.appendChild(mark);
     }
   }
@@ -152,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Marker positioning must use the REAL, live scale.
     leftIndentMarker.style.left = `${
-      (paddingLeft + indentPx) * realCurrentScale
+      (paddingLeft + indentPx) * realCurrentScale + 15
     }px`;
     rightIndentMarker.style.left = `${
       scaledWidth - (paddingRight + rightIndentPx) * realCurrentScale
@@ -231,12 +240,87 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // quill.ruler.js (Final Version with Corrected Vertical Content Margin)
+
+  function createVerticalTopMarginHandler(vRuler) {
+    vRuler.setAttribute("draggable", "false");
+
+    const mainWhitePaperBoard = document.getElementById(
+      "main_white_paper_board"
+    );
+
+    let scrollOffset = 0;
+
+    // ✅ Scroll Sync: keep the ruler fixed while paper scrolls
+    mainWhitePaperBoard.addEventListener("scroll", () => {
+      const scrollTop = mainWhitePaperBoard.scrollTop;
+      vRuler.style.transform = `translateY(${-scrollTop}px)`;
+      scrollOffset = scrollTop;
+    });
+
+    vRuler.addEventListener("mousedown", (e) => {
+      const qlEditor = window.focusedEditor
+        ? window.focusedEditor.container.querySelector(".ql-editor")
+        : null;
+      if (!qlEditor) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const dragStartY = e.pageY;
+      const initialTop = parseFloat(qlEditor.style.marginTop || "0");
+
+      document.body.classList.add("dragging-ns-resize");
+
+      const onMouseMove = (moveEvent) => {
+        requestAnimationFrame(() => {
+          // Account for zoom/scale and scroll offset
+          const deltaY = (moveEvent.pageY - dragStartY) / realCurrentScale;
+          const newTop = Math.max(0, initialTop + deltaY);
+          qlEditor.style.marginTop = `${newTop}px`;
+        });
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        document.body.classList.remove("dragging-ns-resize");
+
+        // Reset ruler background
+        vRuler.style.background = "";
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    });
+  }
+
+  // ... (rest of the file remains the same) ...
+
+  // --- 6. Scroll Synchronization Logic ---
+  function syncRulerScroll() {
+    // The element containing the scrollbar for the paper content.
+    const editorScrollElement = editorContainer;
+    if (editorScrollElement) {
+      // Sync the ruler's scroll top with the editor's scroll top
+      vRuler.scrollTop = editorScrollElement.scrollTop;
+    }
+  }
+
+  // Attach the scroll listener to the element that scrolls the paper content
+  editorContainer.addEventListener("scroll", syncRulerScroll);
+
   createDragHandler(leftIndentMarker, "left-indent");
   createDragHandler(rightIndentMarker, "right-indent");
 
-  // --- 6. Event Listeners ---
+  // NEW: Attach the drag handler to the vertical ruler element
+  createVerticalTopMarginHandler(vRuler);
+
+  // --- 7. Event Listeners ---
   const editorUpdateHandler = () => {
-    if (isRulerVisible) updateRulerMarkers();
+    if (isRulerVisible) {
+      updateRulerMarkers();
+    }
   };
 
   function attachQuillListeners() {

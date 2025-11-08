@@ -45,6 +45,9 @@ function createNewEditor() {
       "align",
       "list",
       "paragraphSpacing",
+      "top-margin",
+      "right-indent", // This must be added even if it appeared to be working, for stability
+      "text-indent",
       "indent",
       "chart",
       "divider",
@@ -254,13 +257,18 @@ style.textContent = `
     position: relative;
     z-index: 1;
   }
+      .ql-editor > *:first-child {
+      margin-top: 0 !important;
+  }
 
   .ql-editor {
-    padding: 0;
+padding-left: 0; 
+    padding-right: 0;
+    padding-bottom: 0;
     height: 100%;
     font-size: 16px;
     line-height: 1.5;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
 
   .paper-editor {
