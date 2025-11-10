@@ -50,6 +50,7 @@
 }
 .signature-modal-header .tabs {
   margin-bottom: 5px;
+  border-bottom: none;
 }
 .signature-modal-header .tabs button {
   width: 50%;
@@ -91,6 +92,12 @@
   width: 100%;
   height: 200px;
   background: #f2f4f7;
+  background-color: #f2f4f7; /* Solid background color */
+  background-image: radial-gradient(
+    #c5c9d6 1.5px,
+    transparent 1.5px
+  ); /* Dot color and size */
+  background-size: 20px 20px;
 }
 
 .signature-controls {
@@ -103,10 +110,39 @@
   padding: 5px 0px;
 }
 
-#add-signature-btn,
-#clear-canvas-btn {
+.signature-controls .control-group-color {
+  border-radius: 8px;
+  border: 1px solid #d0d5dd;
+  display: flex;
+}
+.signature-controls .control-group-border {
+  border-left: 1px solid #d0d5dd;
+  height: 32px;
+}
+.signature-controls .control-group-thickness {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.signature-controls #thickness {
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#add-signature-btn {
   margin-top: 20px;
   padding: 10px 20px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  border-radius: 32px;
+  font-size: 16px;
+}
+#clear-canvas-btn {
   width: 100%;
   border: none;
   cursor: pointer;
@@ -116,11 +152,6 @@
 #add-signature-btn {
   background-color: #1c64f2;
   color: white;
-}
-#clear-canvas-btn {
-  background-color: #f1f1f1;
-  color: #333;
-  margin-top: 10px;
 }
 
 /* Signature Gallery */
@@ -238,9 +269,9 @@
   position: absolute;
   width: 12px;
   height: 12px;
-  background-color: #7633f9;
-  border: 2px solid white;
-  border-radius: 2px;
+  background-color: white;
+  border: 2px solid #8837e9;
+  border-radius: 50%;
   z-index: 11;
   display: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -273,17 +304,48 @@
   right: -6px;
   cursor: se-resize;
 }
+/* New Midpoint Resize Handles */
 
+.resize-handle-n {
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%); /* Centers the handle horizontally */
+  cursor: n-resize; /* North resize cursor */
+}
+
+.resize-handle-s {
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%); /* Centers the handle horizontally */
+  cursor: s-resize; /* South resize cursor */
+}
+
+.resize-handle-w {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%); /* Centers the handle vertically */
+  cursor: w-resize; /* West resize cursor */
+}
+
+.resize-handle-e {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%); /* Centers the handle vertically */
+  cursor: e-resize; /* East resize cursor */
+}
 /* Tooltip Styles */
 .image-action-tooltip {
   position: absolute;
   top: -50px;
-  left: 50%;
-  transform: translateX(-50%);
+
   border-radius: 8px;
   z-index: 20;
   display: none;
   align-items: center;
+}
+.image-action-tooltip img {
+  width: 40px;
+  height: 40px;
 }
 
 .ql-signature-container.selected .image-action-tooltip {
@@ -300,10 +362,6 @@
   justify-content: center;
   border-radius: 6px;
   transition: background-color 0.2s;
-}
-
-.image-action-tooltip button:hover {
-  background-color: #444;
 }
 
 .image-action-tooltip button svg {

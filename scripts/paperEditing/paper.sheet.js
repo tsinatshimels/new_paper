@@ -30,6 +30,7 @@ let buttonsToDisable = [
   "sizemug_row_grid_top--btn",
   "sizemug_outline_grid--btn",
   "sizemug_frame--btn",
+  "toggle-ruler-btn",
 ];
 
 let toastTimeout;
@@ -110,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.currentEditorMode = mode;
     updateModeSwitcherAppearance(mode);
     if (mode !== "true") {
-      // rulerSystem.style.display = "none";
+      rulerSystem.style.display = "none";
       sheetTools.classList.add("active");
       buttonsToDisable.forEach((btnId) => {
         const btn = document.getElementById(btnId);

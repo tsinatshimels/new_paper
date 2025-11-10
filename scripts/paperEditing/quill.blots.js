@@ -1698,7 +1698,7 @@ class SignatureBlot extends BlockEmbed {
     node.appendChild(img);
 
     // Create resize handles
-    ["nw", "ne", "sw", "se"].forEach((handle) => {
+    ["nw", "ne", "sw", "se", "n", "s", "e", "w"].forEach((handle) => {
       const handleEl = document.createElement("div");
       handleEl.className = `resize-handle resize-handle-${handle}`;
       handleEl.setAttribute("data-direction", handle);

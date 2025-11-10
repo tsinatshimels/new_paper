@@ -57,6 +57,88 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const clearCanvas = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
   clearCanvasBtn.addEventListener("click", clearCanvas);
+  // Function to calculate the bounding box of drawn content (keep this as provided before)
+  function getBoundingBox(canvas, ctx) {
+    const w = canvas.width;
+    const h = canvas.height;
+    const imageData = ctx.getImageData(0, 0, w, h).data;
+
+    let minX = w,
+      maxX = 0,
+      minY = h,
+      maxY = 0;
+    let found = false;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const alphaIndex = (y * w + x) * 4 + 3;
+        if (imageData[alphaIndex] > 0) {
+          found = true;
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        }
+      }
+    }
+
+    if (!found) return null;
+
+    const padding = 5;
+    minX = Math.max(0, minX - padding);
+    minY = Math.max(0, minY - padding);
+    maxX = Math.min(w, maxX + padding);
+    maxY = Math.min(h, maxY + padding);
+
+    const boxWidth = maxX - minX;
+    const boxHeight = maxY - minY;
+
+    return { x: minX, y: minY, w: boxWidth, h: boxHeight };
+  }
+
+  // *** NEW FUNCTION: Handles asynchronous cropping of a stored image URL ***
+  function getCroppedDataUrl(originalDataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        // 1. Draw the stored image onto a temp canvas
+        const boxCanvas = document.createElement("canvas");
+        boxCanvas.width = img.width;
+        boxCanvas.height = img.height;
+        const boxCtx = boxCanvas.getContext("2d");
+        boxCtx.drawImage(img, 0, 0);
+
+        // 2. Get the bounding box
+        const box = getBoundingBox(boxCanvas, boxCtx);
+
+        if (box && box.w > 0 && box.h > 0) {
+          // 3. Create a final cropped canvas
+          const finalCanvas = document.createElement("canvas");
+          const finalCtx = finalCanvas.getContext("2d");
+          finalCanvas.width = box.w;
+          finalCanvas.height = box.h;
+
+          // 4. Draw the cropped section onto the final canvas
+          finalCtx.drawImage(
+            boxCanvas,
+            box.x,
+            box.y,
+            box.w,
+            box.h, // Source: the full drawn image
+            0,
+            0,
+            box.w,
+            box.h // Destination: the new small canvas
+          );
+          resolve(finalCanvas.toDataURL());
+        } else {
+          // Fallback: return original if cropping failed
+          resolve(originalDataUrl);
+        }
+      };
+      img.src = originalDataUrl;
+    });
+  }
 
   // --- Signature Management ---
   addSignatureBtn.addEventListener("click", () => {
@@ -153,14 +235,23 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== UPDATED INSERT FUNCTION - USING CUSTOM BLOT ONLY =====
   function insertSignature(id) {
     const signature = signatures.find((s) => s.id === id);
-    if (signature && window.focusedEditor) {
+    if (!signature || !window.focusedEditor) return;
+
+    // 1. Get the original URL
+    const originalDataUrl = signature.url;
+
+    // 2. ASYNC: Get the tightly cropped URL
+    getCroppedDataUrl(originalDataUrl).then((croppedDataUrl) => {
       const range = window.focusedEditor.getSelection(true);
 
       // Add positioning to signature data
       signatureCount++;
       const positionOffset = (signatureCount - 1) * 30;
+
+      // 3. Pass the CROPPED URL to the Quill blot
       const signatureWithPosition = {
         ...signature,
+        url: croppedDataUrl, // The key change: use the CROPPED URL for display
         positionOffset: positionOffset,
       };
 
@@ -183,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
           setupSignatureContainerEvents(container);
         }
       }, 10);
-    }
+    });
   }
 
   // ===== SETUP CONTAINER EVENTS =====
@@ -310,6 +401,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.defaultView.getComputedStyle(img).height,
         10
       );
+      // *** NEW: Capture starting position for repositioning during resizing ***
+      startContainerLeft = parseInt(container.style.left) || 0;
+      startContainerTop = parseInt(container.style.top) || 0;
+      // **********************************************************************
 
       document.addEventListener("mousemove", resize);
       document.addEventListener("mouseup", stopResize);
@@ -325,29 +420,47 @@ document.addEventListener("DOMContentLoaded", function () {
       let newHeight = startHeight;
 
       switch (currentHandle) {
-        case "se":
+        // CORNER RESIZING (Existing Logic)
+        case "se": // South-East
           newWidth = startWidth + dx;
           newHeight = startHeight + dy;
           break;
-        case "sw":
+        case "sw": // South-West (change position for left move)
           newWidth = startWidth - dx;
           newHeight = startHeight + dy;
-          container.style.left = parseInt(container.style.left) + dx + "px";
+          container.style.left = startContainerLeft + dx + "px";
           break;
-        case "ne":
+        case "ne": // North-East (change position for top move)
           newWidth = startWidth + dx;
           newHeight = startHeight - dy;
-          container.style.top = parseInt(container.style.top) + dy + "px";
+          container.style.top = startContainerTop + dy + "px";
           break;
-        case "nw":
+        case "nw": // North-West (change position for top and left move)
           newWidth = startWidth - dx;
           newHeight = startHeight - dy;
-          container.style.left = parseInt(container.style.left) + dx + "px";
-          container.style.top = parseInt(container.style.top) + dy + "px";
+          container.style.left = startContainerLeft + dx + "px";
+          container.style.top = startContainerTop + dy + "px";
           break;
+
+        // *** NEW MIDPOINT RESIZING LOGIC ***
+        case "n": // North (only change height and top position)
+          newHeight = startHeight - dy;
+          container.style.top = startContainerTop + dy + "px";
+          break;
+        case "s": // South (only change height)
+          newHeight = startHeight + dy;
+          break;
+        case "e": // East (only change width)
+          newWidth = startWidth + dx;
+          break;
+        case "w": // West (only change width and left position)
+          newWidth = startWidth - dx;
+          container.style.left = startContainerLeft + dx + "px";
+          break;
+        // **********************************
       }
 
-      // Set minimum size
+      // Set minimum size (remains the same)
       newWidth = Math.max(50, newWidth);
       newHeight = Math.max(30, newHeight);
 
