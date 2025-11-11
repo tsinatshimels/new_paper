@@ -1,0 +1,212 @@
+/* Smart Chips Dropdown Menu */
+.smart_chips_document_element {
+  position: relative;
+}
+.smart-chips-dropdown {
+  display: none;
+  position: absolute;
+
+  left: 210px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 5px 0;
+  z-index: 100;
+  min-width: 180px;
+}
+.smart-chips-dropdown.open {
+  display: block;
+}
+.chip-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  cursor: pointer;
+  gap: 10px;
+  font-size: 14px;
+}
+.chip-option:hover {
+  background-color: #f1f1f1;
+}
+.chip-option svg {
+  flex-shrink: 0;
+}
+
+/* Quill Chip Styles (Element in the editor) */
+.smart-chip-wrapper {
+  display: flex;
+
+  gap: 5px;
+  padding: 3px 8px;
+  margin: 0 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent; /* Default transparent border */
+  background-color: #f0f0f0;
+  font-size: 0.95em;
+  user-select: none; /* Prevent text selection inside chip */
+}
+
+.smart-chip-wrapper:hover {
+  background-color: #e6e6e6;
+}
+.smart-chip-wrapper.selected {
+  border-color: #4a90e2; /* Blue border when selected */
+  background-color: #e9f2ff;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+.smart-chip-wrapper span {
+  font-weight: 500;
+  line-height: 1;
+}
+.smart-chip-wrapper svg {
+  margin-top: -1px; /* Align icon better with text */
+}
+
+/* Modal/Dropdown for Chip Interaction (Calendar, Lists, etc.) */
+#chip-interaction-modal {
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  z-index: 1050;
+  display: none;
+  min-width: 250px;
+  max-width: 320px;
+  overflow: hidden;
+}
+.chip-modal-content {
+  padding: 8px;
+}
+.chip-modal-search {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  box-sizing: border-box; /* Important */
+}
+.chip-modal-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.chip-modal-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.chip-modal-item:hover {
+  background-color: #f1f1f1;
+}
+.chip-modal-item strong {
+  display: block;
+}
+.chip-modal-item small {
+  color: #666;
+}
+.chip-modal-error {
+  padding: 10px;
+  color: #888;
+  font-style: italic;
+  font-size: 14px;
+}
+.api-attribution {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  color: #999;
+  padding: 8px 0 0;
+  text-decoration: none;
+}
+.api-attribution:hover {
+  text-decoration: underline;
+}
+
+/* Specific styles for People chip list */
+.chip-modal-item-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chip-modal-item-person img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Skeleton loader for People list */
+.chip-modal-item-skeleton {
+  height: 40px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+  margin: 5px 0;
+}
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Specific styles for Event chip */
+.chip-modal-event .chip-modal-search {
+  margin: 8px 0;
+}
+.event-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+.event-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #555;
+  border-bottom: 2px solid transparent;
+}
+.event-tabs button.active {
+  color: #4a90e2;
+  border-bottom-color: #4a90e2;
+}
+
+/* Specific styles for Date picker */
+#chip-interaction-modal input[type="date"] {
+  border: none;
+  padding: 5px;
+  width: 100%;
+}
+/* Fix for chip content to prevent text selection */
+.smart-chip-wrapper * {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Ensure the chip wrapper handles all clicks */
+.smart-chip-wrapper {
+  cursor: pointer;
+  position: relative;
+}
+
+/* Fix for Quill editor chip alignment */
+.ql-editor .smart-chip-wrapper {
+  display: inline-flex !important;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.2;
+}
+
+/* Modal z-index fix */
+#chip-interaction-modal {
+  z-index: 10000;
+}

@@ -1723,6 +1723,11 @@ class SignatureBlot extends BlockEmbed {
   }
 
   static value(node) {
+    const img = node.querySelector("img"); // Find the image first
+
+    if (!img) {
+      return {};
+    }
     return {
       id: node.getAttribute("data-signature-id"),
       url: node.querySelector("img").src,
@@ -1733,3 +1738,34 @@ class SignatureBlot extends BlockEmbed {
 SignatureBlot.blotName = "signature";
 SignatureBlot.tagName = "div";
 Quill.register(SignatureBlot);
+
+// safer SmartChipBlot
+
+class SmartChipBlot extends BlockEmbed {
+  static create(value) {
+    const node = super.create();
+    node.classList.add("smart-chip-wrapper");
+    node.dataset.chipType = value.type || "unknown";
+    node.dataset.value = value.value || "";
+    node.innerHTML = `
+      <span class="smart-chip-icon">${value.icon || ""}</span>
+      <span class="smart-chip-label">${value.display || "Chip"}</span>
+    `;
+    return node;
+  }
+
+  static value(node) {
+    return {
+      type: node.dataset.chipType,
+      value: node.dataset.value,
+      icon: node.querySelector(".smart-chip-icon")?.innerHTML || "",
+      display: node.querySelector(".smart-chip-label")?.textContent || "",
+    };
+  }
+}
+
+SmartChipBlot.blotName = "smart-chip";
+SmartChipBlot.tagName = "span";
+SmartChipBlot.className = "smart-chip-wrapper";
+
+Quill.register(SmartChipBlot);

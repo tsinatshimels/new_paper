@@ -1,0 +1,322 @@
+// smartChips.js
+
+const smartChipsButton = document.getElementById("smartChups");
+const dropdown = document.getElementById("smart-chips-dropdown");
+const chipOptions = dropdown.querySelectorAll(".chip-option");
+
+// --- 1. Dropdown Toggle Logic ---
+smartChipsButton.addEventListener("click", (e) => {
+  e.stopPropagation();
+  dropdown.classList.toggle("open");
+});
+
+document.addEventListener("click", () => {
+  dropdown.classList.remove("open");
+  closeChipInteractionModal();
+  deselectChips();
+});
+
+dropdown.addEventListener("click", (e) => e.stopPropagation());
+
+// --- 2. State and Helper Functions ---
+let activeChipNode = null;
+let interactionModal = null;
+
+function deselectChips() {
+  document.querySelectorAll(".smart-chip-wrapper.selected").forEach((chip) => {
+    chip.classList.remove("selected");
+  });
+}
+
+function closeChipInteractionModal() {
+  if (interactionModal) {
+    interactionModal.remove();
+    interactionModal = null;
+  }
+}
+
+// --- FIXED updateChip that updates label inside the editor ---
+function updateChip(editor, chipNode, newLabel) {
+  if (!activeChipNode || !window.focusedEditor) return;
+
+  const quill = window.focusedEditor;
+  let blot;
+
+  try {
+    blot = Quill.find(activeChipNode);
+  } catch (err) {
+    blot = null;
+  }
+
+  let originalValue = null;
+  try {
+    if (blot && typeof blot.value === "function") {
+      originalValue = blot.value();
+    } else {
+      originalValue = SmartChipBlot.value(activeChipNode);
+    }
+  } catch (err) {
+    originalValue = SmartChipBlot.value(activeChipNode);
+  }
+
+  if (!originalValue)
+    originalValue = { type: "unknown", icon: "", display: "", value: "" };
+
+  const newData = {
+    ...originalValue,
+    display: newLabel,
+    value: newLabel,
+  };
+
+  try {
+    const blotIndex = blot
+      ? quill.getIndex(blot)
+      : quill.getSelection(true)?.index || 0;
+    quill.formatText(blotIndex, 1, "smart-chip", newData, "user");
+  } catch (err) {
+    console.error("Failed to update chip via formatText:", err);
+    try {
+      const blotIndex = quill.getSelection(true)?.index || 0;
+      quill.deleteText(blotIndex, 1, "user");
+      quill.insertEmbed(blotIndex, "smart-chip", newData, "user");
+    } catch (err2) {
+      console.error("Fallback replace also failed:", err2);
+    }
+  }
+
+  // Update the visual label inside the DOM
+  const label = chipNode.querySelector(".smart-chip-label");
+  if (label) label.textContent = newLabel;
+
+  closeChipInteractionModal();
+  deselectChips();
+}
+
+// --- 3. Chip Interaction UI Rendering ---
+
+function renderDateInteraction(modal) {
+  modal.innerHTML = `<div class="chip-modal-content"><input type="date" id="date-selector"></div>`;
+  const dateSelector = modal.querySelector("#date-selector");
+
+  dateSelector.addEventListener("change", (e) => {
+    if (!e.target.value) return;
+    const selectedDate = new Date(e.target.value);
+    const displayFormat = selectedDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    updateChip(window.focusedEditor, activeChipNode, displayFormat);
+  });
+
+  setTimeout(() => {
+    try {
+      dateSelector.showPicker();
+    } catch (error) {
+      console.warn("showPicker() not supported by this browser");
+    }
+  }, 10);
+}
+
+function renderEventInteraction(modal) {
+  const mockData = {
+    public: [{ name: "Quarterly Review", time: "10:00 AM", date: "Today" }],
+    private: [{ name: "Team Sync", time: "11:30 AM", date: "Tomorrow" }],
+  };
+  modal.innerHTML = `
+    <div class="chip-modal-content chip-modal-event">
+      <div class="event-tabs">
+        <button class="active" data-tab="public">Public</button>
+        <button data-tab="private">Private</button>
+      </div>
+      <input type="text" class="chip-modal-search" placeholder="Search events...">
+      <div class="chip-modal-list" id="event-list"></div>
+    </div>`;
+
+  const eventList = modal.querySelector("#event-list");
+  const searchInput = modal.querySelector(".chip-modal-search");
+  const tabs = modal.querySelectorAll(".event-tabs button");
+
+  let activeTab = "public";
+
+  const renderList = (filter = "") => {
+    eventList.innerHTML = "";
+    mockData[activeTab]
+      .filter((e) => e.name.toLowerCase().includes(filter.toLowerCase()))
+      .forEach((event) => {
+        const item = document.createElement("div");
+        item.className = "chip-modal-item";
+        item.innerHTML = `<strong>${event.name}</strong><small>${event.date} at ${event.time}</small>`;
+        item.addEventListener("click", () =>
+          updateChip(window.focusedEditor, activeChipNode, event.name)
+        );
+        eventList.appendChild(item);
+      });
+  };
+
+  tabs.forEach((tab) =>
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      activeTab = tab.dataset.tab;
+      renderList(searchInput.value);
+    })
+  );
+
+  searchInput.addEventListener("input", () => renderList(searchInput.value));
+  renderList();
+  searchInput.focus();
+}
+
+function renderPeopleInteraction(modal) {
+  modal.innerHTML = `
+    <div class="chip-modal-content">
+      <div class="chip-modal-list" id="people-list">
+        <div class="chip-modal-item-skeleton"></div>
+        <div class="chip-modal-item-skeleton"></div>
+      </div>
+    </div>`;
+
+  const peopleList = modal.querySelector("#people-list");
+
+  fetch("https://randomuser.me/api/?results=10&seed=papersync")
+    .then((res) => res.json())
+    .then((data) => {
+      peopleList.innerHTML = "";
+      data.results.forEach((user) => {
+        const fullName = `${user.name.first} ${user.name.last}`;
+        const item = document.createElement("div");
+        item.className = "chip-modal-item chip-modal-item-person";
+        item.innerHTML = `<img src="${user.picture.thumbnail}" alt="${fullName}"> <span>${fullName}</span>`;
+        item.addEventListener("click", () =>
+          updateChip(window.focusedEditor, activeChipNode, fullName)
+        );
+        peopleList.appendChild(item);
+      });
+    })
+    .catch(() => {
+      peopleList.innerHTML = `<div class="chip-modal-error">Failed to load users.</div>`;
+    });
+}
+
+function renderPlaceInteraction(modal) {
+  // Using mock data to avoid needing an API key
+  const mockPlaces = [
+    "New York, USA",
+    "London, UK",
+    "Addis Ababa, Ethiopia",
+    "Tokyo, Japan",
+  ];
+  modal.innerHTML = `
+    <div class="chip-modal-content">
+      <input type="text" class="chip-modal-search" placeholder="Search for a place...">
+      <div class="chip-modal-list" id="place-list"></div>
+    </div>`;
+
+  const searchInput = modal.querySelector(".chip-modal-search");
+  const placeList = modal.querySelector("#place-list");
+
+  const renderPlaces = (filter = "") => {
+    placeList.innerHTML = "";
+    mockPlaces
+      .filter((p) => p.toLowerCase().includes(filter.toLowerCase()))
+      .forEach((place) => {
+        const item = document.createElement("div");
+        item.className = "chip-modal-item";
+        item.textContent = place;
+        item.addEventListener("click", () =>
+          updateChip(window.focusedEditor, activeChipNode, place)
+        );
+        placeList.appendChild(item);
+      });
+  };
+
+  searchInput.addEventListener("input", (e) => renderPlaces(e.target.value));
+  renderPlaces();
+  searchInput.focus();
+}
+
+// --- 4. Initialize all chip logic ---
+function initializeChipFunctionality() {
+  chipOptions.forEach((option) => {
+    option.addEventListener("click", () => {
+      const chipType = option.dataset.chipType;
+      const icon = option.querySelector("svg").outerHTML;
+      const display = chipType.charAt(0).toUpperCase() + chipType.slice(1);
+      if (window.focusedEditor) {
+        const range = window.focusedEditor.getSelection(true);
+        if (!range) return;
+
+        if (range.length > 0) {
+          window.focusedEditor.deleteText(range.index, range.length, "user");
+        }
+
+        const insertIndex = range.index;
+
+        try {
+          window.focusedEditor.insertEmbed(
+            insertIndex,
+            "smart-chip",
+            { type: chipType, display, icon, value: display },
+            "user"
+          );
+          window.focusedEditor.insertText(insertIndex + 1, " ", "user");
+          window.focusedEditor.setSelection(insertIndex + 2, 0, "user");
+          dropdown.classList.remove("open");
+        } catch (err) {
+          console.error("Error inserting smart-chip:", err);
+        }
+      }
+    });
+  });
+
+  window.focusedEditor.root.addEventListener("click", (e) => {
+    const clickedChip = e.target.closest(".smart-chip-wrapper");
+    if (!clickedChip) return;
+
+    e.stopPropagation();
+    if (clickedChip.classList.contains("selected")) return;
+
+    closeChipInteractionModal();
+    deselectChips();
+
+    clickedChip.classList.add("selected");
+    activeChipNode = clickedChip;
+
+    const chipType = clickedChip.dataset.chipType;
+    const rect = clickedChip.getBoundingClientRect(),
+      editorRect = window.focusedEditor.root.getBoundingClientRect();
+
+    interactionModal = document.createElement("div");
+    interactionModal.id = "chip-interaction-modal";
+    interactionModal.style.top = `${rect.bottom - editorRect.top + 5}px`;
+    interactionModal.style.left = `${rect.left - editorRect.left}px`;
+    interactionModal.addEventListener("click", (e) => e.stopPropagation());
+
+    switch (chipType) {
+      case "date":
+        renderDateInteraction(interactionModal);
+        break;
+      case "event":
+        renderEventInteraction(interactionModal);
+        break;
+      case "people":
+        renderPeopleInteraction(interactionModal);
+        break;
+      case "place":
+        renderPlaceInteraction(interactionModal);
+        break;
+    }
+
+    window.focusedEditor.root.appendChild(interactionModal);
+    interactionModal.style.display = "block";
+  });
+}
+
+// --- 5. Wait until the editor is ready ---
+const editorInitializationCheck = setInterval(() => {
+  if (window.focusedEditor && window.focusedEditor.root) {
+    clearInterval(editorInitializationCheck);
+    initializeChipFunctionality();
+  }
+}, 100);

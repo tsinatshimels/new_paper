@@ -157,6 +157,7 @@
     <link rel="stylesheet" href="./css/paper_editing/sheet.border.css" />
     <link rel="stylesheet" href="./css/paper_editing/first.time.message.css" />
     <link rel="stylesheet" href="./css/paper_editing/signature.css" />
+    <link rel="stylesheet" href="./css/paper_editing/smart-chips.css" />
 
     <!-- share modal style -->
     <link rel="stylesheet" href="./css/share.modal.css" />
@@ -1103,6 +1104,42 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 36 36"><rect width="36" height="36" fill="none"/><path fill="#000" d="M17 33.9c-3.9 0-7.9-1.5-10.5-4.5c-.9.7-2 1.3-3.1 1.8c-.5.2-1.1 0-1.3-.5s0-1.1.5-1.3q1.5-.6 2.7-1.5c-1.2-1.9-1.9-4.3-1.9-7.1c0-5.3 2.5-8.1 4.8-8.1c1.5 0 3.2 1.2 3.2 4.7c0 4.7-1.1 8.2-3.5 10.8c2.2 2.6 5.6 3.9 9 3.9c.6 0 1 .4 1 1s-.3.8-.9.8M8.2 14.6c-1 0-2.8 1.8-2.8 6.1c0 2.2.5 4.1 1.4 5.6c1.8-2.1 2.7-5.1 2.7-9.1c0-1.5-.5-2.6-1.3-2.6m25.1-9.8c-.8-1.4-2.1-2.4-3.6-2.8c-.5-.1-1.1.2-1.2.7l-.9 3.4L26 3.3c-.1-.2-.4-.4-.7-.5s-.6 0-.8.2c-1.1.8-1.8 1.9-2.2 3.2l-4.2 15.4c-.4 1.5-.2 3.2.6 4.6c.6 1.1 1.6 1.9 2.7 2.5l-1.1 4c-.1.5.2 1.1.7 1.2h.3c.4 0 .8-.3 1-.7l1.1-3.9h.6c1 0 2-.3 3-.8c1.4-.8 2.4-2.1 2.8-3.6l1.6-5.8l1.6-5.8c.1-.4 0-.8-.4-1.1c-.3-.2-.8-.3-1.1-.1l-4 2.3l.6-2.1l5.7-3.2c.3-.2.5-.5.5-.8c-.1-1.2-.4-2.4-1-3.5m-9.1 2c.1-.5.3-.9.6-1.3l1.9 3.4l-1.4 5.1l-2.1-3.7zm-3.8 18.4c-.5-.9-.7-2-.4-3l2.5-9.2l2.1 3.7l-1.4 5.3l-1.3 4.7q-.9-.45-1.5-1.5m7.3-.9c-.3 1-.9 1.9-1.9 2.4c-.6.4-1.3.5-2 .5L25 23l3.7-2.1zm2.6-9.2l-.8 3.1l-3.7 2.1l.8-3.1zm-1.7-5.5l.1-.4c.1-.1.1-.3.1-.4L30 4.3c.6.3 1.1.9 1.5 1.5c.3.6.5 1.2.5 1.8z"/><path fill="none" d="M0 0h36v36H0z"/></svg>
                         <span>Sign & Signature</span>
                       </li>
+
+                      <!-- In your HTML file, place this immediately after the <li> for Smart Chips -->
+                      <li
+                        role="button"
+                        class="smart_chips_document_element"
+                        id="smartChups"
+                      >
+                        <!-- prettier-ignore -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none"><path d="M22 10.333V20H2v-9.667zm-1.176 0L19 5L3.353 10.333z"/><path d="M14.146 1.432L3 10.336l.354-.003l13.79-4.7z"/><path stroke="#000" stroke-width="2" d="M3.354 10.333h17.47L19.002 5zm0 0l13.79-4.7l-2.997-4.201l-11.148 8.904m.355-.003l-.355.003m0 0H2.5"/><g stroke="#000" stroke-linecap="square" stroke-width="2"><path d="M6.285 15.164h.004v.004h-.004z"/><path d="M22 10.333V20H2v-9.667z"/></g></g></svg>
+                        <span>Smart Chips</span>
+                      </li>
+                      <div
+                        id="smart-chips-dropdown"
+                        class="smart-chips-dropdown"
+                      >
+                        <div data-chip-type="date" class="chip-option">
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M8 14q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m4 0q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m4 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V3q0-.425.288-.712T7 2t.713.288T8 3v1h8V3q0-.425.288-.712T17 2t.713.288T18 3v1h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5zM5 8h14V6H5zm0 0V6z"/></svg>
+                          <span>Date</span>
+                        </div>
+                        <div data-chip-type="event" class="chip-option">
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M8 9q-.425 0-.712-.288T7 8t.288-.712T8 7h12q.425 0 .713.288T21 8t-.288.713T20 9zm0 4q-.425 0-.712-.288T7 12t.288-.712T8 11h12q.425 0 .713.288T21 12t-.288.713T20 13zm0 4q-.425 0-.712-.288T7 16t.288-.712T8 15h12q.425 0 .713.288T21 16t-.288.713T20 17zM4 9q-.425 0-.712-.288T3 8t.288-.712T4 7t.713.288T5 8t-.288.713T4 9m0 4q-.425 0-.712-.288T3 12t.288-.712T4 11t.713.288T5 12t-.288.713T4 13m0 4q-.425 0-.712-.288T3 16t.288-.712T4 15t.713.288T5 16t-.288.713T4 17"/></svg>
+                          <span>Event</span>
+                        </div>
+                        <div data-chip-type="people" class="chip-option">
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></g></svg>
+                          <span>People</span>
+                        </div>
+                        <div data-chip-type="place" class="chip-option">
+                          <!-- prettier-ignore -->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M12 12c-1.1 0-2-.9-2-2s.9-2 2-2s2 .9 2 2s-.9 2-2 2m6-1.8C18 6.57 15.35 4 12 4s-6 2.57-6 6.2c0 2.34 1.95 5.44 6 9.14c4.05-3.7 6-6.8 6-9.14M12 2c4.2 0 8 3.22 8 8.2c0 3.32-2.67 7.25-8 11.8c-5.33-4.55-8-8.48-8-11.8C4 5.22 7.8 2 12 2"/></svg>
+                          <span>Place</span>
+                        </div>
+                      </div>
 
                       <li role="button" class="emoji_document_element">
                         <!-- prettier-ignore -->
@@ -8127,6 +8164,8 @@
     <script src="/scripts/paperEditing/quill.init.js"></script>
     <script src="/scripts/paperEditing/quill.blots.js"></script>
     <script src="/scripts/paperEditing/quill.ruler.js"></script>
+    <script src="/scripts/paperEditing/smartChips.js"></script>
+
     <!-- Your aside.slider.js file should come next -->
     <!-- <script src="/scripts/paperEditing/aside.slider.js" defer></script> -->
     <!-- Quill init MUST come last as it depends on all the others -->
@@ -8204,6 +8243,7 @@
     <script src="/scripts/paperEditing/participant.dropdown.js"></script>
     <script src="/scripts/paperEditing/first.time.message.js"></script>
     <script src="/scripts/paperEditing/viewer.editor.mode.js"></script>
+
     <!-- share Modal -->
     <script src="/scripts/shareModal.js"></script>
 

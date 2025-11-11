@@ -26,6 +26,7 @@ function createNewEditor() {
       },
     },
     formats: [
+      "smart-chip",
       "signature",
       "comment",
       "math-live",
