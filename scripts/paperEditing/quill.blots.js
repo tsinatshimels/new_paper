@@ -1741,31 +1741,45 @@ Quill.register(SignatureBlot);
 
 // safer SmartChipBlot
 
-class SmartChipBlot extends BlockEmbed {
+// quill.blot.js
+
+const InlineEmbed = Quill.import("blots/embed");
+
+class SmartChipBlot extends InlineEmbed {
+  static blotName = "smart-chip";
+  static tagName = "span";
+  static className = "smart-chip-wrapper";
+
   static create(value) {
     const node = super.create();
+
     node.classList.add("smart-chip-wrapper");
+    node.setAttribute("contenteditable", false);
     node.dataset.chipType = value.type || "unknown";
     node.dataset.value = value.value || "";
+
     node.innerHTML = `
-      <span class="smart-chip-icon">${value.icon || ""}</span>
-      <span class="smart-chip-label">${value.display || "Chip"}</span>
+      <span contenteditable="false">
+        <span class="smart-chip-icon">${value.icon || ""}</span>
+        <span class="smart-chip-label">${value.display || "Chip"}</span>
+      </span>
     `;
+
+    // ✨ FIX: Removed the logic that added a trailing space inside the blot.
+    // The space should be managed by Quill's `insertText` method outside of the blot,
+    // which your other code already does correctly.
+
     return node;
   }
 
   static value(node) {
     return {
-      type: node.dataset.chipType,
-      value: node.dataset.value,
+      type: node.dataset.chipType || "unknown",
+      value: node.dataset.value || "",
       icon: node.querySelector(".smart-chip-icon")?.innerHTML || "",
       display: node.querySelector(".smart-chip-label")?.textContent || "",
     };
   }
 }
-
-SmartChipBlot.blotName = "smart-chip";
-SmartChipBlot.tagName = "span";
-SmartChipBlot.className = "smart-chip-wrapper";
 
 Quill.register(SmartChipBlot);

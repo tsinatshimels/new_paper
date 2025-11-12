@@ -4,6 +4,10 @@ const smartChipsButton = document.getElementById("smartChups");
 const dropdown = document.getElementById("smart-chips-dropdown");
 const chipOptions = dropdown.querySelectorAll(".chip-option");
 
+let activeChipNode = null;
+let interactionModal = null;
+let smartChipsInitialized = false;
+
 // --- 1. Dropdown Toggle Logic ---
 smartChipsButton.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -18,10 +22,7 @@ document.addEventListener("click", () => {
 
 dropdown.addEventListener("click", (e) => e.stopPropagation());
 
-// --- 2. State and Helper Functions ---
-let activeChipNode = null;
-let interactionModal = null;
-
+// --- 2. Helpers ---
 function deselectChips() {
   document.querySelectorAll(".smart-chip-wrapper.selected").forEach((chip) => {
     chip.classList.remove("selected");
@@ -35,65 +36,101 @@ function closeChipInteractionModal() {
   }
 }
 
-// --- FIXED updateChip that updates label inside the editor ---
+// --- 3. Event Delegation for Chip Clicks ---
+function initializeChipClickHandler() {
+  // Use event delegation on the editor root
+  if (window.focusedEditor && window.focusedEditor.root) {
+    window.focusedEditor.root.addEventListener("click", chipClickHandler);
+  }
+}
+
+function chipClickHandler(e) {
+  const clickedChip = e.target.closest(".smart-chip-wrapper");
+  if (!clickedChip) return;
+
+  e.stopPropagation();
+  if (clickedChip.classList.contains("selected")) return;
+
+  closeChipInteractionModal();
+  deselectChips();
+
+  clickedChip.classList.add("selected");
+  activeChipNode = clickedChip;
+
+  const chipType = clickedChip.dataset.chipType;
+  const rect = clickedChip.getBoundingClientRect();
+  const editorRect = window.focusedEditor.root.getBoundingClientRect();
+
+  interactionModal = document.createElement("div");
+  interactionModal.id = "chip-interaction-modal";
+  interactionModal.className = "chip-interaction-modal";
+  interactionModal.style.top = `${rect.bottom - editorRect.top + 5}px`;
+  interactionModal.style.left = `${rect.left - editorRect.left}px`;
+  interactionModal.addEventListener("click", (e) => e.stopPropagation());
+
+  switch (chipType) {
+    case "date":
+      renderDateInteraction(interactionModal);
+      break;
+    case "event":
+      renderEventInteraction(interactionModal);
+      break;
+    case "people":
+      renderPeopleInteraction(interactionModal);
+      break;
+    case "place":
+      renderPlaceInteraction(interactionModal);
+      break;
+  }
+
+  window.focusedEditor.root.appendChild(interactionModal);
+  interactionModal.style.display = "block";
+}
+
+// --- 4. Improved Update Chip ---
 function updateChip(editor, chipNode, newLabel) {
-  if (!activeChipNode || !window.focusedEditor) return;
+  if (!chipNode || !editor) return;
+  const quill = editor;
 
-  const quill = window.focusedEditor;
-  let blot;
-
-  try {
-    blot = Quill.find(activeChipNode);
-  } catch (err) {
-    blot = null;
-  }
-
-  let originalValue = null;
-  try {
-    if (blot && typeof blot.value === "function") {
-      originalValue = blot.value();
-    } else {
-      originalValue = SmartChipBlot.value(activeChipNode);
-    }
-  } catch (err) {
-    originalValue = SmartChipBlot.value(activeChipNode);
-  }
-
-  if (!originalValue)
-    originalValue = { type: "unknown", icon: "", display: "", value: "" };
+  // Get current chip data
+  const chipType = chipNode.dataset.chipType;
+  const currentIcon =
+    chipNode.querySelector(".smart-chip-icon")?.innerHTML || "";
 
   const newData = {
-    ...originalValue,
+    type: chipType,
+    icon: currentIcon,
     display: newLabel,
     value: newLabel,
   };
 
   try {
-    const blotIndex = blot
-      ? quill.getIndex(blot)
-      : quill.getSelection(true)?.index || 0;
-    quill.formatText(blotIndex, 1, "smart-chip", newData, "user");
-  } catch (err) {
-    console.error("Failed to update chip via formatText:", err);
-    try {
-      const blotIndex = quill.getSelection(true)?.index || 0;
-      quill.deleteText(blotIndex, 1, "user");
-      quill.insertEmbed(blotIndex, "smart-chip", newData, "user");
-    } catch (err2) {
-      console.error("Fallback replace also failed:", err2);
-    }
-  }
+    // Find the blot for the current chip
+    const blot = Quill.find(chipNode);
+    if (blot) {
+      const index = quill.getIndex(blot);
 
-  // Update the visual label inside the DOM
-  const label = chipNode.querySelector(".smart-chip-label");
-  if (label) label.textContent = newLabel;
+      // Replace the chip
+      quill.deleteText(index, 1, "user");
+      quill.insertEmbed(index, "smart-chip", newData, "user");
+      quill.insertText(index + 1, " ", "user");
+      quill.setSelection(index + 2, 0, "user");
+    }
+  } catch (err) {
+    console.error("Chip update failed:", err);
+    // Fallback: direct DOM manipulation
+    const labelElement = chipNode.querySelector(".smart-chip-label");
+    if (labelElement) {
+      labelElement.textContent = newLabel;
+    }
+    chipNode.dataset.value = newLabel;
+  }
 
   closeChipInteractionModal();
   deselectChips();
 }
 
-// --- 3. Chip Interaction UI Rendering ---
-
+// --- 5. Interaction Modals (keep these the same) ---
 function renderDateInteraction(modal) {
   modal.innerHTML = `<div class="chip-modal-content"><input type="date" id="date-selector"></div>`;
   const dateSelector = modal.querySelector("#date-selector");
@@ -112,9 +149,7 @@ function renderDateInteraction(modal) {
   setTimeout(() => {
     try {
       dateSelector.showPicker();
-    } catch (error) {
-      console.warn("showPicker() not supported by this browser");
-    }
+    } catch {}
   }, 10);
 }
 
@@ -123,20 +158,18 @@ function renderEventInteraction(modal) {
     public: [{ name: "Quarterly Review", time: "10:00 AM", date: "Today" }],
     private: [{ name: "Team Sync", time: "11:30 AM", date: "Tomorrow" }],
   };
-  modal.innerHTML = `
-    <div class="chip-modal-content chip-modal-event">
-      <div class="event-tabs">
-        <button class="active" data-tab="public">Public</button>
-        <button data-tab="private">Private</button>
-      </div>
-      <input type="text" class="chip-modal-search" placeholder="Search events...">
-      <div class="chip-modal-list" id="event-list"></div>
-    </div>`;
+  modal.innerHTML = `<div class="chip-modal-content chip-modal-event">
+    <div class="event-tabs">
+      <button class="active" data-tab="public">Public</button>
+      <button data-tab="private">Private</button>
+    </div>
+    <input type="text" class="chip-modal-search" placeholder="Search events...">
+    <div class="chip-modal-list" id="event-list"></div>
+  </div>`;
 
   const eventList = modal.querySelector("#event-list");
   const searchInput = modal.querySelector(".chip-modal-search");
   const tabs = modal.querySelectorAll(".event-tabs button");
-
   let activeTab = "public";
 
   const renderList = (filter = "") => {
@@ -169,13 +202,12 @@ function renderEventInteraction(modal) {
 }
 
 function renderPeopleInteraction(modal) {
-  modal.innerHTML = `
-    <div class="chip-modal-content">
-      <div class="chip-modal-list" id="people-list">
-        <div class="chip-modal-item-skeleton"></div>
-        <div class="chip-modal-item-skeleton"></div>
-      </div>
-    </div>`;
+  modal.innerHTML = `<div class="chip-modal-content">
+    <div class="chip-modal-list" id="people-list">
+      <div class="chip-modal-item-skeleton"></div>
+      <div class="chip-modal-item-skeleton"></div>
+    </div>
+  </div>`;
 
   const peopleList = modal.querySelector("#people-list");
 
@@ -200,18 +232,16 @@ function renderPeopleInteraction(modal) {
 }
 
 function renderPlaceInteraction(modal) {
-  // Using mock data to avoid needing an API key
   const mockPlaces = [
     "New York, USA",
     "London, UK",
     "Addis Ababa, Ethiopia",
     "Tokyo, Japan",
   ];
-  modal.innerHTML = `
-    <div class="chip-modal-content">
-      <input type="text" class="chip-modal-search" placeholder="Search for a place...">
-      <div class="chip-modal-list" id="place-list"></div>
-    </div>`;
+  modal.innerHTML = `<div class="chip-modal-content">
+    <input type="text" class="chip-modal-search" placeholder="Search for a place...">
+    <div class="chip-modal-list" id="place-list"></div>
+  </div>`;
 
   const searchInput = modal.querySelector(".chip-modal-search");
   const placeList = modal.querySelector("#place-list");
@@ -236,88 +266,49 @@ function renderPlaceInteraction(modal) {
   searchInput.focus();
 }
 
-// --- 4. Initialize all chip logic ---
+// --- 6. Initialize ---
 function initializeChipFunctionality() {
+  if (smartChipsInitialized) return;
+  smartChipsInitialized = true;
+
   chipOptions.forEach((option) => {
     option.addEventListener("click", () => {
       const chipType = option.dataset.chipType;
-      const icon = option.querySelector("svg").outerHTML;
+      const icon = option.querySelector("svg")?.outerHTML || "";
       const display = chipType.charAt(0).toUpperCase() + chipType.slice(1);
+
       if (window.focusedEditor) {
         const range = window.focusedEditor.getSelection(true);
         if (!range) return;
 
-        if (range.length > 0) {
+        if (range.length > 0)
           window.focusedEditor.deleteText(range.index, range.length, "user");
-        }
 
         const insertIndex = range.index;
 
-        try {
-          window.focusedEditor.insertEmbed(
-            insertIndex,
-            "smart-chip",
-            { type: chipType, display, icon, value: display },
-            "user"
-          );
-          window.focusedEditor.insertText(insertIndex + 1, " ", "user");
-          window.focusedEditor.setSelection(insertIndex + 2, 0, "user");
-          dropdown.classList.remove("open");
-        } catch (err) {
-          console.error("Error inserting smart-chip:", err);
-        }
+        window.focusedEditor.insertEmbed(
+          insertIndex,
+          "smart-chip",
+          { type: chipType, display, icon, value: display },
+          "user"
+        );
+        window.focusedEditor.insertText(insertIndex + 1, " ", "user");
+        window.focusedEditor.setSelection(insertIndex + 2, 0, "user");
+
+        dropdown.classList.remove("open");
       }
-      closeDropdownBar(); // close all other dropdowns
+      closeDropdownBar(); // close all dropdown
     });
   });
 
-  window.focusedEditor.root.addEventListener("click", (e) => {
-    const clickedChip = e.target.closest(".smart-chip-wrapper");
-    if (!clickedChip) return;
-
-    e.stopPropagation();
-    if (clickedChip.classList.contains("selected")) return;
-
-    closeChipInteractionModal();
-    deselectChips();
-
-    clickedChip.classList.add("selected");
-    activeChipNode = clickedChip;
-
-    const chipType = clickedChip.dataset.chipType;
-    const rect = clickedChip.getBoundingClientRect(),
-      editorRect = window.focusedEditor.root.getBoundingClientRect();
-
-    interactionModal = document.createElement("div");
-    interactionModal.id = "chip-interaction-modal";
-    interactionModal.style.top = `${rect.bottom - editorRect.top + 5}px`;
-    interactionModal.style.left = `${rect.left - editorRect.left}px`;
-    interactionModal.addEventListener("click", (e) => e.stopPropagation());
-
-    switch (chipType) {
-      case "date":
-        renderDateInteraction(interactionModal);
-        break;
-      case "event":
-        renderEventInteraction(interactionModal);
-        break;
-      case "people":
-        renderPeopleInteraction(interactionModal);
-        break;
-      case "place":
-        renderPlaceInteraction(interactionModal);
-        break;
-    }
-
-    window.focusedEditor.root.appendChild(interactionModal);
-    interactionModal.style.display = "block";
-  });
+  // Initialize event delegation for chips
+  initializeChipClickHandler();
 }
 
-// --- 5. Wait until the editor is ready ---
-const editorInitializationCheck = setInterval(() => {
+// --- 7. Wait for editor ---
+const checkEditor = setInterval(() => {
   if (window.focusedEditor && window.focusedEditor.root) {
-    clearInterval(editorInitializationCheck);
+    clearInterval(checkEditor);
     initializeChipFunctionality();
   }
 }, 100);

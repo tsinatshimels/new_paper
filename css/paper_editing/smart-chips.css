@@ -5,7 +5,6 @@
 .smart-chips-dropdown {
   display: none;
   position: absolute;
-
   left: 210px;
   background-color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -32,39 +31,56 @@
   flex-shrink: 0;
 }
 
-/* Quill Chip Styles (Element in the editor) */
+/* Quill Chip Styles - FIXED */
 .smart-chip-wrapper {
-  display: flex;
-
+  display: inline-flex;
+  align-items: center;
   gap: 5px;
-  padding: 3px 8px;
+  padding: 2px 8px; /* Reduced top/bottom padding */
   margin: 0 2px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent; /* Default transparent border */
+  border: 1px solid transparent;
   background-color: #f0f0f0;
   font-size: 0.95em;
-  user-select: none; /* Prevent text selection inside chip */
+  user-select: none;
+  line-height: 1; /* Critical fix */
+  vertical-align: baseline; /* Critical fix */
+  height: auto; /* Ensure height is content-based */
 }
 
 .smart-chip-wrapper:hover {
   background-color: #e6e6e6;
 }
 .smart-chip-wrapper.selected {
-  border-color: #4a90e2; /* Blue border when selected */
+  border-color: #4a90e2;
   background-color: #e9f2ff;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
+
+/* FIXED: Chip content alignment */
 .smart-chip-wrapper span {
   font-weight: 500;
-  line-height: 1;
-}
-.smart-chip-wrapper svg {
-  margin-top: -1px; /* Align icon better with text */
+  line-height: 1; /* Remove extra line height */
+  display: flex;
+  align-items: center;
 }
 
-/* Modal/Dropdown for Chip Interaction (Calendar, Lists, etc.) */
+.smart-chip-icon,
+.smart-chip-label {
+  line-height: 1; /* Ensure no extra line height */
+  display: flex;
+  align-items: center;
+  margin-right: 7px;
+}
+
+.smart-chip-wrapper svg {
+  margin: 0; /* Remove any vertical margin */
+  display: block; /* Prevent inline spacing issues */
+}
+
+/* Modal/Dropdown for Chip Interaction - FIXED */
 #chip-interaction-modal {
   position: absolute;
   background: white;
@@ -76,52 +92,73 @@
   min-width: 250px;
   max-width: 320px;
   overflow: hidden;
+  line-height: 1.2; /* Reduce line height in modal */
 }
+
 .chip-modal-content {
   padding: 8px;
+  line-height: 0.2; /* Consistent line height */
 }
+
 .chip-modal-search {
   width: 100%;
   padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   margin-bottom: 8px;
-  box-sizing: border-box; /* Important */
+  box-sizing: border-box;
+  line-height: 1.2; /* Fix input line height */
 }
+
 .chip-modal-list {
   max-height: 220px;
+
+  line-height: 1.2; /* Consistent line height */
   overflow-y: auto;
+  scrollbar-width: none;
 }
+
 .chip-modal-item {
-  padding: 10px 12px;
+  padding: 8px 12px; /* Reduced top/bottom padding */
   cursor: pointer;
   border-radius: 4px;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.2; /* Reduced line height */
+  margin: 0; /* Remove any margins */
 }
+
 .chip-modal-item:hover {
   background-color: #f1f1f1;
 }
+
 .chip-modal-item strong {
   display: block;
+  line-height: 1.2; /* Consistent line height */
 }
+
 .chip-modal-item small {
   color: #666;
+  line-height: 1.2; /* Consistent line height */
 }
+
 .chip-modal-error {
-  padding: 10px;
+  padding: 8px 10px; /* Reduced padding */
   color: #888;
   font-style: italic;
   font-size: 14px;
+  line-height: 1.2;
 }
+
 .api-attribution {
   display: block;
   text-align: center;
   font-size: 11px;
   color: #999;
-  padding: 8px 0 0;
+  padding: 6px 0 0; /* Reduced padding */
   text-decoration: none;
+  line-height: 1.2;
 }
+
 .api-attribution:hover {
   text-decoration: underline;
 }
@@ -131,23 +168,29 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 6px 12px; /* Reduced padding */
+  line-height: 1.2;
 }
+
 .chip-modal-item-person img {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   object-fit: cover;
+  display: block; /* Prevent inline spacing */
 }
 
 /* Skeleton loader for People list */
 .chip-modal-item-skeleton {
-  height: 40px;
+  height: 32px; /* Reduced height */
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s infinite;
   border-radius: 4px;
-  margin: 5px 0;
+  margin: 3px 0; /* Reduced margin */
+  line-height: 1;
 }
+
 @keyframes skeleton-loading {
   0% {
     background-position: 200% 0;
@@ -159,22 +202,27 @@
 
 /* Specific styles for Event chip */
 .chip-modal-event .chip-modal-search {
-  margin: 8px 0;
+  margin: 6px 0; /* Reduced margin */
 }
+
 .event-tabs {
   display: flex;
   border-bottom: 1px solid #eee;
+  line-height: 1;
 }
+
 .event-tabs button {
   flex: 1;
-  padding: 10px;
+  padding: 8px; /* Reduced padding */
   border: none;
   background: none;
   cursor: pointer;
   font-weight: 500;
   color: #555;
   border-bottom: 2px solid transparent;
+  line-height: 1.2; /* Consistent line height */
 }
+
 .event-tabs button.active {
   color: #4a90e2;
   border-bottom-color: #4a90e2;
@@ -185,7 +233,9 @@
   border: none;
   padding: 5px;
   width: 100%;
+  line-height: 1.2;
 }
+
 /* Fix for chip content to prevent text selection */
 .smart-chip-wrapper * {
   user-select: none;
@@ -198,15 +248,37 @@
   position: relative;
 }
 
-/* Fix for Quill editor chip alignment */
+/* FIXED: Quill editor chip alignment - Critical fixes */
 .ql-editor .smart-chip-wrapper {
   display: inline-flex !important;
   align-items: center;
   vertical-align: middle;
-  line-height: 1.2;
+  line-height: 1 !important;
+  height: 30px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Reset any Quill-specific spacing */
+.ql-editor {
+  line-height: 1.5; /* Ensure consistent base line-height */
+}
+
+.ql-editor .smart-chip-wrapper {
+  vertical-align: baseline;
 }
 
 /* Modal z-index fix */
 #chip-interaction-modal {
   z-index: 10000;
+}
+
+/* Additional fix for modal content spacing */
+.chip-modal-content > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.chip-modal-content > * + * {
+  margin-top: 6px; /* Controlled spacing instead of default margins */
 }
