@@ -267,6 +267,7 @@ function initializeChipFunctionality() {
           console.error("Error inserting smart-chip:", err);
         }
       }
+      closeDropdownBar(); // close all other dropdowns
     });
   });
 

@@ -23,20 +23,9 @@ document.addEventListener("DOMContentLoaded", function () {
     signatureModal.classList.add("open");
     closeDropdownBar(); // close all dropdown
   });
-  closeButton.addEventListener("click", () =>
-    signatureModal.classList.remove("open")
-  );
-
-  function closeDropdownBar() {
-    const dropdowns = document.querySelectorAll(
-      ".toolbar_headers--holder ul#dropdown"
-    );
-    //   make the aria-expanded false for all dropdowns
-    dropdowns.forEach((dropdown) => {
-      dropdown.style.display = "none";
-      dropdown.previousElementSibling.setAttribute("aria-expanded", "false");
-    });
-  }
+  closeButton.addEventListener("click", () => {
+    signatureModal.classList.remove("open");
+  });
 
   // --- Canvas Drawing Logic ---
   const startDrawing = (e) => {
