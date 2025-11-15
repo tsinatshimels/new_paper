@@ -6,6 +6,7 @@
   display: none;
   position: absolute;
   left: 210px;
+  top: 180px;
   background-color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
@@ -104,10 +105,12 @@
   width: 100%;
   padding: 8px 10px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 200px;
   margin-bottom: 8px;
   box-sizing: border-box;
-  line-height: 1.2; /* Fix input line height */
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .chip-modal-list {
@@ -117,7 +120,9 @@
   overflow-y: auto;
   scrollbar-width: none;
 }
-
+.chip-modal-list span {
+  margin-top: 2px;
+}
 .chip-modal-item {
   padding: 8px 12px; /* Reduced top/bottom padding */
   cursor: pointer;
@@ -125,12 +130,25 @@
   font-size: 14px;
   line-height: 1.2; /* Reduced line height */
   margin: 0; /* Remove any margins */
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
+.chip-modal-item .event-detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: first baseline;
+  gap: 6px;
+}
 .chip-modal-item:hover {
   background-color: #f1f1f1;
 }
-
+.chip-modal-item-place {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2; /* Consistent line height */
+}
 .chip-modal-item strong {
   display: block;
   line-height: 1.2; /* Consistent line height */
@@ -207,7 +225,10 @@
 
 .event-tabs {
   display: flex;
-  border-bottom: 1px solid #eee;
+  background: #f6f6f6;
+  border-radius: 200px;
+  border: #eaecf0 1px solid;
+  padding: 5px;
   line-height: 1;
 }
 
@@ -218,14 +239,16 @@
   background: none;
   cursor: pointer;
   font-weight: 500;
-  color: #555;
+  color: rgba(0, 0, 0, 0.4);
   border-bottom: 2px solid transparent;
   line-height: 1.2; /* Consistent line height */
 }
 
 .event-tabs button.active {
-  color: #4a90e2;
-  border-bottom-color: #4a90e2;
+  color: #8837e9;
+  border: 1px #eaecf0 solid;
+  background: white;
+  border-radius: 200px;
 }
 
 /* Specific styles for Date picker */

@@ -155,15 +155,62 @@ function renderDateInteraction(modal) {
 
 function renderEventInteraction(modal) {
   const mockData = {
-    public: [{ name: "Quarterly Review", time: "10:00 AM", date: "Today" }],
-    private: [{ name: "Team Sync", time: "11:30 AM", date: "Tomorrow" }],
+    public: [
+      {
+        name: "Quarterly Review",
+        time: "8:00 – 10:00 AM",
+        dot: "./icons/eventDot1.svg",
+      },
+      {
+        name: "Client Presentation",
+        time: "11:00 AM – 12:00 PM",
+        dot: "./icons/eventDot1.svg",
+      },
+      {
+        name: "Product Demo",
+        time: "2:00 – 3:00 PM",
+        dot: "./icons/eventDot2.svg",
+      },
+      {
+        name: "Marketing Briefing",
+        time: "4:00 – 4:45 PM",
+        dot: "./icons/eventDot3.svg",
+      },
+    ],
+
+    private: [
+      {
+        name: "Team Sync",
+        time: "8:00 – 11:30 AM",
+        dot: "./icons/eventDot2.svg",
+      },
+      {
+        name: "Backend Strategy Call",
+        time: "12:00 – 1:30 PM",
+        dot: "./icons/eventDot2.svg",
+      },
+      {
+        name: "Design Review Session",
+        time: "3:15 – 4:15 PM",
+        dot: "./icons/eventDot1.svg",
+      },
+      {
+        name: "Hiring Committee Meeting",
+        time: "5:00 – 6:00 PM",
+        dot: "./icons/eventDot3.svg",
+      },
+    ],
   };
+
   modal.innerHTML = `<div class="chip-modal-content chip-modal-event">
     <div class="event-tabs">
       <button class="active" data-tab="public">Public</button>
       <button data-tab="private">Private</button>
     </div>
-    <input type="text" class="chip-modal-search" placeholder="Search events...">
+    <div class="chip-modal-search">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0s.41-1.08 0-1.49zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14"/></svg>
+    <input type="text"  placeholder="Search events...">
+    </div>
     <div class="chip-modal-list" id="event-list"></div>
   </div>`;
 
@@ -179,7 +226,7 @@ function renderEventInteraction(modal) {
       .forEach((event) => {
         const item = document.createElement("div");
         item.className = "chip-modal-item";
-        item.innerHTML = `<strong>${event.name}</strong><small>${event.date} at ${event.time}</small>`;
+        item.innerHTML = `<span><img src="${event.dot}" /></span><div class="event-detail"><small>${event.time}</small><strong>${event.name}</strong></div>`;
         item.addEventListener("click", () =>
           updateChip(window.focusedEditor, activeChipNode, event.name)
         );
@@ -203,6 +250,10 @@ function renderEventInteraction(modal) {
 
 function renderPeopleInteraction(modal) {
   modal.innerHTML = `<div class="chip-modal-content">
+  <div class="chip-modal-search">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0s.41-1.08 0-1.49zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14"/></svg>
+    <input type="text"  placeholder="Search events...">
+    </div>
     <div class="chip-modal-list" id="people-list">
       <div class="chip-modal-item-skeleton"></div>
       <div class="chip-modal-item-skeleton"></div>
@@ -233,13 +284,22 @@ function renderPeopleInteraction(modal) {
 
 function renderPlaceInteraction(modal) {
   const mockPlaces = [
-    "New York, USA",
-    "London, UK",
-    "Addis Ababa, Ethiopia",
-    "Tokyo, Japan",
+    { capital: "Addis Ababa", country: "Ethiopia" },
+    { capital: "Washington D.C.", country: "USA" },
+    { capital: "London", country: "United Kingdom" },
+    { capital: "Tokyo", country: "Japan" },
+    { capital: "Paris", country: "France" },
+    { capital: "Berlin", country: "Germany" },
+    { capital: "Ottawa", country: "Canada" },
+    { capital: "Canberra", country: "Australia" },
+    { capital: "Nairobi", country: "Kenya" },
+    { capital: "Cape Town", country: "South Africa" },
   ];
   modal.innerHTML = `<div class="chip-modal-content">
-    <input type="text" class="chip-modal-search" placeholder="Search for a place...">
+    <div class="chip-modal-search">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#000" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0s.41-1.08 0-1.49zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14"/></svg>
+    <input type="text"  placeholder="Search events...">
+    </div>
     <div class="chip-modal-list" id="place-list"></div>
   </div>`;
 
@@ -248,17 +308,22 @@ function renderPlaceInteraction(modal) {
 
   const renderPlaces = (filter = "") => {
     placeList.innerHTML = "";
-    mockPlaces
-      .filter((p) => p.toLowerCase().includes(filter.toLowerCase()))
-      .forEach((place) => {
-        const item = document.createElement("div");
-        item.className = "chip-modal-item";
-        item.textContent = place;
-        item.addEventListener("click", () =>
-          updateChip(window.focusedEditor, activeChipNode, place)
-        );
-        placeList.appendChild(item);
-      });
+    mockPlaces.forEach(({ capital, country }) => {
+      const item = document.createElement("div");
+      item.className = "chip-modal-item chip-modal-item-place";
+      item.innerHTML = `
+          <div style="font-size: 12px; opacity: 0.7;">${capital}</div>
+          <div style="font-weight: 600;">${country}</div>
+        `;
+      item.addEventListener("click", () =>
+        updateChip(
+          window.focusedEditor,
+          activeChipNode,
+          `${capital}, ${country}`
+        )
+      );
+      placeList.appendChild(item);
+    });
   };
 
   searchInput.addEventListener("input", (e) => renderPlaces(e.target.value));
