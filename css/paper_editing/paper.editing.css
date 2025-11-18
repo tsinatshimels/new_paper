@@ -326,6 +326,7 @@ strong {
 
 .main_header .collaborators {
   position: relative;
+  margin-right: 10px;
 }
 
 .main_header .collaborators .collaborators_wrapper {
