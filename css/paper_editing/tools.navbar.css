@@ -463,7 +463,8 @@
   border: 1px solid var(--border-color);
 }
 
-.toolbar_headers--holder ul#dropdown li {
+.toolbar_headers--holder ul#dropdown li,
+.toolbar_headers--holder ul#fileDropdown li {
   display: flex;
   align-items: center;
   gap: 10px;

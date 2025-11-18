@@ -1007,7 +1007,10 @@
                         />
                       </svg>
                     </span>
-                    <ul aria-expanded="false" id="dropdown">
+                    <ul
+                      id="fileDropdown"
+                      class="file_options_dropdown file-hidden"
+                    >
                       <li role="button" class="new_paper_element">
                         <!-- prettier-ignore -->
                         <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M13.3327 6.99967V4.53301C13.3327 3.41301 13.3327 2.85301 13.1127 2.42634C12.9227 2.05139 12.6195 1.74582 12.246 1.55301C11.806 1.33301 11.246 1.33301 10.1327 1.33301H5.86602C4.74602 1.33301 4.18602 1.33301 3.75935 1.55301C3.3844 1.74295 3.07883 2.04619 2.88602 2.41967C2.66602 2.85967 2.66602 3.41967 2.66602 4.53301V11.4663C2.66602 12.5863 2.66602 13.1463 2.88602 13.573C3.07596 13.948 3.3792 14.2535 3.75268 14.4463C4.18602 14.6663 4.74602 14.6663 5.86602 14.6663H7.99935M9.33268 7.33301H5.33268M6.66602 9.99967H5.33268M10.666 4.66634H5.33268M11.9993 13.9997V9.99967M9.99935 11.9997H13.9993" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1026,22 +1029,21 @@
                         <span>Download</span>
                       </li>
 
-                      <li class="convert_document_element">
-                        <div class="converter-wrapper">
-                          <!-- This is the main button the user clicks -->
-                          <div class="converter-trigger" role="button">
-                            <!-- prettier-ignore -->
-                            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M1.33398 9.33372C1.33398 9.33372 1.41398 9.90039 3.76065 12.2404C4.51876 12.9989 5.4663 13.5403 6.50466 13.8084C7.54302 14.0764 8.63424 14.0613 9.66476 13.7645C10.6953 13.4677 11.6274 12.9002 12.3642 12.121C13.1009 11.3417 13.6154 10.3792 13.854 9.33372M1.33398 9.33372V13.3337M1.33398 9.33372H5.33398M14.6673 6.66705C14.6673 6.66705 14.5873 6.10039 12.2407 3.76039C11.4825 3.00189 10.535 2.46045 9.49664 2.1924C8.45828 1.92436 7.36706 1.9395 6.33654 2.23627C5.30602 2.53304 4.37388 3.10058 3.63712 3.87982C2.90036 4.65907 2.38591 5.62153 2.14732 6.66705M14.6673 6.66705V2.66705M14.6673 6.66705H10.6673" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <span>Convert</span>
-                          </div>
-                          <!-- This submenu is hidden by default -->
-                          <ul id="converter-submenu" class="converter-submenu">
-                            <li data-action="to-pdf">Convert to PDF</li>
-                            <li data-action="to-jpg">Convert to JPG</li>
-                            <li data-action="protect-pdf">Protect PDF</li>
-                          </ul>
-                        </div>
+                      <li role="button" class="convert_document_element">
+                        <!-- prettier-ignore -->
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="copy" xmlns="http://www.w3.org/2000/svg"><path d="M1.33398 9.33372C1.33398 9.33372 1.41398 9.90039 3.76065 12.2404C4.51876 12.9989 5.4663 13.5403 6.50466 13.8084C7.54302 14.0764 8.63424 14.0613 9.66476 13.7645C10.6953 13.4677 11.6274 12.9002 12.3642 12.121C13.1009 11.3417 13.6154 10.3792 13.854 9.33372M1.33398 9.33372V13.3337M1.33398 9.33372H5.33398M14.6673 6.66705C14.6673 6.66705 14.5873 6.10039 12.2407 3.76039C11.4825 3.00189 10.535 2.46045 9.49664 2.1924C8.45828 1.92436 7.36706 1.9395 6.33654 2.23627C5.30602 2.53304 4.37388 3.10058 3.63712 3.87982C2.90036 4.65907 2.38591 5.62153 2.14732 6.66705M14.6673 6.66705V2.66705M14.6673 6.66705H10.6673" stroke="#33363F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Convert</span>
                       </li>
+                      <div
+                        id="converter-submenu-wrapper"
+                        class="converter-submenu-wrapper"
+                      >
+                        <ul id="converter-submenu" class="converter-submenu">
+                          <li data-action="to-pdf">Convert to PDF</li>
+                          <li data-action="to-jpg">Convert to JPG</li>
+                          <li data-action="protect-pdf">Protect PDF</li>
+                        </ul>
+                      </div>
 
                       <li role="button" class="print_document_element">
                         <!-- prettier-ignore -->
@@ -8068,49 +8070,53 @@
     </div>
 
     <!-- Converter modal -->
+    <!-- Updated Converter modal -->
     <div id="converter-modal" class="converter-modal" style="display: none">
       <div class="converter-modal-content">
         <!-- Step 1: File Type Selection -->
         <div id="converter-step-1">
-          <h3 class="converter-title">Convert to PDF</h3>
+          <h3 id="converter-step-1-title" class="converter-title">
+            Convert to PDF
+          </h3>
           <div class="converter-options">
             <button class="converter-option" data-type="jpg">
-              <img src="https-your-icon-path/jpg-icon.png" alt="JPG to PDF" />
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 16 16"><rect width="16" height="16" fill="none"/><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="#eed49f" d="M11.5 6A1.5 1.5 0 0 1 10 7.5A1.5 1.5 0 0 1 8.5 6A1.5 1.5 0 0 1 10 4.5A1.5 1.5 0 0 1 11.5 6" stroke-width="1"/><path stroke="#a6da95" d="M7.5 13.5L11 10c.5-.5 1.5-.5 2 0l1.5 1.5" stroke-width="1"/><path stroke="#a6da95" d="m1.5 9.5l2-2C4 7 5 7 5.5 7.5l4 4" stroke-width="1"/><path stroke="#7dc4e4" d="M3 2.5h10c.83 0 1.5.67 1.5 1.5v8c0 .83-.67 1.5-1.5 1.5H3A1.5 1.5 0 0 1 1.5 12V4c0-.83.67-1.5 1.5-1.5" stroke-width="1"/></g></svg>
               <span>JPG to PDF</span>
             </button>
             <button class="converter-option" data-type="word">
-              <img src="https-your-icon-path/word-icon.png" alt="Word to PDF" />
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><defs><linearGradient id="SVGCSIZcbiK" x1="4.494" x2="13.832" y1="-1712.086" y2="-1695.914" gradientTransform="translate(0 1720)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2368c4"/><stop offset=".5" stop-color="#1a5dbe"/><stop offset="1" stop-color="#1146ac"/></linearGradient></defs><path fill="#41a5ee" d="M28.806 3H9.705a1.19 1.19 0 0 0-1.193 1.191V9.5l11.069 3.25L30 9.5V4.191A1.19 1.19 0 0 0 28.806 3"/><path fill="#2b7cd3" d="M30 9.5H8.512V16l11.069 1.95L30 16Z"/><path fill="#185abd" d="M8.512 16v6.5l10.418 1.3L30 22.5V16Z"/><path fill="#103f91" d="M9.705 29h19.1A1.19 1.19 0 0 0 30 27.809V22.5H8.512v5.309A1.19 1.19 0 0 0 9.705 29"/><path d="M16.434 8.2H8.512v16.25h7.922a1.2 1.2 0 0 0 1.194-1.191V9.391A1.2 1.2 0 0 0 16.434 8.2" opacity="0.1"/><path d="M15.783 8.85H8.512V25.1h7.271a1.2 1.2 0 0 0 1.194-1.191V10.041a1.2 1.2 0 0 0-1.194-1.191" opacity="0.2"/><path d="M15.783 8.85H8.512V23.8h7.271a1.2 1.2 0 0 0 1.194-1.191V10.041a1.2 1.2 0 0 0-1.194-1.191" opacity="0.2"/><path d="M15.132 8.85h-6.62V23.8h6.62a1.2 1.2 0 0 0 1.194-1.191V10.041a1.2 1.2 0 0 0-1.194-1.191" opacity="0.2"/><path fill="url(#SVGCSIZcbiK)" d="M3.194 8.85h11.938a1.193 1.193 0 0 1 1.194 1.191v11.918a1.193 1.193 0 0 1-1.194 1.191H3.194A1.19 1.19 0 0 1 2 21.959V10.041A1.19 1.19 0 0 1 3.194 8.85"/><path fill="#fff" d="M6.9 17.988q.035.276.046.481h.028q.015-.195.065-.47c.05-.275.062-.338.089-.465l1.255-5.407h1.624l1.3 5.326a8 8 0 0 1 .162 1h.022a8 8 0 0 1 .135-.975l1.039-5.358h1.477l-1.824 7.748h-1.727l-1.237-5.126q-.054-.222-.122-.578t-.084-.52h-.021q-.021.189-.084.561t-.1.552L7.78 19.871H6.024L4.19 12.127h1.5l1.131 5.418a5 5 0 0 1 .079.443"/></svg>
               <span>Word to PDF</span>
             </button>
             <button class="converter-option" data-type="powerpoint">
-              <img
-                src="https-your-icon-path/ppt-icon.png"
-                alt="PowerPoint to PDF"
-              />
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path fill="#d33922" d="M18.536 2.321v2.863c3.4.019 7.357-.035 10.754.016c.642 0 .67.568.678 1.064c.054 5.942-.013 12.055.032 18c-.012.234-.006 1.1-.013 1.346c-.022.823-.434.859-1.257.884c-.132 0-.52.006-.648.012c-3.181-.016-6.362-.009-9.546-.009v3.182L2 27.134V4.873z"/><path fill="#fff" d="M18.536 6.138h10.5v19.4h-10.5V23h7.634v-1.275h-7.634v-1.59h7.634v-1.272h-7.631q.002-.936-.006-1.87a4.47 4.47 0 0 0 3.82-.375a4.35 4.35 0 0 0 1.959-3.474c-1.4-.01-2.793-.006-4.186-.006c0-1.384.016-2.767-.029-4.148c-.522.1-1.043.21-1.562.321V6.139"/><path fill="#d33922" d="M20.766 8.324a4.476 4.476 0 0 1 4.186 4.167c-1.4.016-2.793.01-4.189.01V8.324"/><path fill="#fff" d="M7.1 10.726c1.727.083 3.82-.684 5.252.611c1.371 1.664 1.008 4.724-1.024 5.719A4.7 4.7 0 0 1 9 17.348c0 1.244-.006 2.488 0 3.731q-.947-.082-1.893-.159c-.029-3.4-.035-6.8 0-10.2"/><path fill="#d33922" d="M8.993 12.446c.627-.029 1.4-.143 1.826.445a2.3 2.3 0 0 1 .041 2.087c-.363.655-1.183.592-1.816.668c-.067-1.066-.06-2.131-.051-3.2"/></svg>
               <span>PowerPoint to PDF</span>
             </button>
             <button class="converter-option" data-type="excel">
-              <img
-                src="https-your-icon-path/excel-icon.png"
-                alt="Excel to PDF"
-              />
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path fill="#20744a" fill-rule="evenodd" d="M28.781 4.405h-10.13V2.018L2 4.588v22.527l16.651 2.868v-3.538h10.13A1.16 1.16 0 0 0 30 25.349V5.5a1.16 1.16 0 0 0-1.219-1.095m.16 21.126H18.617l-.017-1.889h2.487v-2.2h-2.506l-.012-1.3h2.518v-2.2H18.55l-.012-1.3h2.549v-2.2H18.53v-1.3h2.557v-2.2H18.53v-1.3h2.557v-2.2H18.53v-2h10.411Z"/><path fill="#20744a" d="M22.487 7.439h4.323v2.2h-4.323zm0 3.501h4.323v2.2h-4.323zm0 3.501h4.323v2.2h-4.323zm0 3.501h4.323v2.2h-4.323zm0 3.501h4.323v2.2h-4.323z"/><path fill="#fff" fill-rule="evenodd" d="m6.347 10.673l2.146-.123l1.349 3.709l1.594-3.862l2.146-.123l-2.606 5.266l2.606 5.279l-2.269-.153l-1.532-4.024l-1.533 3.871l-2.085-.184l2.422-4.663z"/></svg>
               <span>Excel to PDF</span>
             </button>
             <button class="converter-option" data-type="html">
-              <img src="https-your-icon-path/html-icon.png" alt="HTML to PDF" />
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path fill="#e44f26" d="M5.902 27.201L3.655 2h24.69l-2.25 25.197L15.985 30z"/><path fill="#f1662a" d="m16 27.858l8.17-2.265l1.922-21.532H16z"/><path fill="#ebebeb" d="M16 13.407h-4.09l-.282-3.165H16V7.151H8.25l.074.83l.759 8.517H16zm0 8.027l-.014.004l-3.442-.929l-.22-2.465H9.221l.433 4.852l6.332 1.758l.014-.004z"/><path fill="#fff" d="M15.989 13.407v3.091h3.806l-.358 4.009l-3.448.93v3.216l6.337-1.757l.046-.522l.726-8.137l.076-.83zm0-6.256v3.091h7.466l.062-.694l.141-1.567l.074-.83z"/></svg>
               <span>HTML to PDF</span>
             </button>
           </div>
           <input type="file" id="file-input" style="display: none" />
-          <button id="select-file-btn" class="converter-btn">
-            Select File
-          </button>
+          <div id="selectFile">
+            <button id="select-file-btn" class="converter-btn">
+              Select File
+            </button>
+          </div>
           <p id="selected-file-name" class="selected-file-name"></p>
           <div class="converter-actions">
             <button id="cancel-btn" class="converter-btn-secondary">
               Cancel
             </button>
-            <button id="continue-btn" class="converter-btn" disabled>
+            <button id="continue-btn" class="converter-btn-continue" disabled>
               Continue
             </button>
           </div>
@@ -8118,34 +8124,137 @@
 
         <!-- Step 2: Confirmation -->
         <div id="converter-step-2" style="display: none">
-          <h3 class="converter-title">Convert to PDF</h3>
-          <p>You are converting this file to PDF.</p>
+          <h3 id="converter-step-2-title" class="converter-title">
+            Convert to PDF
+          </h3>
+          <p class="converter-description">
+            You are about to convert your file. Please review the selected
+            format and ensure everything is correct. Once confirmed, we will
+            beging the conversion process.
+          </p>
           <div class="converter-actions">
+            <button id="convert-now-btn" class="converter-btn">
+              <!-- prettier-ignore  -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 512 512"><rect width="512" height="512" fill="none"/><path fill="#fff" d="M142.9 142.9c-17.5 17.5-30.1 38-37.8 59.8c-5.9 16.7-24.2 25.4-40.8 19.5S38.9 198 44.8 181.4c10.8-30.7 28.4-59.4 52.8-83.8c87.2-87.2 228.3-87.5 315.8-1L455 55c6.9-6.9 17.2-8.9 26.2-5.2S496 62.3 496 72v128c0 13.3-10.7 24-24 24H344c-9.7 0-18.5-5.8-22.2-14.8s-1.7-19.3 5.2-26.2l41.1-41.1c-62.6-61.5-163.1-61.2-225.3 1zM16 312c0-13.3 10.7-24 24-24h128c9.7 0 18.5 5.8 22.2 14.8s1.7 19.3-5.2 26.2l-41.1 41.1c62.6 61.5 163.1 61.2 225.3-1c17.5-17.5 30.1-38 37.8-59.8c5.9-16.7 24.2-25.4 40.8-19.5s25.4 24.2 19.5 40.8c-10.8 30.6-28.4 59.3-52.9 83.8c-87.2 87.2-228.3 87.5-315.8 1L57 457c-6.9 6.9-17.2 8.9-26.2 5.2S16 449.7 16 440V312.1z"/></svg>
+              Convert
+            </button>
             <button id="back-to-step-1" class="converter-btn-secondary">
               Back
             </button>
-            <button id="convert-now-btn" class="converter-btn">Convert</button>
           </div>
         </div>
 
         <!-- Step 3: Progress -->
         <div id="converter-step-3" style="display: none">
-          <h3 class="converter-title">Converting...</h3>
+          <h3 id="converter-step-3-title" class="converter-title">
+            Converting...
+          </h3>
           <div class="progress-bar-container">
             <div class="progress-bar"></div>
           </div>
           <p class="progress-percentage">0%</p>
+          <div class="converter-actions">
+            <button id="cancel-conversion-btn" class="converter-btn-secondary">
+              Cancel Conversion
+            </button>
+          </div>
         </div>
 
         <!-- Step 4: Success -->
         <div id="converter-step-4" style="display: none">
           <h3 class="converter-title">Success!</h3>
-          <p>Successfully converted to PDF.</p>
+          <p id="success-message">Successfully converted to PDF.</p>
           <div class="converter-actions">
             <button id="back-to-step-2" class="converter-btn-secondary">
               Back
             </button>
             <button id="download-pdf-btn" class="converter-btn">
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JPG Converter Modal -->
+    <div id="jpg-converter-modal" class="converter-modal" style="display: none">
+      <div class="converter-modal-content">
+        <!-- Step 1: File Selection -->
+        <div id="jpg-step-1">
+          <h3 class="converter-title">Convert Image to JPG</h3>
+          <p class="converter-subtitle">
+            Transform PNG, GIF, PSD, SVG, WebP, HEIC or RAW to JPG format.
+            Convert many images to JPG.
+          </p>
+          <input
+            type="file"
+            id="jpg-file-input"
+            accept=".png,.gif,.psd,.svg,.webp,.heic,.raw,.tiff,.bmp"
+            multiple
+            style="display: none"
+          />
+          <button id="select-jpg-file-btn" class="converter-btn">
+            Select Images
+          </button>
+          <div id="selected-jpg-files" class="selected-files-container"></div>
+          <div class="converter-actions">
+            <button id="jpg-cancel-btn" class="converter-btn-secondary">
+              Cancel
+            </button>
+            <button id="jpg-continue-btn" class="converter-btn" disabled>
+              Continue
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Preview and Options -->
+        <div id="jpg-step-2" style="display: none">
+          <h3 id="jpg-step-2-title" class="converter-title">Convert to JPG</h3>
+          <div id="jpg-preview-container" class="preview-container"></div>
+          <button id="add-more-images-btn" class="converter-btn-secondary">
+            + Add More Images
+          </button>
+          <div class="convert-options">
+            <p>Convert options: All images will be converted to JPG</p>
+          </div>
+          <div class="converter-actions">
+            <button id="jpg-back-to-step-1" class="converter-btn-secondary">
+              Back
+            </button>
+            <button id="convert-to-jpg-btn" class="converter-btn">
+              Convert to JPG
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Progress -->
+        <div id="jpg-step-3" style="display: none">
+          <h3 id="jpg-step-3-title" class="converter-title">
+            Converting to JPG
+          </h3>
+          <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+          </div>
+          <p class="progress-percentage">0%</p>
+          <div class="converter-actions">
+            <button
+              id="jpg-cancel-conversion-btn"
+              class="converter-btn-secondary"
+            >
+              Cancel Conversion
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Success -->
+        <div id="jpg-step-4" style="display: none">
+          <h3 class="converter-title">Success!</h3>
+          <p id="jpg-success-message">Successfully converted to JPG.</p>
+          <div class="converter-actions">
+            <button id="jpg-back-to-step-2" class="converter-btn-secondary">
+              Back
+            </button>
+            <button id="download-jpg-btn" class="converter-btn">
               Download
             </button>
           </div>
