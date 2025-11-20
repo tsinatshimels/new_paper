@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!selectedConversionType) return;
 
     const typeName = getTypeDisplayName(selectedConversionType);
-    step2Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="blue-label">PDF</span>`;
+    step2Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="red-label">PDF</span>`;
     step1.style.display = "none";
     step2.style.display = "block";
   });
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   convertNowBtn.addEventListener("click", () => {
     const typeName = getTypeDisplayName(selectedConversionType);
-    step3Title.textContent = `Converting ${typeName} to PDF`;
+    step3Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="red-label">PDF</span>`;
     step2.style.display = "none";
     step3.style.display = "block";
     simulatePdfConversion();

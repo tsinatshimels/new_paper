@@ -8149,6 +8149,11 @@
           <h3 id="converter-step-3-title" class="converter-title">
             Converting...
           </h3>
+          <p>
+            Please hold on while we process your document in to the selected
+            format. This may take a few moments, depending on the size of the
+            file
+          </p>
           <div class="progress-bar-container">
             <div class="progress-bar"></div>
           </div>
@@ -8162,13 +8167,27 @@
 
         <!-- Step 4: Success -->
         <div id="converter-step-4" style="display: none">
-          <h3 class="converter-title">Success!</h3>
-          <p id="success-message">Successfully converted to PDF.</p>
+          <h3 class="converter-title conversion-success">
+            <!-- prettier-ignore -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#007A4B" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg>
+            <p id="success-message">Successfully converted to PDF.</p>
+          </h3>
           <div class="converter-actions">
             <button id="back-to-step-2" class="converter-btn-secondary">
               Back
             </button>
-            <button id="download-pdf-btn" class="converter-btn">
+            <button
+              id="download-pdf-btn"
+              class="converter-btn"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                justify-content: center;
+              "
+            >
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#fff" d="M8.53 11.47a.75.75 0 0 0-1.06 1.06zM12 16l-.53.53a.75.75 0 0 0 1.06 0zm4.53-3.47a.75.75 0 1 0-1.06-1.06zM12.75 4a.75.75 0 0 0-1.5 0zm7 13a.75.75 0 0 0-1.5 0zm-14 0a.75.75 0 0 0-1.5 0zm1.72-4.47l4 4l1.06-1.06l-4-4zm5.06 4l4-4l-1.06-1.06l-4 4zm.22-.53V4h-1.5v12zm5.5 1v.6h1.5V17zm0 .6c0 .916-.734 1.65-1.65 1.65v1.5a3.144 3.144 0 0 0 3.15-3.15zm-1.65 1.65H7.4v1.5h9.2zm-9.2 0c-.916 0-1.65-.734-1.65-1.65h-1.5a3.144 3.144 0 0 0 3.15 3.15zM5.75 17.6V17h-1.5v.6z"/></svg>
               Download
             </button>
           </div>

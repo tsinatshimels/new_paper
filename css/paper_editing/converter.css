@@ -85,6 +85,15 @@
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
   color: #333;
+
+  font-weight: 600;
+}
+.conversion-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .converter-options {
@@ -163,7 +172,10 @@
   color: #007bff;
   font-weight: 600;
 }
-
+.red-label {
+  color: red;
+  font-weight: 600;
+}
 .converter-btn {
   background-color: #007bff;
   color: white;
