@@ -8070,8 +8070,9 @@
     </div>
 
     <!-- Converter modal -->
-    <!-- Updated Converter modal -->
+    <!-- Converter modal (PDF - Unchanged) -->
     <div id="converter-modal" class="converter-modal" style="display: none">
+      <!-- ... (Keep your existing PDF modal content exactly as it was) ... -->
       <div class="converter-modal-content">
         <!-- Step 1: File Type Selection -->
         <div id="converter-step-1">
@@ -8198,12 +8199,19 @@
     <!-- JPG Converter Modal -->
     <div id="jpg-converter-modal" class="converter-modal" style="display: none">
       <div class="converter-modal-content">
-        <!-- Step 1: File Selection -->
+        <!-- Step 1: File Selection with Interactive Types -->
         <div id="jpg-step-1">
-          <h3 class="converter-title">Convert Image to JPG</h3>
+          <h3 id="jpg-step-1-title" class="converter-title">Convert to JPG</h3>
           <p class="converter-subtitle">
-            Transform PNG, GIF, PSD, SVG, WebP, HEIC or RAW to JPG format.
-            Convert many images to JPG.
+            Transform
+            <button class="type-tag" data-type="PNG">PNG</button>,
+            <button class="type-tag" data-type="GIF">GIF</button>,
+            <button class="type-tag" data-type="PSD">PSD</button>,
+            <button class="type-tag" data-type="SVG">SVG</button>,
+            <button class="type-tag" data-type="WebP">WebP</button>,
+            <button class="type-tag" data-type="HEIC">HEIC</button> or
+            <button class="type-tag" data-type="RAW">RAW</button>
+            to JPG format. Convert many images to JPG.
           </p>
           <input
             type="file"
@@ -8212,9 +8220,11 @@
             multiple
             style="display: none"
           />
-          <button id="select-jpg-file-btn" class="converter-btn">
-            Select Images
-          </button>
+          <div id="selectFile">
+            <button id="select-jpg-file-btn" class="converter-btn">
+              Select Images
+            </button>
+          </div>
           <div id="selected-jpg-files" class="selected-files-container"></div>
           <div class="converter-actions">
             <button id="jpg-cancel-btn" class="converter-btn-secondary">
@@ -8227,22 +8237,38 @@
         </div>
 
         <!-- Step 2: Preview and Options -->
-        <div id="jpg-step-2" style="display: none">
-          <h3 id="jpg-step-2-title" class="converter-title">Convert to JPG</h3>
-          <div id="jpg-preview-container" class="preview-container"></div>
-          <button id="add-more-images-btn" class="converter-btn-secondary">
-            + Add More Images
-          </button>
-          <div class="convert-options">
-            <p>Convert options: All images will be converted to JPG</p>
+        <div id="jpg-step-2" class="jpg-step-2" style="display: none">
+          <div class="jpg-step-2-preview">
+            <div
+              class="converter-title"
+              style="display: flex; gap: 10px; margin-bottom: 1.5rem"
+            >
+              <button id="jpg-back-to-step-1">
+                <!-- prettier-ignore -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" fill-rule="evenodd"><path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#2343d3" d="M7.94 13.06a1.5 1.5 0 0 1 0-2.12l5.656-5.658a1.5 1.5 0 1 1 2.121 2.122L11.122 12l4.596 4.596a1.5 1.5 0 1 1-2.12 2.122l-5.66-5.658Z"/></g></svg>
+              </button>
+              <h3 id="jpg-step-2-title">Convert to JPG</h3>
+            </div>
+            <div id="jpg-preview-container" class="preview-container"></div>
+            <button id="add-more-images-btn">
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" fill="none"/><circle cx="24" cy="24" r="21" fill="#0a3af3"/><g fill="#fff"><path d="M21 14h6v20h-6z"/><path d="M14 21h20v6H14z"/></g></svg>
+            </button>
           </div>
-          <div class="converter-actions">
-            <button id="jpg-back-to-step-1" class="converter-btn-secondary">
-              Back
-            </button>
-            <button id="convert-to-jpg-btn" class="converter-btn">
-              Convert to JPG
-            </button>
+          <div class="jpg-step-2-actions">
+            <div class="convert-options">
+              <span>Convert options </span>
+              <p>All images will be converted to JPG</p>
+            </div>
+            <div class="converter-actions" style="width: 100%; padding: 1rem">
+              <button
+                id="convert-to-jpg-btn"
+                style="padding: 1rem; width: 100%"
+                class="converter-btn"
+              >
+                Convert to JPG
+              </button>
+            </div>
           </div>
         </div>
 
@@ -8251,6 +8277,11 @@
           <h3 id="jpg-step-3-title" class="converter-title">
             Converting to JPG
           </h3>
+          <p>
+            Please hold on while we process your document in to the selected
+            format. This may take a few moments, depending on the size of the
+            file
+          </p>
           <div class="progress-bar-container">
             <div class="progress-bar"></div>
           </div>
@@ -8267,14 +8298,192 @@
 
         <!-- Step 4: Success -->
         <div id="jpg-step-4" style="display: none">
-          <h3 class="converter-title">Success!</h3>
-          <p id="jpg-success-message">Successfully converted to JPG.</p>
+          <h3 class="converter-title conversion-success">
+            <!-- prettier-ignore -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#007A4B" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg>
+            <p id="success-message">Successfully converted to PDF.</p>
+          </h3>
           <div class="converter-actions">
             <button id="jpg-back-to-step-2" class="converter-btn-secondary">
               Back
             </button>
-            <button id="download-jpg-btn" class="converter-btn">
+            <button
+              id="download-jpg-btn"
+              class="converter-btn"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                justify-content: center;
+              "
+            >
+              <!-- prettier-ignore -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#fff" d="M8.53 11.47a.75.75 0 0 0-1.06 1.06zM12 16l-.53.53a.75.75 0 0 0 1.06 0zm4.53-3.47a.75.75 0 1 0-1.06-1.06zM12.75 4a.75.75 0 0 0-1.5 0zm7 13a.75.75 0 0 0-1.5 0zm-14 0a.75.75 0 0 0-1.5 0zm1.72-4.47l4 4l1.06-1.06l-4-4zm5.06 4l4-4l-1.06-1.06l-4 4zm.22-.53V4h-1.5v12zm5.5 1v.6h1.5V17zm0 .6c0 .916-.734 1.65-1.65 1.65v1.5a3.144 3.144 0 0 0 3.15-3.15zm-1.65 1.65H7.4v1.5h9.2zm-9.2 0c-.916 0-1.65-.734-1.65-1.65h-1.5a3.144 3.144 0 0 0 3.15 3.15zM5.75 17.6V17h-1.5v.6z"/></svg>
               Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Protect PDF Modal -->
+    <div id="protect-modal" class="converter-modal" style="display: none">
+      <div class="converter-modal-content">
+        <!-- Step 1: Select File -->
+        <div id="protect-step-1">
+          <h3 class="converter-title">Protect PDF File</h3>
+          <p
+            class="converter-subtitle"
+            style="text-align: center; margin-bottom: 20px"
+          >
+            Encrypt your PDF with a password to keep sensitive data
+            confidential.
+          </p>
+          <input
+            type="file"
+            id="protect-file-input"
+            accept=".pdf"
+            multiple
+            style="display: none"
+          />
+          <div id="selectFile">
+            <button id="select-protect-file-btn" class="converter-btn-protect">
+              Select PDF file
+            </button>
+          </div>
+          <div class="converter-actions">
+            <button id="protect-cancel-btn" class="converter-btn-secondary">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Configure Password (Split View) -->
+        <div id="protect-step-2" style="display: none">
+          <div class="protect-split-container">
+            <!-- Left Side: File List -->
+            <div class="protect-left-panel">
+              <div class="converter-actions">
+                <button
+                  id="protect-back-step-1"
+                  
+                >
+                <!-- prettier-ignore -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><g fill="none" fill-rule="evenodd"><path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#2343d3" d="M7.94 13.06a1.5 1.5 0 0 1 0-2.12l5.656-5.658a1.5 1.5 0 1 1 2.121 2.122L11.122 12l4.596 4.596a1.5 1.5 0 1 1-2.12 2.122l-5.66-5.658Z"/></g></svg>
+            
+                </button>
+              </div>
+              <div id="protect-file-list" class="file-list-vertical"></div>
+              <button
+                id="protect-add-more-btn"
+              
+                style="width: 100%; margin-top: 10px"
+              >
+               <!-- prettier-ignore -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" fill="none"/><circle cx="24" cy="24" r="21" fill="#f32c0a"/><g fill="#fff"><path d="M21 14h6v20h-6z"/><path d="M14 21h20v6H14z"/></g></svg>
+              </button>
+            </div>
+
+            <!-- Right Side: Password Form -->
+            <div class="protect-right-panel">
+              <h4 class="section-title">Protect PDF</h4>
+              <p class="section-desc">
+                Set a password to protect your PDF file.
+              </p>
+
+              <div class="input-group">
+                <label>Type Password</label>
+                <div class="password-wrapper">
+                  <input
+                    type="password"
+                    id="pdf-password"
+                    placeholder="Enter password"
+                  />
+                  <span class="eye-toggle" data-target="pdf-password">
+                    <!-- Eye Icon (Iconify: ph:eye) -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 256 256"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M247.31 124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57 61.26 162.88 48 128 48S61.43 61.26 36.34 86.35C17.51 105.18 9 124 8.69 124.76a8 8 0 0 0 0 6.5c.35.79 8.82 19.57 27.65 38.4C61.43 194.74 93.12 208 128 208s66.57-13.26 91.66-38.34c18.83-18.83 27.3-37.61 27.65-38.4a8 8 0 0 0 0-6.5M128 192c-30.78 0-57.67-11.19-79.93-33.25A133.5 133.5 0 0 1 25 128a133.3 133.3 0 0 1 23.07-30.75C70.33 75.19 97.22 64 128 64s57.67 11.19 79.93 33.25A133.5 133.5 0 0 1 231 128c-7.21 13.46-38.62 64-103 64m0-112a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48m0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label>Repeat Password</label>
+                <div class="password-wrapper">
+                  <input
+                    type="password"
+                    id="pdf-password-confirm"
+                    placeholder="Repeat password"
+                  />
+                  <span class="eye-toggle" data-target="pdf-password-confirm">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 256 256"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M247.31 124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57 61.26 162.88 48 128 48S61.43 61.26 36.34 86.35C17.51 105.18 9 124 8.69 124.76a8 8 0 0 0 0 6.5c.35.79 8.82 19.57 27.65 38.4C61.43 194.74 93.12 208 128 208s66.57-13.26 91.66-38.34c18.83-18.83 27.3-37.61 27.65-38.4a8 8 0 0 0 0-6.5M128 192c-30.78 0-57.67-11.19-79.93-33.25A133.5 133.5 0 0 1 25 128a133.3 133.3 0 0 1 23.07-30.75C70.33 75.19 97.22 64 128 64s57.67 11.19 79.93 33.25A133.5 133.5 0 0 1 231 128c-7.21 13.46-38.62 64-103 64m0-112a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48m0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <button
+                id="protect-submit-btn"
+                class="converter-btn"
+                style="width: 100%; margin-top: 20px"
+                disabled
+              >
+                Protect PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Progress -->
+        <div id="protect-step-3" style="display: none">
+          <h3 class="converter-title">Protecting PDF...</h3>
+          <p>Please wait while we encrypt your document.</p>
+          <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+          </div>
+          <p class="progress-percentage">0%</p>
+        </div>
+
+        <!-- Step 4: Success -->
+        <div id="protect-step-4" style="display: none">
+          <h3 class="converter-title conversion-success">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="#007A4B"
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12c5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4l1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"
+              />
+            </svg>
+            <p>PDF Protected Successfully!</p>
+          </h3>
+          <div class="converter-actions">
+            <button id="protect-back-home" class="converter-btn-secondary">
+              Back
+            </button>
+            <button id="download-protected-btn" class="converter-btn">
+              Download PDF
             </button>
           </div>
         </div>
@@ -8310,7 +8519,7 @@
       src="https://cdn.jsdelivr.net/npm/@duetds/date-picker@latest/dist/duet/duet.esm.js"
     ></script>
     <!-- PDF lib for document export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script> -->
     <!-- DOCX lib for document export  -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.4/pizzip.min.js"></script>
@@ -8327,7 +8536,6 @@
     <script>
       const HIDDEN = "paper-editing";
     </script>
-
     <!-- 1. SheetJS (for CSV, XLS, XLSX) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -8337,7 +8545,14 @@
     <!-- 3. docx (for DOCX) and FileSaver.js (to help save the file) -->
     <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
+    <!-- to protect a pdf -->
+    <script src="https://unpkg.com/pdf-lib@^1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+      // Set the worker source (Required for PDF.js to work)
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    </script>
     <!-- font -->
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 
