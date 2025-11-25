@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Toggle submenu correctly
     submenu.style.display =
       submenu.style.display === "block" ? "none" : "block";
+    convertElement.classList.toggle("active-convert-document-element");
   });
 
   // Close submenu when clicking one of the submenu items
@@ -49,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (typeof closeDropdownBar === "function") {
         closeDropdownBar();
+        convertElement.classList.remove("active-convert-document-element");
       }
 
       if (action === "to-pdf") {

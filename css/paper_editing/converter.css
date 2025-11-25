@@ -217,7 +217,11 @@
   background-color: #007bff;
   color: white;
 }
-
+.active-convert-document-element {
+  background: #8837e9;
+  color: #fff;
+  border-radius: 6px;
+}
 .converter-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
