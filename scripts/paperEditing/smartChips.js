@@ -11,6 +11,12 @@ let smartChipsInitialized = false;
 // --- 1. Dropdown Toggle Logic ---
 smartChipsButton.addEventListener("click", (e) => {
   e.stopPropagation();
+  // Close grammar dropdown when smart chips is clicked
+  const grammarDropdown = document.querySelector("#grammarDropdown");
+  if (grammarDropdown) {
+    grammarDropdown.classList.remove("open");
+  }
+  // Toggle smart chips dropdown
   dropdown.classList.toggle("open");
 });
 
@@ -18,6 +24,11 @@ document.addEventListener("click", () => {
   dropdown.classList.remove("open");
   closeChipInteractionModal();
   deselectChips();
+  // Also close grammar dropdown when clicking outside
+  const grammarDropdown = document.querySelector("#grammarDropdown");
+  if (grammarDropdown) {
+    grammarDropdown.classList.remove("open");
+  }
 });
 
 dropdown.addEventListener("click", (e) => e.stopPropagation());

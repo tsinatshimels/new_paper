@@ -102,6 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedConversionType = e.currentTarget.dataset.type;
       const typeName = getTypeDisplayName(selectedConversionType);
       step1Title.textContent = `Convert ${typeName} to PDF`;
+
+      // Update file input accept attribute based on selected type
+      fileInput.accept = getAcceptAttributeForType(selectedConversionType);
     });
   });
 
@@ -122,6 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedConversionType = detectFileType(fileExt);
         const typeName = getTypeDisplayName(selectedConversionType);
         step1Title.textContent = `Convert ${typeName} to PDF`;
+        // Update accept attribute based on detected type
+        fileInput.accept = getAcceptAttributeForType(selectedConversionType);
       }
     }
   });
@@ -164,17 +169,274 @@ document.addEventListener("DOMContentLoaded", () => {
     step2.style.display = "block";
   });
 
-  downloadPdfBtn.addEventListener("click", () => {
+  downloadPdfBtn.addEventListener("click", async () => {
+    try {
+      await convertFileToPdf(selectedFile, selectedConversionType);
+    } catch (error) {
+      console.error("Conversion error:", error);
+      alert("Error converting file to PDF: " + error.message);
+    }
+  });
+
+  // Function to convert different file types to PDF
+  async function convertFileToPdf(file, conversionType) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const fileName = file.name.split(".")[0];
+
+    switch (conversionType) {
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+      case "webp":
+        await convertImageToPdf(doc, file);
+        break;
+      case "word":
+      case "doc":
+      case "docx":
+        await convertWordToPdf(doc, file);
+        break;
+      case "powerpoint":
+      case "ppt":
+      case "pptx":
+        await convertPowerPointToPdf(doc, file);
+        break;
+      case "excel":
+      case "xls":
+      case "xlsx":
+        await convertExcelToPdf(doc, file);
+        break;
+      case "html":
+      case "htm":
+        await convertHtmlToPdf(doc, file);
+        break;
+      default:
+        throw new Error("Unsupported file type for conversion");
+    }
+
+    doc.save(`converted-${fileName}.pdf`);
+  }
+
+  // Convert Image to PDF
+  async function convertImageToPdf(doc, file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const imgWidth = img.width;
+          const imgHeight = img.height;
+          const pdfWidth = doc.internal.pageSize.getWidth();
+          const pdfHeight = doc.internal.pageSize.getHeight();
+
+          // Calculate dimensions to fit the page while maintaining aspect ratio
+          let width = imgWidth;
+          let height = imgHeight;
+          const ratio = Math.min(pdfWidth / width, pdfHeight / height);
+          width = width * ratio;
+          height = height * ratio;
+
+          // Center the image on the page
+          const x = (pdfWidth - width) / 2;
+          const y = (pdfHeight - height) / 2;
+
+          // Determine image format based on file type
+          const fileExt = file.name.split(".").pop().toLowerCase();
+          let format = "JPEG"; // default
+          let imageData = e.target.result;
+
+          // For WebP and other formats that jsPDF might not support directly,
+          // convert to canvas first
+          if (fileExt === "webp" || fileExt === "heic" || fileExt === "raw") {
+            const canvas = document.createElement("canvas");
+            canvas.width = imgWidth;
+            canvas.height = imgHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            imageData = canvas.toDataURL("image/jpeg", 0.95);
+            format = "JPEG";
+          } else if (fileExt === "png") {
+            format = "PNG";
+          } else if (fileExt === "gif") {
+            format = "GIF";
+          }
+
+          doc.addImage(imageData, format, x, y, width, height);
+          resolve();
+        };
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Convert Word (DOCX) to PDF
+  async function convertWordToPdf(doc, file) {
+    if (typeof mammoth === "undefined") {
+      throw new Error(
+        "Mammoth library is not loaded. Please include the script tag."
+      );
+    }
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      const htmlContent = result.value;
+
+      // Create a temporary div to parse HTML
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = htmlContent;
+
+      // Extract text content and format it
+      const textContent = tempDiv.innerText || tempDiv.textContent;
+      const lines = textContent.split("\n").filter((line) => line.trim());
+
+      let yPosition = 20;
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const lineHeight = 7;
+
+      lines.forEach((line) => {
+        if (yPosition > pageHeight - margin) {
+          doc.addPage();
+          yPosition = margin;
+        }
+
+        // Split long lines to fit page width
+        const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+        const splitLines = doc.splitTextToSize(line, maxWidth);
+
+        splitLines.forEach((splitLine) => {
+          if (yPosition > pageHeight - margin) {
+            doc.addPage();
+            yPosition = margin;
+          }
+          doc.text(splitLine, margin, yPosition);
+          yPosition += lineHeight;
+        });
+      });
+    } catch (error) {
+      throw new Error("Failed to convert Word document: " + error.message);
+    }
+  }
+
+  // Convert PowerPoint to PDF
+  async function convertPowerPointToPdf(doc, file) {
+    // PowerPoint conversion is complex - for now, we'll extract text if possible
+    // Note: Full PPTX conversion requires server-side processing or specialized libraries
+    doc.text("PowerPoint to PDF conversion", 20, 20);
     doc.text(
-      `Converted from ${selectedConversionType.toUpperCase()} to PDF`,
-      10,
-      10
+      "Note: Full PowerPoint conversion requires specialized processing.",
+      20,
+      30
     );
-    doc.text(`Original file: ${selectedFile.name}`, 10, 20);
-    doc.save(`converted-${selectedFile.name.split(".")[0]}.pdf`);
-  });
+    doc.text(`Original file: ${file.name}`, 20, 40);
+    doc.text(
+      "For best results, please use Microsoft PowerPoint to export as PDF.",
+      20,
+      50
+    );
+
+    // If the file is a PPTX (ZIP-based), we could try to extract text
+    // For now, we'll show a message
+    return Promise.resolve();
+  }
+
+  // Convert Excel to PDF
+  async function convertExcelToPdf(doc, file) {
+    if (typeof XLSX === "undefined") {
+      throw new Error(
+        "SheetJS library is not loaded. Please include the script tag."
+      );
+    }
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      // Convert to JSON array
+      const data = XLSX.utils.sheet_to_json(worksheet, {
+        header: 1,
+        defval: "",
+      });
+
+      if (data.length === 0) {
+        doc.text("No data found in Excel file", 20, 20);
+        return;
+      }
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      const startX = margin;
+      let startY = margin;
+      const rowHeight = 7;
+      const colWidth =
+        (pageWidth - margin * 2) / Math.min(data[0]?.length || 1, 5);
+
+      data.forEach((row, rowIndex) => {
+        if (startY + rowHeight > pageHeight - margin) {
+          doc.addPage();
+          startY = margin;
+        }
+
+        row.slice(0, 5).forEach((cell, colIndex) => {
+          const x = startX + colIndex * colWidth;
+          const cellText = String(cell || "").substring(0, 20); // Limit text length
+          doc.text(cellText, x, startY);
+        });
+
+        startY += rowHeight;
+      });
+    } catch (error) {
+      throw new Error("Failed to convert Excel file: " + error.message);
+    }
+  }
+
+  // Convert HTML to PDF
+  async function convertHtmlToPdf(doc, file) {
+    try {
+      const text = await file.text();
+
+      // Create a temporary div to parse HTML
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = text;
+
+      // Extract text content
+      const textContent = tempDiv.innerText || tempDiv.textContent;
+      const lines = textContent.split("\n").filter((line) => line.trim());
+
+      let yPosition = 20;
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const lineHeight = 7;
+      const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+
+      lines.forEach((line) => {
+        if (yPosition > pageHeight - margin) {
+          doc.addPage();
+          yPosition = margin;
+        }
+
+        const splitLines = doc.splitTextToSize(line, maxWidth);
+        splitLines.forEach((splitLine) => {
+          if (yPosition > pageHeight - margin) {
+            doc.addPage();
+            yPosition = margin;
+          }
+          doc.text(splitLine, margin, yPosition);
+          yPosition += lineHeight;
+        });
+      });
+    } catch (error) {
+      throw new Error("Failed to convert HTML file: " + error.message);
+    }
+  }
 
   // --- JPG CONVERTER LOGIC ---
   const jpgStep1 = document.getElementById("jpg-step-1");
@@ -546,34 +808,66 @@ document.addEventListener("DOMContentLoaded", () => {
       const { PDFDocument } = PDFLib;
       const password = passwordInput.value;
 
+      if (!password || password.trim() === "") {
+        throw new Error("Password cannot be empty");
+      }
+
       // We process the first selected file
       const file = protectFiles[0];
       const fileBuffer = await file.arrayBuffer();
 
-      // 2. Load the PDF
-      const pdfDoc = await PDFDocument.load(fileBuffer);
+      // 2. Load the PDF (if already encrypted, it will need password - for now we assume it's not encrypted)
+      let pdfDoc;
+      try {
+        pdfDoc = await PDFDocument.load(fileBuffer);
+      } catch (loadError) {
+        // If PDF is already encrypted, try loading without password first
+        if (loadError.message && loadError.message.includes("password")) {
+          throw new Error(
+            "This PDF is already password protected. Please use an unprotected PDF."
+          );
+        }
+        throw new Error("Failed to load PDF: " + loadError.message);
+      }
 
-      // 3. Encrypt and Save
-      // This creates a byte array of the encrypted PDF
+      // 3. Encrypt and Save with proper encryption settings
+      // The userPassword is what prompts for password when opening the PDF
+      // The ownerPassword is used for permissions (can be same as userPassword)
+      console.log("Encrypting PDF with password protection...");
       const pdfBytes = await pdfDoc.save({
+        useObjectStreams: false, // Ensure compatibility
+        addDefaultPage: false,
         encrypt: {
-          userPassword: password, // Password needed to OPEN the file
-          ownerPassword: password + "123", // Password needed to EDIT permissions (different from user pass)
+          userPassword: password, // This password is required to OPEN the file - prompts when opening
+          ownerPassword: password, // Owner password (can be same as user password)
           permissions: {
-            printing: "highResolution",
-            modifying: false,
-            copying: false,
-            annotating: false,
-            fillingForms: false,
-            contentAccessibility: false,
-            documentAssembly: false,
+            printing: "highResolution", // Allow printing
+            modifying: false, // Prevent modifications
+            copying: false, // Prevent copying
+            annotating: false, // Prevent annotations
+            fillingForms: false, // Prevent form filling
+            contentAccessibility: false, // Prevent content accessibility
+            documentAssembly: false, // Prevent document assembly
           },
         },
       });
 
+      console.log(
+        "PDF encrypted successfully. Size:",
+        pdfBytes.length,
+        "bytes"
+      );
+
       // 4. Create the download blob
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
+
+      // Revoke old URL if exists
+      if (protectedPdfBlobUrl) {
+        URL.revokeObjectURL(protectedPdfBlobUrl);
+      }
+
       protectedPdfBlobUrl = URL.createObjectURL(blob);
+      console.log("Protected PDF ready for download");
 
       // Complete progress bar
       clearInterval(progressInterval);
@@ -588,9 +882,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Encryption Failed:", error);
       clearInterval(progressInterval);
-      alert(
-        "An error occurred while encrypting the PDF. See console for details."
-      );
+      alert("An error occurred while encrypting the PDF: " + error.message);
 
       // Reset logic on failure
       protectStep3.style.display = "none";
@@ -617,13 +909,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   downloadProtectedBtn.addEventListener("click", () => {
-    if (protectedPdfBlobUrl) {
+    if (protectedPdfBlobUrl && protectFiles.length > 0) {
+      const originalFileName = protectFiles[0].name;
+      const fileNameWithoutExt = originalFileName.replace(/\.[^/.]+$/, "");
       const link = document.createElement("a");
       link.href = protectedPdfBlobUrl;
-      link.download = "protected-document.pdf";
+      link.download = `${fileNameWithoutExt}-protected.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    } else {
+      alert("No protected PDF available. Please protect a PDF first.");
     }
   });
 
@@ -679,8 +975,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const typeMap = {
       jpg: "jpg",
       jpeg: "jpg",
-      png: "png",
-      gif: "gif",
+      png: "jpg",
+      gif: "jpg",
+      webp: "jpg",
       doc: "word",
       docx: "word",
       ppt: "powerpoint",
@@ -691,6 +988,17 @@ document.addEventListener("DOMContentLoaded", () => {
       htm: "html",
     };
     return typeMap[extension] || "file";
+  }
+
+  function getAcceptAttributeForType(type) {
+    const acceptMap = {
+      jpg: ".jpg,.jpeg,.png,.gif,.webp",
+      word: ".doc,.docx",
+      powerpoint: ".ppt,.pptx",
+      excel: ".xls,.xlsx",
+      html: ".html,.htm",
+    };
+    return acceptMap[type] || "*";
   }
 
   function simulatePdfConversion() {

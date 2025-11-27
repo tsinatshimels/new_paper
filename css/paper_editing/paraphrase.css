@@ -1,0 +1,268 @@
+/* --- 1. Paraphrase Badge (Trigger) --- */
+#paraphrase-btn-badge {
+  position: fixed;
+  bottom: 40px;
+  right: 300px;
+  background-color: #8837e9;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+  cursor: pointer;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Segoe UI", sans-serif;
+  font-weight: 600;
+  transition: transform 0.2s ease;
+}
+
+#paraphrase-btn-badge:hover {
+  transform: translateY(-2px);
+  background-color: #651fff;
+}
+
+/* --- 2. Overlay (Full Screen) --- */
+#paraphrase-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f8f9fa;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#paraphrase-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* --- 3. Header --- */
+.paraphrase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  height: 60px;
+}
+
+.paraphrase-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.close-paraphrase {
+  border: none;
+  background: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #777;
+  line-height: 1;
+}
+
+.close-paraphrase:hover {
+  color: #333;
+}
+
+/* --- 4. Main Split Container --- */
+.paraphrase-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex: 1;
+  padding: 30px 40px;
+  overflow: hidden;
+  padding-bottom: 100px; /* Space for footer */
+}
+
+.para-paper-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+  max-width: 700px;
+  height: 100%;
+}
+
+.para-paper-label {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #555;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* The Editor Box (Scrollable Area) */
+.para-editor-box {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  white-space: pre-wrap; /* Keeps formatting */
+  scroll-behavior: smooth;
+}
+
+/* --- 5. Sentence & Highlight Styles --- */
+
+/* The span wrapping each sentence */
+.para-sentence {
+  cursor: pointer;
+  padding: 3px 2px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin-right: 4px; /* Space between sentences */
+}
+
+.para-sentence:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* ACTIVE STATE (Purple Highlight) - Applied to both sides */
+.para-sentence.active-sentence {
+  background-color: rgba(124, 77, 255, 0.15);
+  color: #311b92;
+  box-shadow: 0 0 0 1px rgba(124, 77, 255, 0.2);
+}
+
+/* Changed Words (Orange) - Right side only */
+.diff-change {
+  color: #e65100;
+  font-weight: 600;
+  border-bottom: 1px dotted #ff9800;
+}
+
+.loading-text {
+  color: #999;
+  font-style: italic;
+}
+
+/* --- 6. Footer Navigation Bar --- */
+.paraphrase-footer {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 10px 25px;
+  border-radius: 50px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 2001;
+  min-width: 500px;
+  justify-content: space-between;
+}
+
+.footer-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navigation Buttons (Arrows) */
+.nav-btn {
+  border: 1px solid #eee;
+  background: white;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+  color: #7c4dff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Stats Text */
+.para-stats-text {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.sentence-counter {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #333;
+  font-variant-numeric: tabular-nums;
+}
+
+.word-counter {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #eee;
+}
+
+/* Action Buttons (Regenerate, Copy) */
+.action-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.action-icon-btn:hover {
+  background-color: #f0f0f0;
+  color: #7c4dff;
+}
+
+/* Replace All Button */
+.insert-btn {
+  background-color: #7c4dff;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
+  transition: background 0.2s;
+}
+
+.insert-btn:hover {
+  background-color: #651fff;
+}
