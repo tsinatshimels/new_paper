@@ -190,6 +190,18 @@
 #protect-submit-btn {
   background: #f32c0a;
   color: #fff;
+  margin-top: 8rem !important;
+}
+#converter-modal {
+  max-width: 700px !important;
+}
+#toggle-conversion-direction {
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  color: #fff;
+  background-color: #007bff;
 }
 .converter-btn-protect {
   padding: 1.5rem;
@@ -296,6 +308,7 @@
 }
 .jpg-step-2 {
   display: flex;
+  height: 500px;
 }
 .jpg-step-2 .jpg-step-2-preview {
   background: #dadce0;
@@ -337,7 +350,17 @@
   display: flex;
   gap: 1rem;
 }
-
+.protect-split-container {
+  height: 500px;
+}
+#jpg-preview-container {
+  gap: 50px !important;
+  height: 400px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
 /* --- Protect PDF Modal Split Layout --- */
 
 #protect-modal {
@@ -364,6 +387,7 @@
   overflow-y: auto;
   max-height: 250px;
   margin-top: 3rem;
+  scrollbar-width: none;
 }
 
 .protect-file-item {
@@ -390,6 +414,7 @@
   background: #fff !important;
   padding-left: 0.5rem;
   padding: 2rem;
+  height: 100%;
 }
 
 .section-title {

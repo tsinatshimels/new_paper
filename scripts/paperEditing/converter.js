@@ -66,6 +66,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Close modals on outside click
+  document.addEventListener("mousedown", (e) => {
+    // Converter modal
+    if (modal.style.display === "block") {
+      if (!e.target.closest("#converter-modal .converter-modal-content")) {
+        modal.style.display = "none";
+      }
+    }
+    // JPG modal
+    if (jpgModal.style.display === "block") {
+      if (!e.target.closest("#jpg-converter-modal .converter-modal-content")) {
+        jpgModal.style.display = "none";
+      }
+    }
+    // Protect modal
+    if (protectModal.style.display === "block") {
+      if (!e.target.closest("#protect-modal .converter-modal-content")) {
+        protectModal.style.display = "none";
+      }
+    }
+  });
+
+  // Close modals on ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (modal.style.display === "block") modal.style.display = "none";
+      if (jpgModal.style.display === "block") jpgModal.style.display = "none";
+      if (protectModal.style.display === "block")
+        protectModal.style.display = "none";
+    }
+  });
+
   // --- PDF CONVERTER LOGIC ---
   const step1 = document.getElementById("converter-step-1");
   const step2 = document.getElementById("converter-step-2");
@@ -90,21 +122,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let selectedFile = null;
   let selectedConversionType = null;
+  let selectedConversionTarget = null; // target for reverse conversion (from PDF)
   let conversionInterval = null;
+  let conversionDirection = "to-pdf"; // can be 'to-pdf' or 'from-pdf'
 
   // Converter option buttons
   const converterOptions = document.querySelectorAll(
     ".converter-option[data-type]"
   );
 
+  // Toggle direction button
+  const toggleDirectionBtn = document.getElementById(
+    "toggle-conversion-direction"
+  );
+
+  toggleDirectionBtn.addEventListener("click", () => {
+    if (conversionDirection === "to-pdf") {
+      conversionDirection = "from-pdf";
+      toggleDirectionBtn.textContent = "Convert from PDF";
+      // Update title
+      step1Title.textContent = "Convert from PDF";
+      // Ensure file input accepts PDFs only in this mode
+      fileInput.accept = ".pdf";
+      // Update button labels to show reverse intent
+      converterOptions.forEach((opt) => {
+        const target = opt.dataset.target || opt.dataset.type;
+        opt.querySelector("span").textContent = `PDF to ${getTypeDisplayName(
+          target
+        )}`;
+      });
+    } else {
+      conversionDirection = "to-pdf";
+      toggleDirectionBtn.textContent = "Convert to PDF";
+      step1Title.textContent = "Convert to PDF";
+      // Reset file input accept
+      fileInput.accept = getAcceptAttributeForType(selectedConversionType);
+      // Restore original labels
+      converterOptions.forEach((opt) => {
+        const src = opt.dataset.type;
+        opt.querySelector("span").textContent = `${getTypeDisplayName(
+          src
+        )} to PDF`;
+      });
+    }
+  });
+
   converterOptions.forEach((option) => {
     option.addEventListener("click", (e) => {
-      selectedConversionType = e.currentTarget.dataset.type;
-      const typeName = getTypeDisplayName(selectedConversionType);
-      step1Title.textContent = `Convert ${typeName} to PDF`;
+      if (conversionDirection === "to-pdf") {
+        selectedConversionType = e.currentTarget.dataset.type;
+        const typeName = getTypeDisplayName(selectedConversionType);
+        step1Title.textContent = `Convert ${typeName} to PDF`;
 
-      // Update file input accept attribute based on selected type
-      fileInput.accept = getAcceptAttributeForType(selectedConversionType);
+        // Update file input accept attribute based on selected type
+        fileInput.accept = getAcceptAttributeForType(selectedConversionType);
+      } else {
+        // conversionDirection === 'from-pdf'
+        selectedConversionTarget =
+          e.currentTarget.dataset.target || e.currentTarget.dataset.type;
+        const targetName = getTypeDisplayName(selectedConversionTarget);
+        step1Title.textContent = `Convert PDF to ${targetName}`;
+        // Accept PDF instead when converting from PDF
+        fileInput.accept = ".pdf";
+      }
     });
   });
 
@@ -120,13 +200,21 @@ document.addEventListener("DOMContentLoaded", () => {
       continueBtn.disabled = false;
 
       // Auto-detect file type if no type selected
-      if (!selectedConversionType) {
+      if (!selectedConversionType && conversionDirection === "to-pdf") {
         const fileExt = selectedFile.name.split(".").pop().toLowerCase();
         selectedConversionType = detectFileType(fileExt);
         const typeName = getTypeDisplayName(selectedConversionType);
         step1Title.textContent = `Convert ${typeName} to PDF`;
         // Update accept attribute based on detected type
         fileInput.accept = getAcceptAttributeForType(selectedConversionType);
+      }
+      // If in from-pdf mode and we have no selectedConversionTarget, guess JPG as default
+      if (conversionDirection === "from-pdf" && !selectedConversionTarget) {
+        // default to JPG when converting from PDF
+        selectedConversionTarget = "jpg";
+        const targetName = getTypeDisplayName(selectedConversionTarget);
+        step1Title.textContent = `Convert PDF to ${targetName}`;
+        fileInput.accept = ".pdf";
       }
     }
   });
@@ -136,10 +224,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   continueBtn.addEventListener("click", () => {
-    if (!selectedConversionType) return;
-
-    const typeName = getTypeDisplayName(selectedConversionType);
-    step2Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="red-label">PDF</span>`;
+    if (conversionDirection === "to-pdf") {
+      if (!selectedConversionType) return;
+      const typeName = getTypeDisplayName(selectedConversionType);
+      step2Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="red-label">PDF</span>`;
+    } else {
+      if (!selectedConversionTarget) return;
+      const targetName = getTypeDisplayName(selectedConversionTarget);
+      step2Title.innerHTML = `You are converting this file from <span class="blue-label">PDF</span> to <span class="red-label">${targetName}</span>`;
+    }
     step1.style.display = "none";
     step2.style.display = "block";
   });
@@ -150,11 +243,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   convertNowBtn.addEventListener("click", () => {
-    const typeName = getTypeDisplayName(selectedConversionType);
-    step3Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="red-label">PDF</span>`;
-    step2.style.display = "none";
-    step3.style.display = "block";
-    simulatePdfConversion();
+    if (conversionDirection === "to-pdf") {
+      const typeName = getTypeDisplayName(selectedConversionType);
+      step3Title.innerHTML = `You are converting this file from <span class="blue-label">${typeName}</span> to <span class="red-label">PDF</span>`;
+      step2.style.display = "none";
+      step3.style.display = "block";
+      simulatePdfConversion();
+    } else {
+      const targetName = getTypeDisplayName(selectedConversionTarget || "jpg");
+      step3Title.innerHTML = `You are converting this file from <span class="blue-label">PDF</span> to <span class="red-label">${targetName}</span>`;
+      step2.style.display = "none";
+      step3.style.display = "block";
+      // Simulate and then process conversion PDF -> target (e.g., JPG)
+      simulatePdfConversion();
+    }
   });
 
   cancelConversionBtn.addEventListener("click", () => {
@@ -171,12 +273,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   downloadPdfBtn.addEventListener("click", async () => {
     try {
-      await convertFileToPdf(selectedFile, selectedConversionType);
+      if (conversionDirection === "to-pdf") {
+        await convertFileToPdf(selectedFile, selectedConversionType);
+      } else {
+        // from PDF - determine target
+        const target = selectedConversionTarget || "jpg";
+        if (target === "jpg") {
+          await convertPdfToJpg(selectedFile);
+        } else {
+          alert("This reverse conversion is not supported yet.");
+        }
+      }
     } catch (error) {
       console.error("Conversion error:", error);
-      alert("Error converting file to PDF: " + error.message);
+      alert("Error converting file: " + error.message);
     }
   });
+
+  // When in from-pdf mode, download button behavior should convert pdf to chosen target
+  // Replace the existing click on convertNow? Keep separate: we'll handle conversion in step3 completion.
 
   // Function to convert different file types to PDF
   async function convertFileToPdf(file, conversionType) {
@@ -216,6 +331,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     doc.save(`converted-${fileName}.pdf`);
+  }
+
+  // Convert PDF to JPG pages (multi-page support)
+  async function convertPdfToJpg(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const total = pdf.numPages;
+
+      for (let i = 1; i <= total; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 2.0 });
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: context, viewport }).promise;
+        const jpgUrl = canvas.toDataURL("image/jpeg", 0.95);
+        const blob = dataURLToBlob(jpgUrl);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${file.name.replace(/\.[^/.]+$/, "")}_page${i}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        // Free object URL
+        URL.revokeObjectURL(link.href);
+      }
+    } catch (err) {
+      console.error("PDF to JPG conversion failed:", err);
+      alert("Error converting PDF to JPG: " + err.message);
+    }
+  }
+
+  function dataURLToBlob(dataurl) {
+    const arr = dataurl.split(",");
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = (mimeMatch && mimeMatch[1]) || "image/jpeg";
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
   }
 
   // Convert Image to PDF
@@ -481,120 +641,157 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  selectJpgFileBtn.addEventListener("click", () => jpgFileInput.click());
+  if (selectJpgFileBtn && jpgFileInput) {
+    selectJpgFileBtn.addEventListener("click", () => jpgFileInput.click());
+  }
 
-  jpgFileInput.addEventListener("change", (e) => {
-    const newFiles = Array.from(e.target.files);
-    selectedJpgFiles = [...selectedJpgFiles, ...newFiles];
-    updateJpgFileDisplay();
-    jpgContinueBtn.disabled = selectedJpgFiles.length === 0;
-  });
+  if (jpgFileInput) {
+    jpgFileInput.addEventListener("change", (e) => {
+      const newFiles = Array.from(e.target.files || []);
+      selectedJpgFiles = [...selectedJpgFiles, ...newFiles];
+      updateJpgFileDisplay();
+      // Automatically go to preview step when files selected
+      if (jpgStep1 && jpgStep2) {
+        if (
+          jpgStep1.style.display === "block" ||
+          jpgStep1.style.display === ""
+        ) {
+          jpgStep1.style.display = "none";
+          jpgStep2.style.display = "flex";
+          updateJpgPreview();
+        } else if (jpgStep2.style.display === "flex") {
+          // If already in preview, just update preview with new files
+          updateJpgPreview();
+        }
+      }
+      if (jpgContinueBtn)
+        jpgContinueBtn.disabled = selectedJpgFiles.length === 0;
+    });
+  }
 
-  addMoreImagesBtn.addEventListener("click", () => jpgFileInput.click());
+  if (addMoreImagesBtn) {
+    addMoreImagesBtn.addEventListener("click", () => {
+      if (jpgFileInput) jpgFileInput.click();
+    });
+  }
 
-  jpgCancelBtn.addEventListener(
-    "click",
-    () => (jpgModal.style.display = "none")
-  );
+  if (jpgCancelBtn) {
+    jpgCancelBtn.addEventListener(
+      "click",
+      () => (jpgModal.style.display = "none")
+    );
+  }
 
-  jpgContinueBtn.addEventListener("click", () => {
-    jpgStep1.style.display = "none";
-    jpgStep2.style.display = "flex";
-    updateJpgPreview();
-  });
+  if (jpgContinueBtn) {
+    jpgContinueBtn.addEventListener("click", () => {
+      jpgStep1.style.display = "none";
+      jpgStep2.style.display = "flex";
+      updateJpgPreview();
+    });
+  }
 
-  jpgBackToStep1.addEventListener("click", () => {
-    jpgStep2.style.display = "none";
-    jpgStep1.style.display = "block";
-  });
+  if (jpgBackToStep1) {
+    jpgBackToStep1.addEventListener("click", () => {
+      jpgStep2.style.display = "none";
+      jpgStep1.style.display = "block";
+    });
+  }
 
-  convertToJpgBtn.addEventListener("click", () => {
-    if (selectedJpgFiles.length === 0) return;
-    const fileTypes = [
-      ...new Set(
-        selectedJpgFiles.map((file) =>
-          getTypeDisplayName(file.name.split(".").pop().toLowerCase())
-        )
-      ),
-    ];
-    jpgStep3Title.textContent = `Converting ${fileTypes.join(", ")} to JPG`;
-    jpgStep2.style.display = "none";
-    jpgStep3.style.display = "block";
-    simulateJpgConversion();
-  });
+  if (convertToJpgBtn) {
+    convertToJpgBtn.addEventListener("click", () => {
+      if (selectedJpgFiles.length === 0) return;
+      const fileTypes = [
+        ...new Set(
+          selectedJpgFiles.map((file) =>
+            getTypeDisplayName(file.name.split(".").pop().toLowerCase())
+          )
+        ),
+      ];
+      jpgStep3Title.textContent = `Converting ${fileTypes.join(", ")} to JPG`;
+      jpgStep2.style.display = "none";
+      jpgStep3.style.display = "block";
+      simulateJpgConversion();
+    });
+  }
 
-  jpgCancelConversionBtn.addEventListener("click", () => {
-    if (jpgConversionInterval) clearInterval(jpgConversionInterval);
-    jpgModal.style.display = "none";
-  });
+  if (jpgCancelConversionBtn) {
+    jpgCancelConversionBtn.addEventListener("click", () => {
+      if (jpgConversionInterval) clearInterval(jpgConversionInterval);
+      jpgModal.style.display = "none";
+    });
+  }
 
-  jpgBackToStep2.addEventListener("click", () => {
-    jpgStep4.style.display = "none";
-    jpgStep2.style.display = "flex";
-  });
+  if (jpgBackToStep2) {
+    jpgBackToStep2.addEventListener("click", () => {
+      jpgStep4.style.display = "none";
+      jpgStep2.style.display = "flex";
+    });
+  }
 
   // --- REPLACE THE OLD downloadJpgBtn LISTENER WITH THIS ---
 
-  downloadJpgBtn.addEventListener("click", async () => {
-    if (selectedJpgFiles.length === 0) {
-      alert("No files found to download.");
-      return;
-    }
+  if (downloadJpgBtn) {
+    downloadJpgBtn.addEventListener("click", async () => {
+      if (selectedJpgFiles.length === 0) {
+        alert("No files found to download.");
+        return;
+      }
 
-    // Helper function to convert and download a single file
-    const processAndDownload = (file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
+      // Helper function to convert and download a single file
+      const processAndDownload = (file) => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
 
-        reader.onload = (e) => {
-          const img = new Image();
+          reader.onload = (e) => {
+            const img = new Image();
 
-          img.onload = () => {
-            // 1. Create a canvas to handle conversion
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext("2d");
+            img.onload = () => {
+              // 1. Create a canvas to handle conversion
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
 
-            // 2. Fill background white (because JPG doesn't support transparency)
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+              // 2. Fill background white (because JPG doesn't support transparency)
+              ctx.fillStyle = "#FFFFFF";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 3. Draw the original image onto the canvas
-            ctx.drawImage(img, 0, 0);
+              // 3. Draw the original image onto the canvas
+              ctx.drawImage(img, 0, 0);
 
-            // 4. Convert the canvas content to a JPG Data URL
-            // 0.9 represents 90% quality
-            const jpgUrl = canvas.toDataURL("image/jpeg", 0.9);
+              // 4. Convert the canvas content to a JPG Data URL
+              // 0.9 represents 90% quality
+              const jpgUrl = canvas.toDataURL("image/jpeg", 0.9);
 
-            // 5. Create a temporary link to trigger download
-            const link = document.createElement("a");
-            link.href = jpgUrl;
+              // 5. Create a temporary link to trigger download
+              const link = document.createElement("a");
+              link.href = jpgUrl;
 
-            // Rename the file extension to .jpg
-            const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
-            link.download = newFileName;
+              // Rename the file extension to .jpg
+              const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+              link.download = newFileName;
 
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
 
-            resolve();
+              resolve();
+            };
+
+            img.src = e.target.result;
           };
 
-          img.src = e.target.result;
-        };
+          reader.readAsDataURL(file);
+        });
+      };
 
-        reader.readAsDataURL(file);
-      });
-    };
-
-    // Loop through all selected files and download them
-    // We use 'for...of' with await to prevent browser blocking multiple downloads
-    for (const file of selectedJpgFiles) {
-      await processAndDownload(file);
-    }
-  });
+      // Loop through all selected files and download them
+      // We use 'for...of' with await to prevent browser blocking multiple downloads
+      for (const file of selectedJpgFiles) {
+        await processAndDownload(file);
+      }
+    });
+  }
 
   // --- PROTECT PDF LOGIC (NEW) ---
   // --- PROTECT PDF LOGIC (REAL ENCRYPTION) ---
@@ -1014,8 +1211,16 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(conversionInterval);
         step3.style.display = "none";
         step4.style.display = "block";
-        const typeName = getTypeDisplayName(selectedConversionType);
-        successMessage.textContent = `Successfully converted from ${typeName} to PDF`;
+        if (conversionDirection === "to-pdf") {
+          const typeName = getTypeDisplayName(selectedConversionType);
+          successMessage.textContent = `Successfully converted from ${typeName} to PDF`;
+        } else {
+          const targetName = getTypeDisplayName(
+            selectedConversionTarget || "jpg"
+          );
+          successMessage.textContent = `Successfully converted from PDF to ${targetName}`;
+          // Wait for the user to click Download (downloadPdfBtn handler will perform the conversion)
+        }
       } else {
         width++;
         progressBar.style.width = width + "%";
@@ -1054,6 +1259,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateJpgFileDisplay() {
+    if (!selectedJpgFilesContainer) return;
     selectedJpgFilesContainer.innerHTML = "";
     if (selectedJpgFiles.length > 0) {
       const fileList = document.createElement("div");
@@ -1071,27 +1277,62 @@ document.addEventListener("DOMContentLoaded", () => {
           const index = parseInt(e.target.dataset.index);
           selectedJpgFiles.splice(index, 1);
           updateJpgFileDisplay();
-          jpgContinueBtn.disabled = selectedJpgFiles.length === 0;
+          if (jpgContinueBtn)
+            jpgContinueBtn.disabled = selectedJpgFiles.length === 0;
         });
       });
     }
   }
 
   function updateJpgPreview() {
+    if (!jpgPreviewContainer) return;
     jpgPreviewContainer.innerHTML = "";
     jpgStep2Title.textContent = `Convert ${selectedJpgFiles.length} image(s) to JPG`;
+    // Layout side-by-side
+    jpgPreviewContainer.style.display = "flex";
+    jpgPreviewContainer.style.flexWrap = "wrap";
+    jpgPreviewContainer.style.gap = "10px";
     selectedJpgFiles.forEach((file) => {
       const previewItem = document.createElement("div");
       previewItem.className = "preview-item";
+      previewItem.style.width = "120px";
+      previewItem.style.display = "flex";
+      previewItem.style.flexDirection = "column";
+      previewItem.style.alignItems = "center";
+      previewItem.style.justifyContent = "center";
+      previewItem.style.gap = "6px";
       if (file.type.startsWith("image/")) {
         const img = document.createElement("img");
         img.src = URL.createObjectURL(file);
         img.alt = file.name;
+        img.style.width = "100%";
+        img.style.height = "80px";
+        img.style.objectFit = "cover";
         previewItem.appendChild(img);
       }
       const fileName = document.createElement("p");
       fileName.textContent = file.name;
       previewItem.appendChild(fileName);
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "remove-preview-file";
+      removeBtn.textContent = "×";
+      removeBtn.style.marginTop = "6px";
+      removeBtn.style.background = "#fff";
+      removeBtn.style.border = "1px solid #ddd";
+      removeBtn.style.borderRadius = "50%";
+      removeBtn.style.width = "28px";
+      removeBtn.style.height = "28px";
+      removeBtn.style.cursor = "pointer";
+      previewItem.prepend(removeBtn);
+      removeBtn.addEventListener("click", () => {
+        // remove file from selectedJpgFiles array
+        const idx = selectedJpgFiles.indexOf(file);
+        if (idx > -1) {
+          selectedJpgFiles.splice(idx, 1);
+          updateJpgPreview();
+          updateJpgFileDisplay();
+        }
+      });
       jpgPreviewContainer.appendChild(previewItem);
     });
   }
@@ -1103,10 +1344,20 @@ document.addEventListener("DOMContentLoaded", () => {
     step4.style.display = "none";
     selectedFile = null;
     selectedConversionType = null;
+    selectedConversionTarget = null;
     selectedFileName.textContent = "";
     continueBtn.disabled = true;
     fileInput.value = "";
     step1Title.textContent = "Convert to PDF";
+    conversionDirection = "to-pdf";
+    if (toggleDirectionBtn) toggleDirectionBtn.textContent = "Convert to PDF";
+    // Restore original labels
+    converterOptions.forEach((opt) => {
+      const src = opt.dataset.type;
+      opt.querySelector("span").textContent = `${getTypeDisplayName(
+        src
+      )} to PDF`;
+    });
     document.querySelector("#converter-step-3 .progress-bar").style.width =
       "0%";
     document.querySelector(
@@ -1121,9 +1372,9 @@ document.addEventListener("DOMContentLoaded", () => {
     jpgStep3.style.display = "none";
     jpgStep4.style.display = "none";
     selectedJpgFiles = [];
-    selectedJpgFilesContainer.innerHTML = "";
-    jpgPreviewContainer.innerHTML = "";
-    jpgContinueBtn.disabled = true;
+    if (selectedJpgFilesContainer) selectedJpgFilesContainer.innerHTML = "";
+    if (jpgPreviewContainer) jpgPreviewContainer.innerHTML = "";
+    if (jpgContinueBtn) jpgContinueBtn.disabled = true;
     jpgFileInput.value = "";
     jpgStep1Title.textContent = "Convert Image to JPG"; // Reset title
     document.querySelector("#jpg-step-3 .progress-bar").style.width = "0%";
