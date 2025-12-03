@@ -190,7 +190,7 @@
 #protect-submit-btn {
   background: #f32c0a;
   color: #fff;
-  margin-top: 8rem !important;
+  margin-top: 7rem !important;
 }
 #converter-modal {
   max-width: 700px !important;
@@ -430,7 +430,7 @@
 }
 
 .input-group {
-  margin-bottom: 1rem;
+  margin-top: 1rem;
   text-align: left;
 }
 

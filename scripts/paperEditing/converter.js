@@ -804,7 +804,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "select-protect-file-btn"
   );
   const protectFileInput = document.getElementById("protect-file-input");
-  const protectCancelBtn = document.getElementById("protect-cancel-btn");
+  // const protectCancelBtn = document.getElementById("protect-cancel-btn");
 
   const protectFileList = document.getElementById("protect-file-list");
   const protectAddMoreBtn = document.getElementById("protect-add-more-btn");
@@ -818,6 +818,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("pdf-password");
   const passwordConfirmInput = document.getElementById("pdf-password-confirm");
   const eyeToggles = document.querySelectorAll(".eye-toggle");
+
+  const passwordErrorEl = document.getElementById("pdf-password-error");
+  const passwordRequiredErrorEl = document.getElementById(
+    "pdf-password-required-error"
+  );
 
   let protectFiles = [];
   let protectedPdfBlobUrl = null; // Store the final file URL here
@@ -960,13 +965,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 4. Validation
   function validatePasswords() {
-    const p1 = passwordInput.value;
-    const p2 = passwordConfirmInput.value;
+    const p1 = passwordInput.value || "";
+    const p2 = passwordConfirmInput.value || "";
+
+    // Clear errors by default
+    if (passwordErrorEl) passwordErrorEl.style.display = "none";
+    if (passwordRequiredErrorEl) passwordRequiredErrorEl.style.display = "none";
+
+    // Required check for password (show only if user started typing in confirm)
+    if (!p1 && p2) {
+      if (passwordRequiredErrorEl) {
+        passwordRequiredErrorEl.textContent = "Password is required";
+        passwordRequiredErrorEl.style.display = "block";
+      }
+      protectSubmitBtn.disabled = true;
+      return;
+    }
+
+    // If both present and equal -> enable
     if (p1 && p2 && p1 === p2) {
       protectSubmitBtn.disabled = false;
-    } else {
-      protectSubmitBtn.disabled = true;
+      if (passwordErrorEl) passwordErrorEl.style.display = "none";
+      return;
     }
+
+    // If both present and not equal -> show mismatch
+    if (p1 && p2 && p1 !== p2) {
+      if (passwordErrorEl) {
+        passwordErrorEl.textContent = "Passwords do not match";
+        passwordErrorEl.style.display = "block";
+      }
+      protectSubmitBtn.disabled = true;
+      return;
+    }
+
+    // Default: disable submit
+    protectSubmitBtn.disabled = true;
   }
 
   passwordInput.addEventListener("input", validatePasswords);
@@ -1086,12 +1120,6 @@ document.addEventListener("DOMContentLoaded", () => {
       protectStep2.style.display = "block";
     }
   });
-
-  // 6. Navigation & Download
-  protectCancelBtn.addEventListener(
-    "click",
-    () => (protectModal.style.display = "none")
-  );
 
   protectBackStep1.addEventListener("click", () => {
     protectStep2.style.display = "none";

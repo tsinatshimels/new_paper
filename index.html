@@ -8400,11 +8400,6 @@
               Select PDF file
             </button>
           </div>
-          <div class="converter-actions">
-            <button id="protect-cancel-btn" class="converter-btn-secondary">
-              Cancel
-            </button>
-          </div>
         </div>
 
         <!-- Step 2: Configure Password (Split View) -->
@@ -8459,6 +8454,18 @@
                   </span>
                 </div>
               </div>
+              <p
+                id="pdf-password-required-error"
+                class="input-error"
+                style="
+                  display: none;
+                  color: #d9534f;
+                  font-size: 0.9rem;
+                  margin-top: 6px;
+                "
+              >
+                Password is required
+              </p>
 
               <div class="input-group">
                 <label>Repeat Password</label>
@@ -8483,11 +8490,18 @@
                   </span>
                 </div>
               </div>
+              <p
+                id="pdf-password-error"
+                class="input-error"
+                style="display: none; color: #d9534f; font-size: 0.9rem"
+              >
+                Passwords do not match
+              </p>
 
               <button
                 id="protect-submit-btn"
                 class="converter-btn"
-                style="width: 100%; margin-top: 20px"
+                style="width: 100%; margin-top: 18px"
                 disabled
               >
                 Protect PDF
