@@ -197,3 +197,206 @@
   background: #b42318;
   color: white;
 }
+/* Styling for the Limit Message */
+.preview-limit-message {
+  text-align: center;
+  padding: 2rem 0;
+  width: 100%;
+  margin-top: 1rem;
+  color: #667085; /* Gray color */
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.preview-limit-message p {
+  background: #f9fafb;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #eaecf0;
+}
+
+/* Ensure the Overlay covers the editor area properly */
+#preview-overlay {
+  position: absolute; /* or fixed depending on layout */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f2f4f7; /* Match your app background */
+  z-index: 100; /* Higher than main editor */
+  display: none; /* Hidden by default */
+  overflow-y: auto; /* Allow scrolling for the preview paper */
+  scrollbar-width: none;
+}
+
+/* Center the preview paper */
+#overlay_paper_lists {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 50px;
+}
+
+/* Container for the whole preview to allow positioning */
+#overlay_paper_lists {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  padding-bottom: 60px;
+}
+
+/* The Paper in Preview Mode */
+.preview-mode-paper {
+  margin-top: 8rem !important;
+  /* Ensure paper stays centered */
+  max-width: 700px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 1. THE FOOTER (Access Limited) --- */
+.preview-footer-limit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  color: #667085;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+#preview-overlay .main_header {
+  position: fixed;
+  z-index: 9;
+  width: 100%;
+}
+#preview-overlay .tools_navbar--header {
+  border-radius: none;
+  position: fixed;
+  top: 55px;
+  z-index: 9;
+  width: 100%;
+}
+.preview-footer-limit div {
+  display: flex;
+  gap: 5px;
+}
+
+.preview-footer-limit svg {
+  width: 20px;
+  height: 20px;
+  fill: #667085;
+}
+
+/* --- 2. THE RIGHT SIDEBAR (Profile & Actions) --- */
+.preview-info-sidebar {
+  position: fixed; /* Keeps it visible while scrolling paper */
+  top: 125px; /* Adjust based on your header height */
+  right: 20px;
+  width: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eaecf0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.preview-info-sidebar img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  object-fit: cover;
+}
+
+.preview-info-sidebar .req-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #101828;
+  margin-bottom: 4px;
+}
+
+.preview-info-sidebar .req-message {
+  font-size: 0.9rem;
+  color: #667085;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.preview-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.preview-btn:hover {
+  opacity: 0.9;
+}
+
+.btn-accept-preview {
+  background-color: #12b76a; /* Green */
+  color: white;
+}
+
+.btn-reject-preview {
+  background-color: #f04438; /* Red */
+  color: white;
+}
+.preview-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.only-view {
+  background: #f6f6f6;
+  border-radius: 20px;
+  color: #667085;
+  display: flex;
+  gap: 5px;
+  padding: 8px 16px;
+}
+.preview-mode-paper {
+  width: 700px !important;
+}
+#preview-overlay .paper_info {
+  border-right: 1px solid #eaecf0;
+  /* height: 20px; */
+}
+/* Hide sidebar on small screens if necessary */
+@media (max-width: 1100px) {
+  .preview-info-sidebar {
+    position: static;
+    margin: 20px auto;
+    width: 700px; /* Match paper width */
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .preview-info-sidebar img {
+    margin-bottom: 0;
+    margin-right: 15px;
+  }
+  .preview-actions {
+    width: auto;
+  }
+}
