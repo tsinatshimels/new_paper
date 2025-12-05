@@ -162,6 +162,7 @@
     <link rel="stylesheet" href="./css/paper_editing/converter.css" />
     <link rel="stylesheet" href="./css/paper_editing/grammar.css" />
     <link rel="stylesheet" href="./css/paper_editing/paraphrase.css" />
+    <link rel="stylesheet" href="./css/paper_editing/template.css" />
 
     <!-- share modal style -->
     <link rel="stylesheet" href="./css/share.modal.css" />
@@ -1281,7 +1282,7 @@
                     </ul>
                   </button>
 
-                  <button class="toolbar_direct--btn">
+                  <button class="toolbar_direct--btn" id="showTemplateModal">
                     <span>Templates</span>
                   </button>
 
@@ -4437,7 +4438,7 @@
               </svg>
             </div>
           </div>
-          <button class="toolbar_direct--btn" id="show_file_option_dropdown">
+          <button class="toolbar_direct--btn">
             <span> File </span>
           </button>
 
@@ -8717,6 +8718,199 @@
       </div>
     </div>
 
+    <!-- Doc Studio Template modal -->
+
+    <div id="ds-modal-overlay" class="ds-modal-overlay">
+      <div class="ds-modal">
+        <!-- Modal Header -->
+        <div class="ds-header">
+          <div class="ds-header-left">
+            <h2>Docs Studio</h2>
+            <div class="ds-search-wrapper">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" placeholder="Search templates..." />
+            </div>
+          </div>
+          <div class="ds-header-right">
+            <button class="ds-btn ds-btn-primary">+ New from Template</button>
+            <button class="ds-btn ds-btn-outline">Upload Template</button>
+            <button id="closeModalBtn" class="ds-close-icon">&times;</button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="ds-body">
+          <!-- Sidebar -->
+          <aside class="ds-sidebar">
+            <div class="ds-sidebar-section">
+              <h3>Categories</h3>
+              <ul class="ds-nav-list">
+                <li><span>Letters</span> <span class="ds-count">2</span></li>
+                <li><span>Reports</span> <span class="ds-count">3</span></li>
+                <li><span>Resumes</span> <span class="ds-count">4</span></li>
+                <li><span>Invoices</span> <span class="ds-count">1</span></li>
+              </ul>
+            </div>
+
+            <div class="ds-sidebar-section">
+              <h3>Sort by</h3>
+              <div class="ds-select-wrapper">
+                <select>
+                  <option>Most popular</option>
+                  <option>Newest</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="ds-sidebar-section">
+              <h3>Tags</h3>
+              <label class="ds-checkbox"
+                ><input type="checkbox" /> <span>Modern</span></label
+              >
+              <label class="ds-checkbox"
+                ><input type="checkbox" /> <span>Formal</span></label
+              >
+              <label class="ds-checkbox"
+                ><input type="checkbox" /> <span>Creative</span></label
+              >
+            </div>
+          </aside>
+
+          <!-- Main Content -->
+          <main class="ds-main">
+            <!-- Tabs -->
+            <div class="ds-tabs">
+              <a href="#" class="active">All</a>
+              <a href="#">Letters</a>
+              <a href="#">Reports</a>
+              <a href="#">Resumes</a>
+              <a href="#">Proposals</a>
+              <a href="#">Invoices</a>
+            </div>
+
+            <!-- Grid -->
+            <div class="ds-grid">
+              <!-- Card 1: Resume -->
+              <div class="ds-card">
+                <div class="ds-card-thumb">
+                  <!-- CSS Drawing for placeholder -->
+                  <div class="ds-skeleton-doc">
+                    <div class="ds-sk-circle"></div>
+                    <div class="ds-sk-line lg"></div>
+                    <div class="ds-sk-line md"></div>
+                    <div class="ds-sk-line sm"></div>
+                  </div>
+                </div>
+                <div class="ds-card-content">
+                  <h4>Modern Resume</h4>
+                  <p>Two-column, sleek layout with side profile bar</p>
+                  <div class="ds-tags-row">
+                    <span class="ds-tag">Formal</span>
+                    <span class="ds-tag">1-page</span>
+                  </div>
+                  <div class="ds-card-actions">
+                    <button class="ds-btn ds-btn-primary small">Use</button>
+                    <button class="ds-btn ds-btn-soft small">Preview</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Cover Letter -->
+              <div class="ds-card">
+                <div class="ds-card-thumb">
+                  <div class="ds-skeleton-doc center-align">
+                    <div class="ds-sk-line sm center"></div>
+                    <div class="ds-sk-line lg"></div>
+                    <div class="ds-sk-line lg"></div>
+                    <div class="ds-sk-line md"></div>
+                  </div>
+                </div>
+                <div class="ds-card-content">
+                  <h4>Cover Letter</h4>
+                  <p>Professional layout with signature line</p>
+                  <div class="ds-tags-row">
+                    <span class="ds-tag">Formal</span>
+                  </div>
+                  <div class="ds-card-actions">
+                    <!-- Spacer to push button right -->
+                    <div style="flex: 1"></div>
+                    <button class="ds-btn ds-btn-soft small">Preview</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Research Report -->
+              <div class="ds-card">
+                <div class="ds-card-thumb">
+                  <div class="ds-skeleton-doc">
+                    <div class="ds-sk-box"></div>
+                    <div class="ds-sk-line md"></div>
+                    <div class="ds-sk-chart">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="ds-card-content">
+                  <h4>Research Report</h4>
+                  <p>Includes TDC, references, and data sections</p>
+                  <div class="ds-tags-row">
+                    <span class="ds-tag">Formal</span>
+                    <span class="ds-tag">2-pages</span>
+                  </div>
+                  <div class="ds-card-actions">
+                    <button class="ds-btn ds-btn-primary small">Use</button>
+                    <button class="ds-btn ds-btn-soft small">Preview</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 4: Invoice -->
+              <div class="ds-card">
+                <div class="ds-card-thumb">
+                  <div class="ds-skeleton-doc">
+                    <div class="ds-sk-line sm"></div>
+                    <div class="ds-sk-line lg"></div>
+                    <div class="ds-sk-table"></div>
+                  </div>
+                </div>
+                <div class="ds-card-content">
+                  <h4>Invoice</h4>
+                  <p>Simple and clean, including invoice table</p>
+                  <div class="ds-card-actions">
+                    <!-- Spacer -->
+                  </div>
+                </div>
+              </div>
+              <!-- Card 5: Business Letter -->
+              <div class="ds-card">
+                <div class="ds-card-thumb">
+                  <div class="ds-skeleton-doc">
+                    <div class="ds-sk-line sm"></div>
+                    <div class="ds-sk-line lg"></div>
+                    <div class="ds-sk-line lg"></div>
+                  </div>
+                </div>
+                <div class="ds-card-content">
+                  <h4>Business Letter</h4>
+                  <p>Standard business letter format</p>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
     <!-- External Scripts -->
     <!-- External Scripts -->
     <!-- External Scripts -->
@@ -8761,7 +8955,7 @@
 
     <!-- Global scripts -->
     <script>
-      const HIDDEN = 'paper-editing';
+      const HIDDEN = 'paper-editing'
     </script>
     <!-- 1. SheetJS (for CSV, XLS, XLSX) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -8778,7 +8972,7 @@
     <script>
       // Set the worker source (Required for PDF.js to work)
       pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
     </script>
     <!-- font -->
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
@@ -8931,6 +9125,7 @@
     <script src="/scripts/paperEditing/converter.js"></script>
     <script src="/scripts/paperEditing/grammar.js"></script>
     <script src="/scripts/paperEditing/paraphrase.js"></script>
+    <script src="/scripts/paperEditing/template.js"></script>
 
     <!-- share Modal -->
     <script src="/scripts/shareModal.js"></script>

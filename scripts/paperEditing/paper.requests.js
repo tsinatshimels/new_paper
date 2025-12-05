@@ -1,9 +1,9 @@
 // DOM ELEMENTS
-const requestDropdown = document.getElementById('requestDropdown');
-const requestToggle = document.getElementById('paperRequestsBtn');
-const wrapper = document.getElementById('paperRequests');
-const requestCountBadge = document.querySelector('.request_count span');
-const requestHoverText = document.querySelector('.request_hover');
+const requestDropdown = document.getElementById('requestDropdown')
+const requestToggle = document.getElementById('paperRequestsBtn')
+const wrapper = document.getElementById('paperRequests')
+const requestCountBadge = document.querySelector('.request_count span')
+const requestHoverText = document.querySelector('.request_hover')
 
 // SAMPLE DATA
 const requests = [
@@ -67,13 +67,13 @@ const requests = [
     message:
       'Isabella is inviting you to a new paper: “Literature Review on Modern Poetry…”',
   },
-];
+]
 
 // Generate a random profile image
 function randomProfile() {
-  const gender = Math.random() > 0.5 ? 'men' : 'women';
-  const id = Math.floor(Math.random() * 100);
-  return `https://randomuser.me/api/portraits/${gender}/${id}.jpg`;
+  const gender = Math.random() > 0.5 ? 'men' : 'women'
+  const id = Math.floor(Math.random() * 100)
+  return `https://randomuser.me/api/portraits/${gender}/${id}.jpg`
 }
 
 // ---------------------------------------------------------
@@ -81,14 +81,14 @@ function randomProfile() {
 // ---------------------------------------------------------
 
 function updateRequestCount() {
-  const count = requests.length;
-  requestCountBadge.textContent = count;
-  requestHoverText.innerHTML = `You have ${count} new requests <span class="request-clip"></span>`;
+  const count = requests.length
+  requestCountBadge.textContent = count
+  requestHoverText.innerHTML = `You have ${count} new requests <span class="request-clip"></span>`
 }
 
 function renderRequests() {
-  const isHidden = requestDropdown.classList.contains('request-hidden');
-  updateRequestCount();
+  const isHidden = requestDropdown.classList.contains('request-hidden')
+  updateRequestCount()
 
   // Header
   requestDropdown.innerHTML = `
@@ -101,21 +101,21 @@ function renderRequests() {
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#667085" d="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></svg>
       </div>
     </div>
-  `;
+  `
 
   // Close Btn inside Header
   requestDropdown
     .querySelector('#closeDropdownBtn')
     .addEventListener('click', (e) => {
-      e.stopPropagation();
-      requestDropdown.classList.add('request-hidden');
-    });
+      e.stopPropagation()
+      requestDropdown.classList.add('request-hidden')
+    })
 
   // List Items
   requests.forEach((req) => {
-    const item = document.createElement('div');
-    item.className = 'request_item';
-    item.dataset.id = req.id;
+    const item = document.createElement('div')
+    item.className = 'request_item'
+    item.dataset.id = req.id
 
     item.innerHTML = `
       <div class="profile"><img src="${req.img}"></div>
@@ -131,23 +131,23 @@ function renderRequests() {
         <button class="accept">✔</button>
         <button class="decline">✕</button>
       </div>
-    `;
+    `
 
     // List Item Accept
     item.querySelector('.accept').addEventListener('click', (e) => {
-      e.stopPropagation();
-      removeRequest(req.id);
-    });
+      e.stopPropagation()
+      removeRequest(req.id)
+    })
     // List Item Decline
     item.querySelector('.decline').addEventListener('click', (e) => {
-      e.stopPropagation();
-      removeRequest(req.id);
-    });
+      e.stopPropagation()
+      removeRequest(req.id)
+    })
 
-    requestDropdown.appendChild(item);
-  });
+    requestDropdown.appendChild(item)
+  })
 
-  if (isHidden) requestDropdown.classList.add('request-hidden');
+  if (isHidden) requestDropdown.classList.add('request-hidden')
 }
 
 // ---------------------------------------------------------
@@ -155,19 +155,19 @@ function renderRequests() {
 // ---------------------------------------------------------
 
 requestToggle.addEventListener('click', (e) => {
-  e.stopPropagation();
-  requestDropdown.classList.toggle('request-hidden');
-});
+  e.stopPropagation()
+  requestDropdown.classList.toggle('request-hidden')
+})
 
 // Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
   // If clicking Toggle or Inside Dropdown, do not close
   if (requestToggle.contains(e.target) || requestDropdown.contains(e.target))
-    return;
+    return
 
   // Otherwise close
-  requestDropdown.classList.add('request-hidden');
-});
+  requestDropdown.classList.add('request-hidden')
+})
 
 // ---------------------------------------------------------
 // 3. PREVIEW & MODAL LOGIC (Global Scope)
@@ -175,28 +175,28 @@ document.addEventListener('click', (e) => {
 
 // Delegate click for PREVIEW buttons inside the dropdown
 requestDropdown.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.request-preview-btn');
-  if (!btn) return;
-  e.stopPropagation();
+  const btn = e.target.closest('.request-preview-btn')
+  if (!btn) return
+  e.stopPropagation()
   btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    requestDropdown.classList.add('request-hidden');
-  });
+    e.stopPropagation()
+    requestDropdown.classList.add('request-hidden')
+  })
 
   // 1. Close the dropdown so we can see the modal
-  requestDropdown.classList.add('request-hidden');
+  requestDropdown.classList.add('request-hidden')
 
   // 2. Get Data
-  const item = btn.closest('.request_item');
-  const reqId = parseInt(item.dataset.id);
-  const reqData = requests.find((r) => r.id === reqId);
+  const item = btn.closest('.request_item')
+  const reqId = parseInt(item.dataset.id)
+  const reqData = requests.find((r) => r.id === reqId)
 
   // (Optional: fetch real content here)
-  const paperHtml = ''; // Use empty to trigger default text for now
+  const paperHtml = '' // Use empty to trigger default text for now
 
   // 3. Open Modal
-  openPreviewModal(paperHtml, reqData);
-});
+  openPreviewModal(paperHtml, reqData)
+})
 
 // ... existing code ...
 
@@ -204,21 +204,21 @@ requestDropdown.addEventListener('click', async (e) => {
 // OPEN PREVIEW MODAL LOGIC
 // ---------------------------------------------------------
 function openPreviewModal(htmlContent, reqData) {
-  const overlayContainer = document.getElementById('overlay_paper_lists');
-  const overlay = document.getElementById('preview-overlay');
+  const overlayContainer = document.getElementById('overlay_paper_lists')
+  const overlay = document.getElementById('preview-overlay')
   // close the dropdown if it's open
 
-  if (!overlay || !overlayContainer) return;
+  if (!overlay || !overlayContainer) return
 
   // 1. SWITCH TO VIEWER MODE
-  if (window.setPaperMode) window.setPaperMode('viewer');
+  if (window.setPaperMode) window.setPaperMode('viewer')
 
   // 2. Clear previous content
-  overlayContainer.innerHTML = '';
+  overlayContainer.innerHTML = ''
 
   // 3. GENERATE PAPER CONTENT (Center)
-  const paperWrapper = document.createElement('div');
-  paperWrapper.className = 'paper paper-editor preview-mode-paper';
+  const paperWrapper = document.createElement('div')
+  paperWrapper.className = 'paper paper-editor preview-mode-paper'
 
   // Inject Paper HTML
   paperWrapper.innerHTML = `
@@ -239,11 +239,11 @@ function openPreviewModal(htmlContent, reqData) {
               }
           </div>
       </div>
-  `;
+  `
 
   // 4. GENERATE FOOTER (Access Limited + Eye Icon)
-  const footerDiv = document.createElement('div');
-  footerDiv.className = 'preview-footer-limit';
+  const footerDiv = document.createElement('div')
+  footerDiv.className = 'preview-footer-limit'
   footerDiv.innerHTML = `
     <!-- Closed Eye SVG -->
     <div>
@@ -253,59 +253,59 @@ function openPreviewModal(htmlContent, reqData) {
     <div>
     <span>Accept invite request to get full access</span>
     </div>
-  `;
+  `
 
   // 5. GENERATE RIGHT SIDEBAR (Profile Info & Buttons)
   // We use reqData passed from the click event
-  const sidebarDiv = document.createElement('div');
-  sidebarDiv.className = 'preview-info-sidebar';
+  const sidebarDiv = document.createElement('div')
+  sidebarDiv.className = 'preview-info-sidebar'
   sidebarDiv.innerHTML = `
     <img src="${reqData.img}" alt="User Profile">
-    <div class="req-title">${reqData.title}</div>
+    <div class="req-title">${reqData.title} <span>${reqData.time}</span></div>
     <div class="req-message">${reqData.message}</div>
     
     <div class="preview-actions">
         <button class="preview-btn btn-accept-preview">Accept</button>
         <button class="preview-btn btn-reject-preview">Reject</button>
     </div>
-  `;
+  `
 
   // 6. APPEND ELEMENTS TO CONTAINER
-  overlayContainer.appendChild(sidebarDiv); // Sidebar first (z-index handles layering)
-  overlayContainer.appendChild(paperWrapper);
-  overlayContainer.appendChild(footerDiv);
+  overlayContainer.appendChild(sidebarDiv) // Sidebar first (z-index handles layering)
+  overlayContainer.appendChild(paperWrapper)
+  overlayContainer.appendChild(footerDiv)
 
   // 7. SHOW OVERLAY
-  overlay.style.display = 'block';
+  overlay.style.display = 'block'
 
   // 8. ATTACH EVENT LISTENERS (Accept/Reject)
 
   // Accept Logic
-  const acceptBtn = sidebarDiv.querySelector('.btn-accept-preview');
+  const acceptBtn = sidebarDiv.querySelector('.btn-accept-preview')
   acceptBtn.addEventListener('click', () => {
-    removeRequest(reqData.id); // Remove from list
-    closePreviewModal(); // Close modal & return to editor
-  });
+    removeRequest(reqData.id) // Remove from list
+    closePreviewModal() // Close modal & return to editor
+  })
 
   // Reject Logic
-  const rejectBtn = sidebarDiv.querySelector('.btn-reject-preview');
+  const rejectBtn = sidebarDiv.querySelector('.btn-reject-preview')
   rejectBtn.addEventListener('click', () => {
-    removeRequest(reqData.id); // Remove from list
-    closePreviewModal(); // Close modal & return to editor
-  });
+    removeRequest(reqData.id) // Remove from list
+    closePreviewModal() // Close modal & return to editor
+  })
 }
 
 // ... existing removeRequest and renderRequests ...
 
 function closePreviewModal() {
-  const overlay = document.getElementById('preview-overlay');
-  const container = document.getElementById('overlay_paper_lists');
+  const overlay = document.getElementById('preview-overlay')
+  const container = document.getElementById('overlay_paper_lists')
 
-  if (overlay) overlay.style.display = 'none';
-  if (container) container.innerHTML = '';
+  if (overlay) overlay.style.display = 'none'
+  if (container) container.innerHTML = ''
 
   // REVERT TO EDITOR MODE
-  if (window.setPaperMode) window.setPaperMode('editor');
+  if (window.setPaperMode) window.setPaperMode('editor')
 }
 
 // ---------------------------------------------------------
@@ -313,19 +313,19 @@ function closePreviewModal() {
 // ---------------------------------------------------------
 
 function removeRequest(id) {
-  const index = requests.findIndex((r) => r.id === id);
+  const index = requests.findIndex((r) => r.id === id)
   if (index !== -1) {
     // 1. Fade out the item in the dropdown
-    const el = document.querySelector(`.request_item[data-id="${id}"]`);
-    if (el) el.classList.add('fade_out');
+    const el = document.querySelector(`.request_item[data-id="${id}"]`)
+    if (el) el.classList.add('fade_out')
 
     // 2. Wait for animation then remove data
     setTimeout(() => {
-      requests.splice(index, 1);
-      renderRequests(); // Re-render list
-    }, 300);
+      requests.splice(index, 1)
+      renderRequests() // Re-render list
+    }, 300)
   }
 }
 
 // Initial Render
-renderRequests();
+renderRequests()

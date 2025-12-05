@@ -297,7 +297,7 @@
   position: fixed; /* Keeps it visible while scrolling paper */
   top: 125px; /* Adjust based on your header height */
   right: 20px;
-  width: 300px;
+  max-width: 400px;
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -306,28 +306,31 @@
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  align-items: center;
+
   text-align: center;
 }
 
 .preview-info-sidebar img {
-  width: 60px;
-  height: 60px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   margin-bottom: 12px;
   object-fit: cover;
 }
 
 .preview-info-sidebar .req-title {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #101828;
   margin-bottom: 4px;
 }
+.preview-info-sidebar .req-title span {
+  color: #667085;
+}
 
 .preview-info-sidebar .req-message {
-  font-size: 0.9rem;
-  color: #667085;
+  font-size: 1rem;
+  color: #000;
   margin-bottom: 20px;
   line-height: 1.4;
 }
